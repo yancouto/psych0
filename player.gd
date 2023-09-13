@@ -1,13 +1,13 @@
 extends Area2D
 signal hit
 
-@export var speed = 400
+@export var speed := 400
 var screen_size
 
 func _ready():
 	screen_size = get_viewport_rect().size
 	position = screen_size / 2
-	
+
 func _process(delta):
 	var vel = Vector2.ZERO
 	if Input.is_action_pressed("move_down"):
@@ -24,7 +24,6 @@ func start(pos):
 	position = pos
 	show()
 	$CollisionShape2D.disabled = false
-
 
 func _on_area_entered(area):
 	print("IVE BEEEN HIT")

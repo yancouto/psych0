@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://wyi8ts15lueo"]
+
+[ext_resource type="Script" path="res://runner.gd" id="1_224jk"]
+[ext_resource type="PackedScene" uid="uid://dwqfguj644qf2" path="res://player.tscn" id="2_1y6tv"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_kjhy5"]
+font_size = 100
+
+[node name="Level Runner" type="Node2D"]
+script = ExtResource("1_224jk")
+
+[node name="Player" parent="." instance=ExtResource("2_1y6tv")]
+
+[node name="LevelOverText" type="Label" parent="."]
+visible = false
+offset_left = 536.0
+offset_top = 96.0
+offset_right = 1030.0
+offset_bottom = 264.0
+text = "Level over"
+label_settings = SubResource("LabelSettings_kjhy5")
