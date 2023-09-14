@@ -19,3 +19,5 @@ offset_right = 1030.0
 offset_bottom = 264.0
 text = "Level over"
 label_settings = SubResource("LabelSettings_kjhy5")
+
+[node name="AllEnemies" type="Node" parent="."]

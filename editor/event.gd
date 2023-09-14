@@ -9,7 +9,8 @@ class Wait extends Event:
 		return secs <= 0
 
 class WaitUntilNoEnemies extends Event:
-	pass
+	func trigger(root: Node, _dt: float) -> bool:
+		return root.get_child_count() == 0
 
 class Spawn extends Event:
 	var formation: Formation

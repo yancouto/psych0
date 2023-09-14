@@ -11,7 +11,7 @@ class Single extends Formation:
 		radius = r
 	func trigger(root: Node, dt: float) -> bool:
 		var enemy = preload("res://enemy.tscn").instantiate()
-		# TODO: set radius
+		enemy.radius = radius
 		enemy.start(pos, speed)
 		root.add_child(enemy)
 		return true
