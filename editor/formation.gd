@@ -9,13 +9,10 @@ class Single extends Formation:
 		pos = p
 		speed = s
 		radius = r
-	func trigger(root: Node, dt: float) -> bool:
-		var enemy = preload("res://enemy.tscn").instantiate()
-		enemy.radius = radius
-		enemy.start(pos, speed)
-		root.add_child(enemy)
-		return true
+	func raw_enemies() -> Array[LevelEvent.EnemyToSpawn]:
+		return [LevelEvent.EnemyToSpawn.new(radius, pos, speed)]
 
-func trigger(_root: Node, _dt: float) -> bool:
+# All enemies that should be spawned at exactly the same time
+func raw_enemies() -> Array[LevelEvent.EnemyToSpawn]:
 	assert(false)
-	return false
+	return []

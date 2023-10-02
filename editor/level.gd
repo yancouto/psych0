@@ -1,21 +1,12 @@
 class_name Level
 
-static var W = 1600
-static var H = 900
-
-var events: Array[Event] = []
+var events: Array[LevelEvent.EventWithDelta] = []
 var cur_event: int = 0
 
-func wait_until_no_enemies() -> void:
-	events.append(Event.WaitUntilNoEnemies.new())
+func _init(events: Array[LevelEvent.EventWithDelta]):
+	self.events = events
 
-func wait(secs: float) -> void:
-	events.append(Event.Wait.new(secs))
-
-func spawn(f: Formation) -> void:
-	events.append(Event.Spawn.new(f))
-
-func next_event() -> Event:
+func next_event() -> LevelEvent.EventWithDelta:
 	if cur_event == events.size():
 		return null
 	else:

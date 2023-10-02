@@ -1,8 +1,8 @@
 extends Node
 
 # Level to run, let's start by hardcoding 1
-var level: Level = preload("res://levels/level1.gd").new()
-var next_event: Event
+var level: Level = preload("res://levels/level1.gd").new().build()
+var next_event: LevelEvent.EventWithDelta
 
 func _ready() -> void:
 	next_event = level.next_event()

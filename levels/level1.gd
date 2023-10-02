@@ -1,4 +1,4 @@
-extends Level
+extends LevelBuilder
 
 func _init():
 	const r = 25
