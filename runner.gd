@@ -8,7 +8,7 @@ func _ready() -> void:
 	next_event = level.next_event()
 
 func _process(dt: float) -> void:
-	if next_event != null && next_event.trigger($AllEnemies, dt):
+	while next_event != null && next_event.trigger($AllEnemies, dt):
 		next_event = level.next_event()
 	if next_event == null:
 		$LevelOverText.visible = true
