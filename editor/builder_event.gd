@@ -54,6 +54,14 @@ func move_next_to_screen(cur_time: LevelTime, enemy: EnemyToSpawn) -> EnemyWithT
 	enemy.pos += enemy.speed * time_to_screen
 	return EnemyWithTime.new(enemy, time)
 
+# Assumes enemy is already compressed next to screen
+func enemy_to_indicator(enemy: EnemyToSpawn) -> IndicatorToSpawn:
+	const margin := 10
+	var center = enemy.pos.clamp(Vector2(margin, margin), Vector2(LevelBuilder.W - margin, LevelBuilder.H - margin))
+	return IndicatorToSpawn.new(center, enemy.speed.angle())
+
+const INDICATOR_TIME := 2.0
+
 class Spawn extends BuilderEvent:
 	var formation: Formation
 	func _init(f: Formation):
@@ -66,8 +74,8 @@ class Spawn extends BuilderEvent:
 		var enemies: Array[EnemyWithTime]
 		enemies.assign(raw_enemies.map(func(e): return move_next_to_screen(cur_time, e)))
 		enemies.sort_custom(func(a: EnemyWithTime, b: EnemyWithTime): return a.time.lt(b.time))
-		if enemies.is_empty():
-			return []
+		# Dummy sentinel at the end so the algorithm below doesn't need special casing
+		enemies.append(EnemyWithTime.new(EnemyToSpawn.new(0, Vector2(0, 0), Vector2(0, 0)), LevelTime.new(1e9, INF)))
 		var events: Array[EventWithTime] = []
 		var last_enemies: Array[EnemyToSpawn] = []
 		var last_time := enemies[0].time
@@ -76,9 +84,13 @@ class Spawn extends BuilderEvent:
 				last_enemies.append(enemy.enemy)
 			else:
 				events.append(EventWithTime.new(LevelEvent.Spawn.new(last_enemies), last_time))
+				var ind_time = last_time.clone()
+				ind_time.secs_after -= INDICATOR_TIME
+				var indicators: Array[IndicatorToSpawn]
+				indicators.assign(last_enemies.map(enemy_to_indicator))
+				events.append(EventWithTime.new(LevelEvent.Indicator.new(indicators, INDICATOR_TIME), ind_time))
 				last_time = enemy.time
 				last_enemies = [enemy.enemy]
-		events.append(EventWithTime.new(LevelEvent.Spawn.new(last_enemies), last_time))
 		return events
 
 func process_and_update_time(cur_time: LevelTime) -> Array[EventWithTime]:

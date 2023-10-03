@@ -98,8 +98,14 @@ class Indicator extends LevelEvent:
 	func _init(to_spawn: Array[IndicatorToSpawn], duration: float):
 		self.to_spawn = to_spawn
 		self.duration = duration
+	func trigger(root: Node) -> bool:
+		const Indicator = preload("res://indicator.tscn")
+		for ind_to_spawn in to_spawn:
+			var indicator = Indicator.instantiate()
+			indicator.start(ind_to_spawn, self.duration)
+			root.add_child(indicator)
+		return true
 
 func trigger(_root: Node) -> bool:
-	# must be implemented
-	assert(false)
+	assert(false, "Must be implemented by all subclasses")
 	return false
