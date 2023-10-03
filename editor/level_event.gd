@@ -34,6 +34,8 @@ class LevelTime:
 			return self.secs_after < other.secs_after
 		else:
 			return self.wait_until_no_enemies < other.wait_until_no_enemies
+	func eq(other: LevelTime) -> bool:
+		return self.wait_until_no_enemies == other.wait_until_no_enemies && is_equal_approx(self.secs_after, other.secs_after)
 
 class EventWithTime:
 	var event: LevelEvent
@@ -68,6 +70,14 @@ class EnemyToSpawn:
 		enemy.start(pos, speed)
 		root.add_child(enemy)
 
+class IndicatorToSpawn:
+	# On the edge of the screen
+	var center: Vector2
+	var angle: float
+	func _init(center: Vector2, angle: float):
+		self.center = center
+		self.angle = angle
+
 # Does nothing, just added in the end always, so we can wait for no enemies
 class LastEvent extends LevelEvent:
 	func trigger(root: Node) -> bool:
@@ -81,6 +91,13 @@ class Spawn extends LevelEvent:
 		for enemy in to_spawn:
 			enemy.spawn(root)
 		return true
+
+class Indicator extends LevelEvent:
+	var to_spawn: Array[IndicatorToSpawn]
+	var duration: float
+	func _init(to_spawn: Array[IndicatorToSpawn], duration: float):
+		self.to_spawn = to_spawn
+		self.duration = duration
 
 func trigger(_root: Node) -> bool:
 	# must be implemented

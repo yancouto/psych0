@@ -1,5 +1,7 @@
 class_name Formation
 
+const EnemyToSpawn = LevelEvent.EnemyToSpawn
+
 class Single extends Formation:
 	#var enemy: String
 	var pos: Vector2
@@ -9,15 +11,15 @@ class Single extends Formation:
 		pos = p
 		speed = s
 		radius = r
-	func raw_enemies() -> Array[LevelEvent.EnemyToSpawn]:
-		return [LevelEvent.EnemyToSpawn.new(radius, pos, speed)]
+	func raw_enemies() -> Array[EnemyToSpawn]:
+		return [EnemyToSpawn.new(radius, pos, speed)]
 
 class Circle extends Formation:
 	var amount: int
 	func _init(amount: int):
 		self.amount = amount
-	func raw_enemies() -> Array[LevelEvent.EnemyToSpawn]:
-		var enemies: Array[LevelEvent.EnemyToSpawn] = []
+	func raw_enemies() -> Array[EnemyToSpawn]:
+		var enemies: Array[EnemyToSpawn] = []
 		var n := self.amount
 		enemies.resize(n)
 		var center := Vector2(LevelBuilder.W / 2.0, LevelBuilder.H / 2.0)
@@ -28,10 +30,10 @@ class Circle extends Formation:
 			var angle := Vector2(0, -1).rotated(i * (TAU / n))
 			var pos := center + angle * circle_radius
 			var speed := -angle * speed_len
-			enemies[i] = LevelEvent.EnemyToSpawn.new(enemy_radius, pos, speed)
+			enemies[i] = EnemyToSpawn.new(enemy_radius, pos, speed)
 		return enemies
 
 # All enemies that should be spawned at exactly the same time
-func raw_enemies() -> Array[LevelEvent.EnemyToSpawn]:
+func raw_enemies() -> Array[EnemyToSpawn]:
 	assert(false)
 	return []
