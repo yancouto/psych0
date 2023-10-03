@@ -29,6 +29,11 @@ class LevelTime:
 		else:
 			assert(self.wait_until_no_enemies == other.wait_until_no_enemies)
 			return LevelTimeDelta.new(0, self.secs_after - other.secs_after)
+	func lt(other: LevelTime) -> bool:
+		if self.wait_until_no_enemies == other.wait_until_no_enemies:
+			return self.secs_after < other.secs_after
+		else:
+			return self.wait_until_no_enemies < other.wait_until_no_enemies
 
 class EventWithTime:
 	var event: LevelEvent
