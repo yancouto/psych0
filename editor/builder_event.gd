@@ -16,6 +16,7 @@ class Wait extends BuilderEvent:
 class WaitUntilNoEnemies extends BuilderEvent:
 	func process_and_update_time(cur_time: LevelTime) -> Array[EventWithTime]:
 		cur_time.wait_until_no_enemies += 1
+		cur_time.secs_after = 0
 		return []
 
 # In 1D, when will segment s1 intersect segment s2 if it moves with speed speed

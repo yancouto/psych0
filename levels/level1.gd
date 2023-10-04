@@ -17,3 +17,9 @@ func _init():
 	spawn(F.Circle.new(2, -screen_angle, 400))
 	spawn(F.Circle.new(2, screen_angle, 400))
 	wait_until_no_enemies()
+	
+	wait(2)
+	spawn(F.HorizontalLine.new(10, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Distribute.new()))
+	wait(1)
+	spawn(F.HorizontalLine.new(12, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.Distribute.new(), 400, 30))
+	wait_until_no_enemies()
