@@ -9,9 +9,6 @@ class Wait extends BuilderEvent:
 	var secs: float
 	func _init(t: float):
 		secs = t
-	func trigger(root: Node, dt: float) -> bool:
-		secs -= dt
-		return secs <= 0
 	func process_and_update_time(cur_time: LevelTime) -> Array[EventWithTime]:
 		cur_time.secs_after += secs
 		return []
@@ -20,8 +17,6 @@ class WaitUntilNoEnemies extends BuilderEvent:
 	func process_and_update_time(cur_time: LevelTime) -> Array[EventWithTime]:
 		cur_time.wait_until_no_enemies += 1
 		return []
-	func trigger(root: Node, _dt: float) -> bool:
-		return root.get_child_count() == 0
 
 # In 1D, when will segment s1 intersect segment s2 if it moves with speed speed
 func intersect_axis(s1l: float, s1r: float, s2l: float, s2r: float, speed: float) -> float:
@@ -66,8 +61,6 @@ class Spawn extends BuilderEvent:
 	var formation: Formation
 	func _init(f: Formation):
 		formation = f
-	func trigger(root: Node, dt: float) -> bool:
-		return formation.trigger(root, dt)
 	func process_and_update_time(cur_time: LevelTime) -> Array[EventWithTime]:
 		var raw_enemies := formation.raw_enemies()
 		# TODO: Create indicators
