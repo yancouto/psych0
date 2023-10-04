@@ -16,8 +16,10 @@ class Single extends Formation:
 
 class Circle extends Formation:
 	var amount: int
-	func _init(amount: int):
+	var starting_angle: float
+	func _init(amount: int, starting_angle: float = 0):
 		self.amount = amount
+		self.starting_angle = starting_angle
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		var enemies: Array[EnemyToSpawn] = []
 		var n := self.amount
@@ -27,7 +29,7 @@ class Circle extends Formation:
 		var circle_radius := center.length() + enemy_radius
 		const speed_len := 200
 		for i in range(n):
-			var angle := Vector2(0, -1).rotated(i * (TAU / n))
+			var angle := Vector2(0, -1).rotated(starting_angle + i * (TAU / n))
 			var pos := center + angle * circle_radius
 			var speed := -angle * speed_len
 			enemies[i] = EnemyToSpawn.new(enemy_radius, pos, speed)

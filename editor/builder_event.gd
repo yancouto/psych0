@@ -48,7 +48,7 @@ func move_next_to_screen(cur_time: LevelTime, enemy: EnemyToSpawn) -> EnemyWithT
 	var time_to_y := intersect_axis(enemy.pos.y - enemy.radius, enemy.pos.y + enemy.radius, 0, LevelBuilder.H, enemy.speed.y)
 	# Must intersect screen at some point. This condition is not sufficient, but good enough check.
 	assert(time_to_x >= 0 && time_to_y >= 0)
-	var time_to_screen: float = max(time_to_x, time_to_y)
+	var time_to_screen := maxf(time_to_x, time_to_y)
 	var time = cur_time.clone()
 	time.secs_after += time_to_screen
 	enemy.pos += enemy.speed * time_to_screen
