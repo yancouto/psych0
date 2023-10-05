@@ -87,6 +87,6 @@ class Spawn extends BuilderEvent:
 				last_enemies = [enemy.enemy]
 		return events
 
-func process_and_update_time(cur_time: LevelTime) -> Array[EventWithTime]:
+func process_and_update_time(_cur_time: LevelTime) -> Array[EventWithTime]:
 	assert(false)
 	return []

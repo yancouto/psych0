@@ -83,6 +83,7 @@ class HorizontalLinePlacement:
 		func positions(n: int, radius: float, len: float) -> Array[Vector2]:
 			var n_left := roundi(n * ((center - size / 2) / (len - size)))
 			# Adjust center a little to make balls look good on both sides
+			# Still needs a little work but it's good enough
 			center = (float(n_left) / n) * (len - size) + size / 2
 			var n_right := n - n_left
 			var pos_left := Distribute.new(0).positions(n_left, radius, center - size / 2)
@@ -110,8 +111,9 @@ class HorizontalLine extends Formation:
 		self.placement = placement
 		self.speed_len = speed_len
 		self.radius = radius
-	func raw_enemies() -> Array[EnemyToSpawn]:
-		var positions := placement.positions(amount, radius, LevelBuilder.W)
+	# Allows customisable width and height
+	func _inner_raw_enemies(w: float, h: float) -> Array[EnemyToSpawn]:
+		var positions := placement.positions(amount, radius, w)
 		var enemies: Array[EnemyToSpawn] = []
 		for pos in positions:
 			var speed_y: float
@@ -119,9 +121,71 @@ class HorizontalLine extends Formation:
 				pos.y = -radius - pos.y
 				speed_y = speed_len
 			else:
-				pos.y = LevelBuilder.H + radius + pos.y
+				pos.y = h + radius + pos.y
 				speed_y = -speed_len
 			enemies.append(EnemyToSpawn.new(radius, pos, Vector2(0, speed_y)))
+		return enemies
+	func raw_enemies() -> Array[EnemyToSpawn]:
+		return _inner_raw_enemies(LevelBuilder.W, LevelBuilder.H)
+
+enum VerticalLineSide { Left, Right }
+
+class VerticalLinePlacement:
+	# Distribute enemies evenly in the screen
+	class Distribute extends VerticalLinePlacement:
+		# Margin from the leftmost and rightmost enemy to the side of the screen
+		var margin: float
+		func _init(margin: float = 0):
+			self.margin = margin
+		func convert() -> HorizontalLinePlacement:
+			return HorizontalLinePlacement.Distribute.new(margin)
+
+	# Distribute enemies evenly, and make them V-shaped
+	class V extends VerticalLinePlacement:
+		# How much to vary x between enemies
+		var dx: float
+		var margin: float
+		func _init(dx: float, margin: float = 0):
+			self.dx = dx
+			self.margin = margin
+		func convert() -> HorizontalLinePlacement:
+			return HorizontalLinePlacement.V.new(dx, margin)
+
+	# Distribute enemies evenly, with a gap in the middle. Automatically balances enemies left and right.
+	class Gap extends VerticalLinePlacement:
+		# Center of the gap
+		var center: float
+		# Size of the gap
+		var size: float
+		func _init(center: float, size: float):
+			self.center = center
+			self.size = size
+		func convert() -> HorizontalLinePlacement:
+			return HorizontalLinePlacement.Gap.new(center, size)
+
+	# Convert to Horizontal, to minimise code duplication. Remember to swap x and y
+	func convert() -> HorizontalLinePlacement:
+		assert(false, "Must be implemented on all subclasses")
+		return null
+
+class VerticalLine extends Formation:
+	var amount: int
+	var side: VerticalLineSide
+	var placement: VerticalLinePlacement
+	var speed_len: float
+	var radius: float
+	func _init(amount: int, side: VerticalLineSide, placement: VerticalLinePlacement, speed_len: float = 300, radius: float = 30):
+		self.amount = amount
+		self.side = side
+		self.placement = placement
+		self.speed_len = speed_len
+		self.radius = radius
+	func raw_enemies() -> Array[EnemyToSpawn]:
+		var horizontal_side := HorizontalLineSide.Top if side == VerticalLineSide.Left else HorizontalLineSide.Bottom
+		var enemies := HorizontalLine.new(amount, horizontal_side, placement.convert(), speed_len, radius)._inner_raw_enemies(LevelBuilder.H, LevelBuilder.W)
+		for enemy in enemies:
+			enemy.pos = Vector2(enemy.pos.y, enemy.pos.x)
+			enemy.speed = Vector2(enemy.speed.y, enemy.speed.x)
 		return enemies
 
 # All enemies that should be spawned at exactly the same time

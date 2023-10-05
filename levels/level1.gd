@@ -32,7 +32,23 @@ func _init():
 	spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.V.new(100), 400))
 	wait_until_no_enemies()
 
-	reset()
+
 	for i in range(5):
 		wait(1)
 		spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new((i + 1) * (W / 6), 200)))
+	wait_until_no_enemies()
+	
+	reset()
+	var extra: Array[Formation] = [
+		F.VerticalLine.new(8, F.VerticalLineSide.Right, F.VerticalLinePlacement.Distribute.new(), 400),
+		null,
+		F.VerticalLine.new(11, F.VerticalLineSide.Right, F.VerticalLinePlacement.V.new(100), 400),
+		null,
+		F.VerticalLine.new(11, F.VerticalLineSide.Right, F.VerticalLinePlacement.Gap.new(500, 300), 400)
+	]
+	for i in range(5):
+		wait(1)
+		if extra[i] != null:
+			spawn(extra[i])
+		spawn(F.VerticalLine.new(13, F.VerticalLineSide.Left, F.VerticalLinePlacement.Gap.new((i + 1) * (H / 6), 200)))
+	wait_until_no_enemies()
