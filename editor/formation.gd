@@ -14,6 +14,30 @@ class Single extends Formation:
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		return [EnemyToSpawn.new(radius, pos, speed)]
 
+# Multiple enemies in a line, one after another
+class Multiple extends Formation:
+	var amount: int
+	# Position of the closes enemy to the screen
+	var pos: Vector2
+	# Speed of the closes enemy to screen
+	var speed: Vector2
+	# Distance between enemies
+	var spacing: float
+	# Enemy radius
+	var radius: float
+	func _init(amount: int, pos: Vector2, speed: Vector2, spacing := 5., radius := 40.):
+		self.amount = amount
+		self.pos = pos
+		self.speed = speed
+		self.spacing = spacing
+		self.radius = radius
+	func raw_enemies() -> Array[EnemyToSpawn]:
+		var enemies: Array[EnemyToSpawn] = []
+		var dir := -speed.normalized()
+		for i in range(amount):
+			enemies.append(EnemyToSpawn.new(radius, pos + dir * (i * spacing + (2 * i - 1) * radius), speed))
+		return enemies
+
 class Circle extends Formation:
 	var amount: int
 	var starting_angle: float
