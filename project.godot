@@ -13,6 +13,7 @@ config_version=5
 config/name="Psych0"
 run/main_scene="res://runner.tscn"
 config/features=PackedStringArray("4.1", "Forward Plus")
+boot_splash/show_image=false
 config/icon="res://icon.svg"
 
 [display]

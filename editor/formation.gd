@@ -39,7 +39,9 @@ class Circle extends Formation:
 enum HorizontalLineSide { Top, Bottom }
 
 class HorizontalLinePlacement:
+	# Distribute enemies evenly in the screen
 	class Distribute extends HorizontalLinePlacement:
+		# Margin from the leftmost and rightmost enemy to the side of the screen
 		var margin: float
 		func _init(margin: float = 0):
 			self.margin = margin
@@ -54,6 +56,7 @@ class HorizontalLinePlacement:
 				pos.append(Vector2(x + margin, 0))
 			return pos
 
+	# Distribute enemies evenly, and make them V-shaped
 	class V extends HorizontalLinePlacement:
 		# How much to vary y between enemies
 		var dy: float
@@ -66,6 +69,27 @@ class HorizontalLinePlacement:
 			var pos := Distribute.new(margin).positions(n, radius, len)
 			for i in range(n):
 				pos[i].y = floorf(absf(i - ((n - 1.) / 2.))) * dy
+			return pos
+
+	# Distribute enemies evenly, with a gap in the middle. Automatically balances enemies left and right.
+	class Gap extends HorizontalLinePlacement:
+		# Center of the gap
+		var center: float
+		# Size of the gap
+		var size: float
+		func _init(center: float, size: float):
+			self.center = center
+			self.size = size
+		func positions(n: int, radius: float, len: float) -> Array[Vector2]:
+			var n_left := roundi(n * ((center - size / 2) / (len - size)))
+			# Adjust center a little to make balls look good on both sides
+			center = (float(n_left) / n) * (len - size) + size / 2
+			var n_right := n - n_left
+			var pos_left := Distribute.new(0).positions(n_left, radius, center - size / 2)
+			var pos_right := Distribute.new(0).positions(n_right, radius, len - (center + size / 2))
+			var pos := pos_left
+			for p in pos_right:
+				pos.append(Vector2(p.x + center + size / 2, p.y))
 			return pos
 
 	# Position of enemies, assuming screen horizontal size is len
