@@ -66,8 +66,7 @@ class EnemyToSpawn:
 		self.speed = speed
 	func spawn(root: Node) -> void:
 		var enemy = preload("res://enemy.tscn").instantiate()
-		enemy.radius = radius
-		enemy.start(pos, speed)
+		enemy.start(pos, speed, radius)
 		root.add_child(enemy)
 
 class IndicatorToSpawn:

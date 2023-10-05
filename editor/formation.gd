@@ -35,7 +35,7 @@ class Multiple extends Formation:
 		var enemies: Array[EnemyToSpawn] = []
 		var dir := -speed.normalized()
 		for i in range(amount):
-			enemies.append(EnemyToSpawn.new(radius, pos + dir * (i * spacing + (2 * i - 1) * radius), speed))
+			enemies.append(EnemyToSpawn.new(radius, pos + dir * i * (spacing + 2 * radius), speed))
 		return enemies
 
 class Circle extends Formation:

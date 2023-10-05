@@ -54,7 +54,7 @@ func _init():
 	wait_until_no_enemies()
 
 	reset()
-	spawn(F.Multiple.new(50, Vector2(W + r, H / 2), Vector2(-300, 0), 5, r))
+	spawn(F.Multiple.new(50, Vector2(W + r, H / 2), Vector2(-300, 0), 10, r))
 	wait(5)
 	for i in range(5):
 		wait(1)
