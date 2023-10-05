@@ -1,7 +1,7 @@
 class_name LevelBuilder
 
-static var W = 1600
-static var H = 900
+static var W := 1600.
+static var H := 900.
 
 var events: Array[BuilderEvent] = []
 
@@ -14,6 +14,10 @@ func wait(secs: float) -> void:
 
 func spawn(f: Formation) -> void:
 	events.append(BuilderEvent.Spawn.new(f))
+
+# Debug only. Clears everything before this event.
+func reset() -> void:
+	events.clear()
 
 func build() -> Level:
 	var cur_time := LevelEvent.LevelTime.new(0, 0)

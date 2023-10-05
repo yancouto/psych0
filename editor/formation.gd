@@ -44,7 +44,6 @@ class HorizontalLinePlacement:
 		func _init(margin: float = 0):
 			self.margin = margin
 		func positions(n: int, radius: float, len: float) -> Array[Vector2]:
-			assert(n > 0)
 			if n == 1:
 				return [Vector2(len / 2, 0)]
 			var pos: Array[Vector2] = []
@@ -54,6 +53,21 @@ class HorizontalLinePlacement:
 				var x := i * dist + radius * (2 * i + 1)
 				pos.append(Vector2(x + margin, 0))
 			return pos
+
+	class V extends HorizontalLinePlacement:
+		# How much to vary y between enemies
+		var dy: float
+		var margin: float
+		func _init(dy: float, margin: float = 0):
+			self.dy = dy
+			self.margin = margin
+		func positions(n: int, radius: float, len: float) -> Array[Vector2]:
+			# Let's reuse the math from Distribute, and only change the y
+			var pos := Distribute.new(margin).positions(n, radius, len)
+			for i in range(n):
+				pos[i].y = floorf(absf(i - ((n - 1.) / 2.))) * dy
+			return pos
+
 	# Position of enemies, assuming screen horizontal size is len
 	# y will start at 0 and go torwards positive
 	func positions(n: int, radius: float, len: float) -> Array[Vector2]:
