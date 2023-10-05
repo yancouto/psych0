@@ -12,4 +12,3 @@ func _process(dt: float) -> void:
 		next_event = level.next_event()
 	if next_event == null:
 		$LevelOverText.visible = true
-
