@@ -212,6 +212,32 @@ class VerticalLine extends Formation:
 			enemy.speed = Vector2(enemy.speed.y, enemy.speed.x)
 		return enemies
 
+class Spiral extends Formation:
+	var amount_in_circle: int
+	var amount: int
+	var spacing: float
+	var starting_angle: float
+	var speed_len: float
+	var radius: float
+	func _init(amount_in_circle: int, amount: int, spacing: float, starting_angle := 0., speed_len := 300., radius := 30.):
+		self.amount_in_circle = amount_in_circle
+		self.amount = amount
+		self.spacing = spacing
+		self.starting_angle = starting_angle
+		self.speed_len = speed_len
+		self.radius = radius
+	func raw_enemies() -> Array[EnemyToSpawn]:
+		var enemies: Array[EnemyToSpawn] = []
+		enemies.resize(amount)
+		var center := Vector2(LevelBuilder.W / 2, LevelBuilder.H / 2)
+		var screen_radius := center.length()
+		for i in range(amount):
+			var angle := Vector2(0, -1).rotated(i * 2 * PI / amount_in_circle)
+			var pos := center + angle * (screen_radius + radius + i * spacing)
+			var speed := -angle * speed_len
+			enemies[i] = EnemyToSpawn.new(radius, pos, speed)
+		return enemies
+
 # All enemies that should be spawned at exactly the same time
 func raw_enemies() -> Array[EnemyToSpawn]:
 	assert(false)
