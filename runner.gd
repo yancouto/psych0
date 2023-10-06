@@ -5,6 +5,7 @@ var level: Level = preload("res://levels/level1.gd").new().build()
 var next_event: LevelEvent.EventWithTime
 
 func _process(dt: float) -> void:
+	dt = %BulletTime.fix_delta(dt)
 	if level != null && level.update($AllEnemies, dt):
 		$LevelOverText.visible = true
 		level = null

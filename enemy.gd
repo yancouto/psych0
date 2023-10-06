@@ -16,8 +16,9 @@ func start(position: Vector2, speed: Vector2, radius: float) -> void:
 	self.radius = radius
 
 
-func _process(delta):
-	position += speed * delta
+func _process(dt: float) -> void:
+	dt = get_node("../%BulletTime").fix_delta(dt)
+	position += speed * dt
 
 func shot() -> void:
 	queue_free()

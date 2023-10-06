@@ -10,8 +10,9 @@ func start(to_spawn: LevelEvent.IndicatorToSpawn, duration: float) -> void:
 	self.angle = to_spawn.angle
 	
 
-func _process(delta: float) -> void:
-	self.ttl -= delta
+func _process(dt: float) -> void:
+	dt = get_node("../%BulletTime").fix_delta(dt)
+	self.ttl -= dt
 	if self.ttl <= 0:
 		queue_free()
 

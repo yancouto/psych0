@@ -15,9 +15,10 @@ func _ready():
 	position = screen_size / 2
 	($CollisionShape2D.shape as CircleShape2D).radius = radius
 
-func _process(delta):
+func _process(dt: float) -> void:
 	if !is_visible():
 		return
+	dt = %BulletTime.fix_delta(dt)
 	var vel = Vector2.ZERO
 	if Input.is_action_pressed("move_down"):
 		vel.y += 1
@@ -28,11 +29,11 @@ func _process(delta):
 	if Input.is_action_pressed("move_right"):
 		vel.x += 1
 	if !vel.is_zero_approx():
-		position += vel.normalized() * speed * delta
+		position += vel.normalized() * speed * dt
 		position = position.clamp(CLAMP_LEFT, CLAMP_RIGHT)
 	
 	# Shooting
-	cur_shot_cooldown -= delta
+	cur_shot_cooldown -= dt
 	if cur_shot_cooldown <= 0 && Input.is_action_pressed("shoot"):
 		cur_shot_cooldown = SHOT_COOLDOWN
 		var shot := preload("res://shot.tscn").instantiate()

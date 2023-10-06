@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://wyi8ts15lueo"]
+[gd_scene load_steps=6 format=3 uid="uid://wyi8ts15lueo"]
 
 [ext_resource type="Script" path="res://runner.gd" id="1_224jk"]
 [ext_resource type="PackedScene" uid="uid://dwqfguj644qf2" path="res://player.tscn" id="2_1y6tv"]
 [ext_resource type="Script" path="res://pausing.gd" id="3_kc0cc"]
+[ext_resource type="Script" path="res://bullet_time.gd" id="4_vvdtp"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_kjhy5"]
 font_size = 100
@@ -26,3 +27,8 @@ label_settings = SubResource("LabelSettings_kjhy5")
 [node name="Pausing" type="Node" parent="."]
 process_mode = 3
 script = ExtResource("3_kc0cc")
+
+[node name="BulletTime" type="Node2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(8, 8)
+script = ExtResource("4_vvdtp")
