@@ -23,12 +23,6 @@ class LevelTime:
 		self.secs_after = secs_after
 	func clone() -> LevelTime:
 		return LevelTime.new(wait_until_no_enemies, secs_after)
-	func sub(other: LevelTime) -> LevelTimeDelta:
-		if self.wait_until_no_enemies > other.wait_until_no_enemies:
-			return LevelTimeDelta.new(wait_until_no_enemies - other.wait_until_no_enemies, self.secs_after)
-		else:
-			assert(self.wait_until_no_enemies == other.wait_until_no_enemies)
-			return LevelTimeDelta.new(0, self.secs_after - other.secs_after)
 	func lt(other: LevelTime) -> bool:
 		if self.wait_until_no_enemies == other.wait_until_no_enemies:
 			return self.secs_after < other.secs_after
@@ -36,6 +30,20 @@ class LevelTime:
 			return self.wait_until_no_enemies < other.wait_until_no_enemies
 	func eq(other: LevelTime) -> bool:
 		return self.wait_until_no_enemies == other.wait_until_no_enemies && is_equal_approx(self.secs_after, other.secs_after)
+	# If it reached the event, return the excess time, otherwise return -1
+	func reaches(root: Node, other: LevelTime) -> float:
+		if other.wait_until_no_enemies > wait_until_no_enemies:
+			if root.get_child_count() == 0:
+				wait_until_no_enemies = other.wait_until_no_enemies
+				secs_after = 0
+		if other.wait_until_no_enemies <= wait_until_no_enemies:
+			if secs_after == 0 && other.secs_after < 0:
+				# Makes it work with initial negative times
+				secs_after = other.secs_after
+		if wait_until_no_enemies >= other.wait_until_no_enemies && secs_after >= other.secs_after:
+			return secs_after - other.secs_after
+		else:
+			return -1.
 
 class EventWithTime:
 	var event: LevelEvent
@@ -43,18 +51,6 @@ class EventWithTime:
 	func _init(event: LevelEvent, time: LevelTime):
 		self.event = event
 		self.time = time
-
-class EventWithDelta:
-	var event: LevelEvent
-	var delta: LevelTimeDelta
-	func _init(event: LevelEvent, delta: LevelTimeDelta):
-		self.event = event
-		self.delta = delta
-	func trigger(root: Node, dt: float) -> bool:
-		var trigger_now := self.delta.sub(root, dt)
-		if trigger_now:
-			self.event.trigger(root)
-		return trigger_now
 
 class EnemyToSpawn:
 	var radius: float
@@ -64,9 +60,10 @@ class EnemyToSpawn:
 		self.radius = radius
 		self.pos = pos
 		self.speed = speed
-	func spawn(root: Node) -> void:
+	func spawn(root: Node, ago: float) -> void:
 		var enemy = preload("res://enemy.tscn").instantiate()
 		enemy.start(pos, speed, radius)
+		enemy.position += enemy.speed * ago
 		root.add_child(enemy)
 
 class IndicatorToSpawn:
@@ -79,16 +76,16 @@ class IndicatorToSpawn:
 
 # Does nothing, just added in the end always, so we can wait for no enemies
 class LastEvent extends LevelEvent:
-	func trigger(root: Node) -> bool:
+	func trigger(_root: Node, _ago: float) -> bool:
 		return true
 
 class Spawn extends LevelEvent:
 	var to_spawn: Array[EnemyToSpawn]
 	func _init(to_spawn: Array[EnemyToSpawn]):
 		self.to_spawn = to_spawn
-	func trigger(root: Node) -> bool:
+	func trigger(root: Node, ago: float) -> bool:
 		for enemy in to_spawn:
-			enemy.spawn(root)
+			enemy.spawn(root, ago)
 		return true
 
 class Indicator extends LevelEvent:
@@ -97,14 +94,15 @@ class Indicator extends LevelEvent:
 	func _init(to_spawn: Array[IndicatorToSpawn], duration: float):
 		self.to_spawn = to_spawn
 		self.duration = duration
-	func trigger(root: Node) -> bool:
+	func trigger(root: Node, ago: float) -> bool:
 		const Indicator = preload("res://indicator.tscn")
 		for ind_to_spawn in to_spawn:
 			var indicator = Indicator.instantiate()
-			indicator.start(ind_to_spawn, self.duration)
+			indicator.start(ind_to_spawn, self.duration - ago)
 			root.add_child(indicator)
 		return true
 
-func trigger(_root: Node) -> bool:
+# Trigger the event, the event should have happened ago seconds ago
+func trigger(_root: Node, ago: float) -> bool:
 	assert(false, "Must be implemented by all subclasses")
 	return false

@@ -2,13 +2,9 @@ extends Node
 
 # Level to run, let's start by hardcoding 1
 var level: Level = preload("res://levels/level1.gd").new().build()
-var next_event: LevelEvent.EventWithDelta
-
-func _ready() -> void:
-	next_event = level.next_event()
+var next_event: LevelEvent.EventWithTime
 
 func _process(dt: float) -> void:
-	while next_event != null && next_event.trigger($AllEnemies, dt):
-		next_event = level.next_event()
-	if next_event == null:
+	if level != null && level.update($AllEnemies, dt):
 		$LevelOverText.visible = true
+		level = null
