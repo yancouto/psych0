@@ -1,7 +1,7 @@
 class_name LevelBuilder
 
-static var W := 1600.
-static var H := 900.
+static var W := 1440.
+static var H := 1080.
 
 var events: Array[BuilderEvent] = []
 
