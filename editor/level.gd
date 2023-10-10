@@ -4,8 +4,8 @@ var events: Array[LevelEvent.EventWithTime] = []
 var cur_event: int = 0
 var cur_time := LevelEvent.LevelTime.new(0, 0)
 
-func _init(events: Array[LevelEvent.EventWithTime]):
-	self.events = events
+func _init(events_: Array[LevelEvent.EventWithTime]):
+	self.events = events_
 
 func update(root: Node, dt: float) -> bool:
 	cur_time.secs_after += dt

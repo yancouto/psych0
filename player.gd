@@ -49,7 +49,7 @@ func start(pos):
 	$CollisionShape2D.disabled = false
 
 # Hit by an enemy
-func _on_area_entered(area):
+func _on_area_entered(_area: Area2D) -> void:
 	print("IVE BEEEN HIT")
 	hide()
 	hit.emit()

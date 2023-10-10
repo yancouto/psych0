@@ -3,9 +3,9 @@ extends Area2D
 @export var radius := 7
 var speed: Vector2
 
-func start(position: Vector2, speed: Vector2) -> void:
-	self.position = position
-	self.speed = speed
+func start(position_: Vector2, speed_: Vector2) -> void:
+	self.position = position_
+	self.speed = speed_
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

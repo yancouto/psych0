@@ -5,10 +5,10 @@ const EnemyToSpawn = LevelEvent.EnemyToSpawn
 const BASE_SPEED := 400.
 const BASE_RADIUS := 30.
 
-static func speed(speedm: Vector2) -> Vector2:
+static func get_speed(speedm: Vector2) -> Vector2:
 	return speedm * BASE_SPEED
 
-static func radius(radiusm: float) -> float:
+static func get_radius(radiusm: float) -> float:
 	return radiusm * BASE_RADIUS
 
 class Single extends Formation:
@@ -21,7 +21,7 @@ class Single extends Formation:
 		speedm = sm
 		radiusm = rm
 	func raw_enemies() -> Array[EnemyToSpawn]:
-		return [EnemyToSpawn.new(radius(radiusm), pos, speed(speedm))]
+		return [EnemyToSpawn.new(Formation.get_radius(radiusm), pos, Formation.get_speed(speedm))]
 
 # Multiple enemies in a line, one after another
 class Multiple extends Formation:
@@ -34,17 +34,17 @@ class Multiple extends Formation:
 	var spacing: float
 	# Enemy radius
 	var radiusm: float
-	func _init(amount: int, pos: Vector2, speedm: Vector2, spacing := 5., radiusm := 1.):
-		self.amount = amount
-		self.pos = pos
-		self.speedm = speedm
-		self.spacing = spacing
-		self.radiusm = radiusm
+	func _init(amount_: int, pos_: Vector2, speedm_: Vector2, spacing_ := 5., radiusm_ := 1.):
+		self.amount = amount_
+		self.pos = pos_
+		self.speedm = speedm_
+		self.spacing = spacing_
+		self.radiusm = radiusm_
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		var enemies: Array[EnemyToSpawn] = []
 		var dir := -speedm.normalized()
-		var speed := speed(speedm)
-		var radius := radius(radiusm)
+		var speed := Formation.get_speed(speedm)
+		var radius := Formation.get_radius(radiusm)
 		for i in range(amount):
 			enemies.append(EnemyToSpawn.new(radius, pos + dir * i * (spacing + 2 * radius), speed))
 		return enemies
@@ -53,10 +53,10 @@ class Circle extends Formation:
 	var amount: int
 	var starting_angle: float
 	var speed_len: float
-	func _init(amount: int, starting_angle: float = 0, speed_len := 1.):
-		self.amount = amount
-		self.starting_angle = starting_angle
-		self.speed_len = speed_len
+	func _init(amount_: int, starting_angle_ := 0., speed_len_ := 1.):
+		self.amount = amount_
+		self.starting_angle = starting_angle_
+		self.speed_len = speed_len_
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		var enemies: Array[EnemyToSpawn] = []
 		var n := self.amount
@@ -79,8 +79,8 @@ class HorizontalLinePlacement:
 	class Distribute extends HorizontalLinePlacement:
 		# Margin from the leftmost and rightmost enemy to the side of the screen
 		var margin: float
-		func _init(margin: float = 0):
-			self.margin = margin
+		func _init(margin_: float = 0):
+			self.margin = margin_
 		func positions(n: int, radius: float, len: float) -> Array[Vector2]:
 			if n == 1:
 				return [Vector2(len / 2, 0)]
@@ -97,9 +97,9 @@ class HorizontalLinePlacement:
 		# How much to vary y between enemies
 		var dy: float
 		var margin: float
-		func _init(dy: float, margin: float = 0):
-			self.dy = dy
-			self.margin = margin
+		func _init(dy_: float, margin_: float = 0):
+			self.dy = dy_
+			self.margin = margin_
 		func positions(n: int, radius: float, len: float) -> Array[Vector2]:
 			# Let's reuse the math from Distribute, and only change the y
 			var pos := Distribute.new(margin).positions(n, radius, len)
@@ -113,9 +113,9 @@ class HorizontalLinePlacement:
 		var center: float
 		# Size of the gap
 		var size: float
-		func _init(center: float, size: float):
-			self.center = center
-			self.size = size
+		func _init(center_: float, size_: float):
+			self.center = center_
+			self.size = size_
 		func positions(n: int, radius: float, len: float) -> Array[Vector2]:
 			var n_left := roundi(n * ((center - size / 2) / (len - size)))
 			# Adjust center a little to make balls look good on both sides
@@ -131,7 +131,7 @@ class HorizontalLinePlacement:
 
 	# Position of enemies, assuming screen horizontal size is len
 	# y will start at 0 and go torwards positive
-	func positions(n: int, radius: float, len: float) -> Array[Vector2]:
+	func positions(_n: int, _radius: float, _len: float) -> Array[Vector2]:
 		assert(false, "Must be implemented by all subclasses")
 		return []
 
@@ -141,15 +141,15 @@ class HorizontalLine extends Formation:
 	var placement: HorizontalLinePlacement
 	var speed_len: float
 	var radiusm: float
-	func _init(amount: int, side: HorizontalLineSide, placement: HorizontalLinePlacement, speed_len := 1., radiusm := 1.):
-		self.amount = amount
-		self.side = side
-		self.placement = placement
-		self.speed_len = speed_len
-		self.radiusm = radiusm
+	func _init(amount_: int, side_: HorizontalLineSide, placement_: HorizontalLinePlacement, speed_len_ := 1., radiusm_ := 1.):
+		self.amount = amount_
+		self.side = side_
+		self.placement = placement_
+		self.speed_len = speed_len_
+		self.radiusm = radiusm_
 	# Allows customisable width and height
 	func _inner_raw_enemies(w: float, h: float) -> Array[EnemyToSpawn]:
-		var radius := radius(radiusm)
+		var radius := Formation.get_radius(radiusm)
 		var positions := placement.positions(amount, radius, w)
 		var enemies: Array[EnemyToSpawn] = []
 		for pos in positions:
@@ -172,8 +172,8 @@ class VerticalLinePlacement:
 	class Distribute extends VerticalLinePlacement:
 		# Margin from the leftmost and rightmost enemy to the side of the screen
 		var margin: float
-		func _init(margin: float = 0):
-			self.margin = margin
+		func _init(margin_: float = 0):
+			self.margin = margin_
 		func convert() -> HorizontalLinePlacement:
 			return HorizontalLinePlacement.Distribute.new(margin)
 
@@ -182,9 +182,9 @@ class VerticalLinePlacement:
 		# How much to vary x between enemies
 		var dx: float
 		var margin: float
-		func _init(dx: float, margin: float = 0):
-			self.dx = dx
-			self.margin = margin
+		func _init(dx_: float, margin_: float = 0):
+			self.dx = dx_
+			self.margin = margin_
 		func convert() -> HorizontalLinePlacement:
 			return HorizontalLinePlacement.V.new(dx, margin)
 
@@ -194,9 +194,9 @@ class VerticalLinePlacement:
 		var center: float
 		# Size of the gap
 		var size: float
-		func _init(center: float, size: float):
-			self.center = center
-			self.size = size
+		func _init(center_: float, size_: float):
+			self.center = center_
+			self.size = size_
 		func convert() -> HorizontalLinePlacement:
 			return HorizontalLinePlacement.Gap.new(center, size)
 
@@ -211,12 +211,12 @@ class VerticalLine extends Formation:
 	var placement: VerticalLinePlacement
 	var speed_len: float
 	var radiusm: float
-	func _init(amount: int, side: VerticalLineSide, placement: VerticalLinePlacement, speed_len := 1., radiusm := 1.):
-		self.amount = amount
-		self.side = side
-		self.placement = placement
-		self.speed_len = speed_len
-		self.radiusm = radiusm
+	func _init(amount_: int, side_: VerticalLineSide, placement_: VerticalLinePlacement, speed_len_ := 1., radiusm_ := 1.):
+		self.amount = amount_
+		self.side = side_
+		self.placement = placement_
+		self.speed_len = speed_len_
+		self.radiusm = radiusm_
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		var horizontal_side := HorizontalLineSide.Top if side == VerticalLineSide.Left else HorizontalLineSide.Bottom
 		var enemies := HorizontalLine.new(amount, horizontal_side, placement.convert(), speed_len, radiusm)._inner_raw_enemies(LevelBuilder.H, LevelBuilder.W)
@@ -232,15 +232,15 @@ class Spiral extends Formation:
 	var starting_angle: float
 	var speed_len: float
 	var radiusm: float
-	func _init(amount_in_circle: int, amount: int, spacing: float, starting_angle := 0., speed_len := 1., radiusm := 1.):
-		self.amount_in_circle = amount_in_circle
-		self.amount = amount
-		self.spacing = spacing
-		self.starting_angle = starting_angle
-		self.speed_len = speed_len
-		self.radiusm = radiusm
+	func _init(amount_in_circle_: int, amount_: int, spacing_: float, starting_angle_ := 0., speed_len_ := 1., radiusm_ := 1.):
+		self.amount_in_circle = amount_in_circle_
+		self.amount = amount_
+		self.spacing = spacing_
+		self.starting_angle = starting_angle_
+		self.speed_len = speed_len_
+		self.radiusm = radiusm_
 	func raw_enemies() -> Array[EnemyToSpawn]:
-		var radius := radius(radiusm)
+		var radius := Formation.get_radius(radiusm)
 		var enemies: Array[EnemyToSpawn] = []
 		enemies.resize(amount)
 		var center := Vector2(LevelBuilder.W / 2, LevelBuilder.H / 2)

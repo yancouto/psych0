@@ -34,9 +34,9 @@ func intersect_axis(s1l: float, s1r: float, s2l: float, s2r: float, speed: float
 class EnemyWithTime:
 	var enemy: EnemyToSpawn
 	var time: LevelTime
-	func _init(enemy: EnemyToSpawn, time: LevelTime):
-		self.enemy = enemy
-		self.time = time
+	func _init(enemy_: EnemyToSpawn, time_: LevelTime):
+		self.enemy = enemy_
+		self.time = time_
 
 # This is done assuming squares and not circles, because the difference is minimal and the math is way simpler
 func move_next_to_screen(cur_time: LevelTime, enemy: EnemyToSpawn) -> EnemyWithTime:
@@ -65,11 +65,11 @@ class Spawn extends BuilderEvent:
 	func process_and_update_time(cur_time: LevelTime) -> Array[EventWithTime]:
 		var raw_enemies := formation.raw_enemies()
 		# TODO: Create indicators
-		var enemies: Array[EnemyWithTime]
+		var enemies: Array[EnemyWithTime] = []
 		enemies.assign(raw_enemies.map(func(e): return move_next_to_screen(cur_time, e)))
 		enemies.sort_custom(func(a: EnemyWithTime, b: EnemyWithTime): return a.time.lt(b.time))
 		# Dummy sentinel at the end so the algorithm below doesn't need special casing
-		enemies.append(EnemyWithTime.new(EnemyToSpawn.new(0, Vector2(0, 0), Vector2(0, 0)), LevelTime.new(1e9, INF)))
+		enemies.append(EnemyWithTime.new(EnemyToSpawn.new(0, Vector2(0, 0), Vector2(0, 0)), LevelTime.new(ceili(1e9), INF)))
 		var events: Array[EventWithTime] = []
 		var last_enemies: Array[EnemyToSpawn] = []
 		var last_time := enemies[0].time
@@ -80,7 +80,7 @@ class Spawn extends BuilderEvent:
 				events.append(EventWithTime.new(LevelEvent.Spawn.new(last_enemies), last_time))
 				var ind_time = last_time.clone()
 				ind_time.secs_after -= INDICATOR_TIME
-				var indicators: Array[IndicatorToSpawn]
+				var indicators: Array[IndicatorToSpawn] = []
 				indicators.assign(last_enemies.map(enemy_to_indicator))
 				events.append(EventWithTime.new(LevelEvent.Indicator.new(indicators, INDICATOR_TIME), ind_time))
 				last_time = enemy.time

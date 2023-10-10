@@ -14,12 +14,9 @@ config/name="Psych0"
 run/main_scene="res://runner.tscn"
 config/features=PackedStringArray("4.1", "Forward Plus")
 boot_splash/show_image=false
-config/icon="res://icon.svg"
 
 [debug]
 
-gdscript/warnings/shadowed_variable=0
-gdscript/warnings/shadowed_variable_base_class=0
 gdscript/warnings/shadowed_global_identifier=0
 
 [display]

@@ -10,10 +10,10 @@ var radius: float:
 		$VisibleOnScreenNotifier2D.rect.size = Vector2(2 * r, 2 * r)
 		$VisibleOnScreenNotifier2D.rect.position = Vector2(-r, -r)
 
-func start(position: Vector2, speed: Vector2, radius: float) -> void:
-	self.position = position
-	self.speed = speed
-	self.radius = radius
+func start(_position: Vector2, _speed: Vector2, _radius: float) -> void:
+	self.position = _position
+	self.speed = _speed
+	self.radius = _radius
 
 
 func _process(dt: float) -> void:
