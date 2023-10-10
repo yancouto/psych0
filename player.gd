@@ -3,7 +3,7 @@ signal hit
 
 @export var SHOT_COOLDOWN := 0.2
 @export var speed := 400
-@export var radius := 20
+@export var radius := 30
 var screen_size
 var cur_shot_cooldown := 0.
 

@@ -2,17 +2,26 @@ class_name Formation
 
 const EnemyToSpawn = LevelEvent.EnemyToSpawn
 
+const BASE_SPEED := 400.
+const BASE_RADIUS := 30.
+
+static func speed(speedm: Vector2) -> Vector2:
+	return speedm * BASE_SPEED
+
+static func radius(radiusm: float) -> float:
+	return radiusm * BASE_RADIUS
+
 class Single extends Formation:
 	#var enemy: String
 	var pos: Vector2
-	var speed: Vector2
-	var radius: float
-	func _init(p: Vector2, s: Vector2, r: float):
+	var speedm: Vector2
+	var radiusm: float
+	func _init(p: Vector2, sm: Vector2, rm: float):
 		pos = p
-		speed = s
-		radius = r
+		speedm = sm
+		radiusm = rm
 	func raw_enemies() -> Array[EnemyToSpawn]:
-		return [EnemyToSpawn.new(radius, pos, speed)]
+		return [EnemyToSpawn.new(radius(radiusm), pos, speed(speedm))]
 
 # Multiple enemies in a line, one after another
 class Multiple extends Formation:
@@ -20,20 +29,22 @@ class Multiple extends Formation:
 	# Position of the closes enemy to the screen
 	var pos: Vector2
 	# Speed of the closes enemy to screen
-	var speed: Vector2
+	var speedm: Vector2
 	# Distance between enemies
 	var spacing: float
 	# Enemy radius
-	var radius: float
-	func _init(amount: int, pos: Vector2, speed: Vector2, spacing := 5., radius := 40.):
+	var radiusm: float
+	func _init(amount: int, pos: Vector2, speedm: Vector2, spacing := 5., radiusm := 1.):
 		self.amount = amount
 		self.pos = pos
-		self.speed = speed
+		self.speedm = speedm
 		self.spacing = spacing
-		self.radius = radius
+		self.radiusm = radiusm
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		var enemies: Array[EnemyToSpawn] = []
-		var dir := -speed.normalized()
+		var dir := -speedm.normalized()
+		var speed := speed(speedm)
+		var radius := radius(radiusm)
 		for i in range(amount):
 			enemies.append(EnemyToSpawn.new(radius, pos + dir * i * (spacing + 2 * radius), speed))
 		return enemies
@@ -42,7 +53,7 @@ class Circle extends Formation:
 	var amount: int
 	var starting_angle: float
 	var speed_len: float
-	func _init(amount: int, starting_angle: float = 0, speed_len: float = 200):
+	func _init(amount: int, starting_angle: float = 0, speed_len := 1.):
 		self.amount = amount
 		self.starting_angle = starting_angle
 		self.speed_len = speed_len
@@ -51,12 +62,13 @@ class Circle extends Formation:
 		var n := self.amount
 		enemies.resize(n)
 		var center := Vector2(LevelBuilder.W / 2.0, LevelBuilder.H / 2.0)
-		const enemy_radius := 20
+		# TODO: Make customisable
+		const enemy_radius := BASE_RADIUS
 		var circle_radius := center.length() + enemy_radius
 		for i in range(n):
 			var angle := Vector2(0, -1).rotated(starting_angle + i * (TAU / n))
 			var pos := center + angle * circle_radius
-			var speed := -angle * speed_len
+			var speed := -angle * speed_len * BASE_SPEED
 			enemies[i] = EnemyToSpawn.new(enemy_radius, pos, speed)
 		return enemies
 
@@ -128,25 +140,26 @@ class HorizontalLine extends Formation:
 	var side: HorizontalLineSide
 	var placement: HorizontalLinePlacement
 	var speed_len: float
-	var radius: float
-	func _init(amount: int, side: HorizontalLineSide, placement: HorizontalLinePlacement, speed_len: float = 300, radius: float = 30):
+	var radiusm: float
+	func _init(amount: int, side: HorizontalLineSide, placement: HorizontalLinePlacement, speed_len := 1., radiusm := 1.):
 		self.amount = amount
 		self.side = side
 		self.placement = placement
 		self.speed_len = speed_len
-		self.radius = radius
+		self.radiusm = radiusm
 	# Allows customisable width and height
 	func _inner_raw_enemies(w: float, h: float) -> Array[EnemyToSpawn]:
+		var radius := radius(radiusm)
 		var positions := placement.positions(amount, radius, w)
 		var enemies: Array[EnemyToSpawn] = []
 		for pos in positions:
 			var speed_y: float
 			if side == HorizontalLineSide.Top:
 				pos.y = -radius - pos.y
-				speed_y = speed_len
+				speed_y = speed_len * BASE_SPEED
 			else:
 				pos.y = h + radius + pos.y
-				speed_y = -speed_len
+				speed_y = -speed_len * BASE_SPEED
 			enemies.append(EnemyToSpawn.new(radius, pos, Vector2(0, speed_y)))
 		return enemies
 	func raw_enemies() -> Array[EnemyToSpawn]:
@@ -197,16 +210,16 @@ class VerticalLine extends Formation:
 	var side: VerticalLineSide
 	var placement: VerticalLinePlacement
 	var speed_len: float
-	var radius: float
-	func _init(amount: int, side: VerticalLineSide, placement: VerticalLinePlacement, speed_len: float = 300, radius: float = 30):
+	var radiusm: float
+	func _init(amount: int, side: VerticalLineSide, placement: VerticalLinePlacement, speed_len := 1., radiusm := 1.):
 		self.amount = amount
 		self.side = side
 		self.placement = placement
 		self.speed_len = speed_len
-		self.radius = radius
+		self.radiusm = radiusm
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		var horizontal_side := HorizontalLineSide.Top if side == VerticalLineSide.Left else HorizontalLineSide.Bottom
-		var enemies := HorizontalLine.new(amount, horizontal_side, placement.convert(), speed_len, radius)._inner_raw_enemies(LevelBuilder.H, LevelBuilder.W)
+		var enemies := HorizontalLine.new(amount, horizontal_side, placement.convert(), speed_len, radiusm)._inner_raw_enemies(LevelBuilder.H, LevelBuilder.W)
 		for enemy in enemies:
 			enemy.pos = Vector2(enemy.pos.y, enemy.pos.x)
 			enemy.speed = Vector2(enemy.speed.y, enemy.speed.x)
@@ -218,15 +231,16 @@ class Spiral extends Formation:
 	var spacing: float
 	var starting_angle: float
 	var speed_len: float
-	var radius: float
-	func _init(amount_in_circle: int, amount: int, spacing: float, starting_angle := 0., speed_len := 300., radius := 30.):
+	var radiusm: float
+	func _init(amount_in_circle: int, amount: int, spacing: float, starting_angle := 0., speed_len := 1., radiusm := 1.):
 		self.amount_in_circle = amount_in_circle
 		self.amount = amount
 		self.spacing = spacing
 		self.starting_angle = starting_angle
 		self.speed_len = speed_len
-		self.radius = radius
+		self.radiusm = radiusm
 	func raw_enemies() -> Array[EnemyToSpawn]:
+		var radius := radius(radiusm)
 		var enemies: Array[EnemyToSpawn] = []
 		enemies.resize(amount)
 		var center := Vector2(LevelBuilder.W / 2, LevelBuilder.H / 2)
@@ -234,7 +248,7 @@ class Spiral extends Formation:
 		for i in range(amount):
 			var angle := Vector2(0, -1).rotated(i * 2 * PI / amount_in_circle)
 			var pos := center + angle * (screen_radius + radius + i * spacing)
-			var speed := -angle * speed_len
+			var speed := -angle * speed_len * BASE_SPEED
 			enemies[i] = EnemyToSpawn.new(radius, pos, speed)
 		return enemies
 
