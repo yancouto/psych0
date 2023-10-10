@@ -32,7 +32,7 @@ func _init():
 	spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.V.new(100), 1))
 	wait_until_no_enemies()
 
-
+	set_indicator_time(1)
 	for i in range(5):
 		wait(1)
 		spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new((i + 1) * (W / 6), 200)))
@@ -60,6 +60,7 @@ func _init():
 		var side := F.VerticalLineSide.Left if i % 2 == 0 else F.VerticalLineSide.Right
 		spawn(F.VerticalLine.new(13, side, F.VerticalLinePlacement.Distribute.new(), 0.9 + 0.25 * i))
 	wait_until_no_enemies()
+	reset_indicator_time()
 
 	spawn(F.Spiral.new(20, 100, 50))
 	wait(5)

@@ -56,12 +56,12 @@ func enemy_to_indicator(enemy: EnemyToSpawn) -> IndicatorToSpawn:
 	var center = enemy.pos.clamp(Vector2(margin, margin), Vector2(LevelBuilder.W - margin, LevelBuilder.H - margin))
 	return IndicatorToSpawn.new(center, enemy.speed.angle())
 
-const INDICATOR_TIME := 2.0
-
 class Spawn extends BuilderEvent:
 	var formation: Formation
-	func _init(f: Formation):
-		formation = f
+	var indicator_time: float
+	func _init(formation_: Formation, indicator_time_: float):
+		formation = formation_
+		indicator_time = indicator_time_
 	func process_and_update_time(cur_time: LevelTime) -> Array[EventWithTime]:
 		var raw_enemies := formation.raw_enemies()
 		# TODO: Create indicators
@@ -79,10 +79,10 @@ class Spawn extends BuilderEvent:
 			else:
 				events.append(EventWithTime.new(LevelEvent.Spawn.new(last_enemies), last_time))
 				var ind_time = last_time.clone()
-				ind_time.secs_after -= INDICATOR_TIME
+				ind_time.secs_after -= indicator_time
 				var indicators: Array[IndicatorToSpawn] = []
 				indicators.assign(last_enemies.map(enemy_to_indicator))
-				events.append(EventWithTime.new(LevelEvent.Indicator.new(indicators, INDICATOR_TIME), ind_time))
+				events.append(EventWithTime.new(LevelEvent.Indicator.new(indicators, indicator_time), ind_time))
 				last_time = enemy.time
 				last_enemies = [enemy.enemy]
 		return events

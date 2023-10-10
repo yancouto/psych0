@@ -232,7 +232,7 @@ class Spiral extends Formation:
 	var starting_angle: float
 	var speed_len: float
 	var radiusm: float
-	func _init(amount_in_circle_: int, amount_: int, spacing_: float, starting_angle_ := 0., speed_len_ := 1., radiusm_ := 1.):
+	func _init(amount_in_circle_: int, amount_: int, spacing_: float, starting_angle_ := 0., speed_len_ := .75, radiusm_ := 1.):
 		self.amount_in_circle = amount_in_circle_
 		self.amount = amount_
 		self.spacing = spacing_

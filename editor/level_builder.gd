@@ -2,8 +2,10 @@ class_name LevelBuilder
 
 static var W := 1440.
 static var H := 1080.
+static var BASE_INDICATOR_TIME := 2.0
 
 var events: Array[BuilderEvent] = []
+var cur_indicator_time := BASE_INDICATOR_TIME
 
 
 func wait_until_no_enemies() -> void:
@@ -13,7 +15,13 @@ func wait(secs: float) -> void:
 	events.append(BuilderEvent.Wait.new(secs))
 
 func spawn(f: Formation) -> void:
-	events.append(BuilderEvent.Spawn.new(f))
+	events.append(BuilderEvent.Spawn.new(f, cur_indicator_time))
+
+func set_indicator_time(indicator_time: float) -> void:
+	cur_indicator_time = indicator_time
+
+func reset_indicator_time() -> void:
+	set_indicator_time(LevelBuilder.BASE_INDICATOR_TIME)
 
 # Debug only. Clears everything before this event.
 func reset() -> void:
