@@ -15,6 +15,8 @@ func start(_position: Vector2, _speed: Vector2, _radius: float) -> void:
 	self.speed = _speed
 	self.radius = _radius
 
+func _draw() -> void:
+	draw_circle(Vector2.ZERO, radius, Color.FIREBRICK)
 
 func _process(dt: float) -> void:
 	dt = get_node("../%BulletTime").fix_delta(dt)

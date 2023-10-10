@@ -32,3 +32,6 @@ script = ExtResource("3_kc0cc")
 unique_name_in_owner = true
 position = Vector2(8, 8)
 script = ExtResource("4_vvdtp")
+
+[connection signal="activated" from="BulletTime" to="Player" method="_on_bullet_time_activated"]
+[connection signal="deactivated" from="BulletTime" to="Player" method="_on_bullet_time_deactivated"]

@@ -16,15 +16,23 @@ func _draw() -> void:
 
 func _process(dt: float) -> void:
 	var prev_secs_left := secs_left
+	var prev_active := active
 	if Input.is_action_pressed("bullet_time"):
 		secs_left = maxf(secs_left - dt, 0.)
 		active = secs_left > 0
 	else:
 		secs_left = minf(MAX_SECS, secs_left + dt * RECOVER)
 		active = false
+	if !prev_active && active:
+		activated.emit()
+	if prev_active && !active:
+		deactivated.emit()
 	if secs_left != prev_secs_left:
 		queue_redraw()
 
 func fix_delta(delta: float) -> float:
 	var multiplier := 0.3 if active else 1.0
 	return delta * multiplier
+
+signal activated
+signal deactivated

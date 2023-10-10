@@ -42,7 +42,7 @@ class EnemyWithTime:
 func move_next_to_screen(cur_time: LevelTime, enemy: EnemyToSpawn) -> EnemyWithTime:
 	var time_to_x := intersect_axis(enemy.pos.x - enemy.radius, enemy.pos.x + enemy.radius, 0, LevelBuilder.W, enemy.speed.x)
 	var time_to_y := intersect_axis(enemy.pos.y - enemy.radius, enemy.pos.y + enemy.radius, 0, LevelBuilder.H, enemy.speed.y)
-	# Must intersect screen at some point. This condition is not sufficient, but good enough check.
+	# Must intersect screen at some point. This condition is not sufficient, but a good enough check.
 	assert(time_to_x >= 0 && time_to_y >= 0)
 	var time_to_screen := maxf(time_to_x, time_to_y)
 	var time = cur_time.clone()
@@ -64,7 +64,6 @@ class Spawn extends BuilderEvent:
 		indicator_time = indicator_time_
 	func process_and_update_time(cur_time: LevelTime) -> Array[EventWithTime]:
 		var raw_enemies := formation.raw_enemies()
-		# TODO: Create indicators
 		var enemies: Array[EnemyWithTime] = []
 		enemies.assign(raw_enemies.map(func(e): return move_next_to_screen(cur_time, e)))
 		enemies.sort_custom(func(a: EnemyWithTime, b: EnemyWithTime): return a.time.lt(b.time))

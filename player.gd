@@ -1,19 +1,24 @@
 extends Area2D
 signal hit
 
+const BASE_RADIUS := 30.
+
 @export var SHOT_COOLDOWN := 0.2
 @export var speed := 400
-@export var radius := 30
-var screen_size
+var radius : float:
+	get:
+		return radius
+	set(r):
+		($CollisionShape2D.shape as CircleShape2D).radius = r
+		radius = r
+var draw_radius : float
 var cur_shot_cooldown := 0.
 
-var CLAMP_LEFT := Vector2(radius, radius)
-var CLAMP_RIGHT := Vector2(LevelBuilder.W - radius, LevelBuilder.H - radius)
+func _ready() -> void:
+	position = Vector2(LevelBuilder.W / 2, LevelBuilder.H / 2)
+	radius = BASE_RADIUS
+	draw_radius = radius
 
-func _ready():
-	screen_size = get_viewport_rect().size
-	position = screen_size / 2
-	($CollisionShape2D.shape as CircleShape2D).radius = radius
 
 func _process(dt: float) -> void:
 	if !is_visible():
@@ -30,7 +35,7 @@ func _process(dt: float) -> void:
 		vel.x += 1
 	if !vel.is_zero_approx():
 		position += vel.normalized() * speed * dt
-		position = position.clamp(CLAMP_LEFT, CLAMP_RIGHT)
+		position = position.clamp(Vector2(radius, radius), Vector2(LevelBuilder.W - radius, LevelBuilder.H - radius))
 	
 	# Shooting
 	cur_shot_cooldown -= dt
@@ -42,9 +47,13 @@ func _process(dt: float) -> void:
 		shot.start(position + (radius - shot.radius) * dir, dir * 600)
 		# TODO: Make specific node for shots
 		self.get_parent().add_child(shot)
+	queue_redraw()
 
-func start(pos):
-	position = pos
+func _draw() -> void:
+	draw_circle(Vector2(), draw_radius, Color.DEEP_PINK)
+
+func start(position_: Vector2) -> void:
+	position = position_
 	show()
 	$CollisionShape2D.disabled = false
 
@@ -54,3 +63,11 @@ func _on_area_entered(_area: Area2D) -> void:
 	hide()
 	hit.emit()
 	$CollisionShape2D.set_deferred("disabled", true)
+
+func _on_bullet_time_activated():
+	radius = BASE_RADIUS * .8
+	create_tween().tween_property(self, 'draw_radius', radius, 0.3)
+
+func _on_bullet_time_deactivated():
+	radius = BASE_RADIUS
+	create_tween().tween_property(self, 'draw_radius', radius, 0.3)

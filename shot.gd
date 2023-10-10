@@ -16,6 +16,9 @@ func _process(dt: float) -> void:
 	dt = get_node("../%BulletTime").fix_delta(dt)
 	position += speed * dt
 
+func _draw() -> void:
+	draw_circle(Vector2.ZERO, radius, Color.BLACK)
+
 # Hit an enemy
 func _on_area_entered(enemy) -> void:
 	enemy.shot()
