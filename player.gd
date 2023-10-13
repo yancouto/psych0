@@ -1,7 +1,9 @@
 extends Area2D
-signal hit
+
 
 const BASE_RADIUS := 30.
+
+enum State { ALIVE, RECOVERING, DEAD }
 
 @export var SHOT_COOLDOWN := 0.2
 @export var speed := 400
@@ -13,6 +15,11 @@ var radius : float:
 		radius = r
 var draw_radius : float
 var cur_shot_cooldown := 0.
+var lives := 5
+var state := State.ALIVE
+var recovering_cooldown := 0.
+var color_a := 1.
+var color_a_tween: Tween = null
 
 func _ready() -> void:
 	position = Vector2(LevelBuilder.W / 2, LevelBuilder.H / 2)
@@ -23,6 +30,7 @@ func _ready() -> void:
 func _process(dt: float) -> void:
 	if !is_visible():
 		return
+	queue_redraw()
 	dt = %BulletTime.fix_delta(dt)
 	var vel = Vector2.ZERO
 	if Input.is_action_pressed("move_down"):
@@ -37,20 +45,30 @@ func _process(dt: float) -> void:
 		position += vel.normalized() * speed * dt
 		position = position.clamp(Vector2(radius, radius), Vector2(LevelBuilder.W - radius, LevelBuilder.H - radius))
 	
-	# Shooting
-	cur_shot_cooldown -= dt
-	if cur_shot_cooldown <= 0 && Input.is_action_pressed("shoot"):
-		cur_shot_cooldown = SHOT_COOLDOWN
-		var shot := preload("res://shot.tscn").instantiate()
-		# TODO: Support controller
-		var dir := (get_viewport().get_mouse_position() - position).normalized()
-		shot.start(position + (radius - shot.radius) * dir, dir * 600)
-		# TODO: Make specific node for shots
-		self.get_parent().add_child(shot)
-	queue_redraw()
+	if state == State.RECOVERING:
+		recovering_cooldown -= dt
+		if recovering_cooldown <= 0:
+			state = State.ALIVE
+			$CollisionShape2D.set_deferred("disabled", false)
+			color_a = 1.
+			color_a_tween.kill()
+	elif state == State.ALIVE:
+		# Shooting
+		cur_shot_cooldown -= dt
+		if cur_shot_cooldown <= 0 && Input.is_action_pressed("shoot"):
+			cur_shot_cooldown = SHOT_COOLDOWN
+			var shot := preload("res://shot.tscn").instantiate()
+			# TODO: Support controller
+			var dir := (get_viewport().get_mouse_position() - position).normalized()
+			shot.start(position + (radius - shot.radius) * dir, dir * 600)
+			# TODO: Make specific node for shots
+			self.get_parent().add_child(shot)
+
 
 func _draw() -> void:
-	draw_circle(Vector2(), draw_radius, Color.DEEP_PINK)
+	var color := Color.DEEP_PINK if state == State.ALIVE else Color.DIM_GRAY
+	color.a = color_a
+	draw_circle(Vector2(), draw_radius, color)
 
 func start(position_: Vector2) -> void:
 	position = position_
@@ -59,10 +77,22 @@ func start(position_: Vector2) -> void:
 
 # Hit by an enemy
 func _on_area_entered(_area: Area2D) -> void:
-	print("IVE BEEEN HIT")
-	hide()
-	hit.emit()
+	if state != State.ALIVE:
+		return
+	lives -= 1
+	print("IVE BEEEN HIT (now ", lives, " lives)")
 	$CollisionShape2D.set_deferred("disabled", true)
+	if lives <= 0:
+		state = State.DEAD
+		hide()
+	state = State.RECOVERING
+	recovering_cooldown = 2.
+	var tween := create_tween().set_loops()
+	tween.tween_property(self, 'color_a', 0., 0.1).set_delay(0.25)
+	tween.tween_property(self, 'color_a', 1., 0.1).set_delay(0.1)
+	color_a_tween = tween
+
+	
 
 func _on_bullet_time_activated():
 	radius = BASE_RADIUS * .8
