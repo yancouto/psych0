@@ -66,14 +66,12 @@ func _process(dt: float) -> void:
 
 
 func _draw() -> void:
+	if state == State.ALIVE:
+		var dir := get_local_mouse_position().normalized()
+		draw_line(Vector2.ZERO, dir * (LevelBuilder.H + LevelBuilder.W), Color(0, 0, 0, 0.15), 1, true)
 	var color := Color.DEEP_PINK if state == State.ALIVE else Color.DIM_GRAY
 	color.a = color_a
 	draw_circle(Vector2(), draw_radius, color)
-
-func start(position_: Vector2) -> void:
-	position = position_
-	show()
-	$CollisionShape2D.disabled = false
 
 # Hit by an enemy
 func _on_area_entered(_area: Area2D) -> void:
