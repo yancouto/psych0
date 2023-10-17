@@ -271,6 +271,7 @@ class Spiral extends Formation:
 	var speed_len: float
 	var radiusm: float
 	var types: Array[EnemyType]
+	var dir: float = 1.
 	func _init(amount_in_circle_: int, amount_: int, spacing_: float, starting_angle_ := 0., speed_len_ := .75, radiusm_ := 1., types_: Array[EnemyType] = []):
 		self.amount_in_circle = amount_in_circle_
 		self.amount = amount_
@@ -279,6 +280,9 @@ class Spiral extends Formation:
 		self.speed_len = speed_len_
 		self.radiusm = radiusm_
 		self.types = types_
+	func invert() -> Spiral:
+		self.dir = -self.dir
+		return self
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		var radius := Formation.get_radius(radiusm)
 		var enemies: Array[EnemyToSpawn] = []
@@ -286,7 +290,7 @@ class Spiral extends Formation:
 		var center := Vector2(LevelBuilder.W / 2, LevelBuilder.H / 2)
 		var screen_radius := center.length()
 		for i in range(amount):
-			var angle := Vector2(0, -1).rotated(i * 2 * PI / amount_in_circle)
+			var angle := Vector2(0, -1).rotated(i * 2 * PI * dir / amount_in_circle)
 			var pos := center + angle * (screen_radius + radius + i * spacing)
 			var speed := -angle * speed_len * BASE_SPEED
 			enemies[i] = EnemyToSpawn.new(radius, pos, LevelEvent.BasicSpeed.from_vec(speed), Formation.get_enemy(types, i))

@@ -14,16 +14,18 @@ func _init():
 	wait_until_no_enemies()
 	spawn(F.Circle.new(2, -PI/2, 1, [E.Basic3]))
 	wait(3)
-	spawn(F.Circle.new(4, 0, 1, [E.Basic3, E.Basic1]))
-	wait(1.5)
-	spawn(F.Circle.new(2, -screen_angle, 1, [E.Basic1, E.Basic3]))
-	spawn(F.Circle.new(2, screen_angle, 1, [E.Basic3, E.Basic1]))
+	spawn(F.Circle.new(4, 0, 1, [E.Basic1]))
+	wait(2)
+	spawn(F.Circle.new(2, -screen_angle, 1, [E.Basic3]))
+	spawn(F.Circle.new(2, screen_angle, 1, [E.Basic3]))
 	wait_until_no_enemies()
 
 	wait(2)
 	spawn(F.HorizontalLine.new(10, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Distribute.new()))
 	wait(1)
-	spawn(F.HorizontalLine.new(12, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.Distribute.new(), 1, 1))
+	for _i in 3:
+		spawn(F.HorizontalLine.new(12, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.Distribute.new(), 1, 1))
+		wait(0.5)
 	wait_until_no_enemies()
 
 
@@ -36,14 +38,16 @@ func _init():
 
 	set_indicator_time(1)
 	for i in 5:
+		if i > 3:
+			spawn(F.VerticalLine.new(8, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), 0.5))
 		wait(1)
 		spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new((i + 1) * (W / 6), 200), 1, 1, [E.Basic1, E.Basic3]))
 	for i in 4:
-		spawn(F.HorizontalLine.new(12, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.Distribute.new(), 0.6))
+		if i < 3:
+			spawn(F.VerticalLine.new(8, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), 0.5))
 		wait(1)
 		spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new(((4 - i) + 1) * (W / 6), 200), 1, 1, [E.Basic3]))
 	wait_until_no_enemies()
-	
 
 	var extra: Array[Formation] = [
 		F.VerticalLine.new(8, F.VerticalLineSide.Right, F.VerticalLinePlacement.Distribute.new(), 1),
@@ -71,6 +75,14 @@ func _init():
 	wait_until_no_enemies()
 	reset_indicator_time()
 
+	wait(2)
+	spawn(F.Spiral.new(8, 8, 100, 0, 1))
+	wait(7)
+	spawn(F.Spiral.new(12, 20, 150, 0, 1.5).invert())
+	wait(4)
+	spawn(F.VerticalLine.new(10, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), .5))
+	spawn(F.VerticalLine.new(10, F.VerticalLineSide.Right, F.VerticalLinePlacement.Distribute.new(), .5))
+	wait(7)
 	spawn(F.Spiral.new(20, 100, 50))
 	wait(5)
 	spawn(F.VerticalLine.new(11, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), .75))

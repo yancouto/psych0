@@ -26,6 +26,7 @@ func reset_indicator_time() -> void:
 # Debug only. Clears everything before this event.
 func reset() -> void:
 	events.clear()
+	events.append(BuilderEvent.Wait.new(BASE_INDICATOR_TIME))
 
 func build() -> Level:
 	var cur_time := LevelEvent.LevelTime.new(0, 0)
