@@ -2,12 +2,14 @@ class_name Formation
 
 const EnemyToSpawn = LevelEvent.EnemyToSpawn
 const EnemyType = LevelEvent.EnemyType
+const Speed = LevelEvent.Speed
 
 const BASE_SPEED := 400.
 const BASE_RADIUS := 30.
 
-static func get_speed(speedm: Vector2) -> Vector2:
-	return speedm * BASE_SPEED
+static func get_speed(speedm: Speed) -> Speed:
+	return speedm.multiply(BASE_SPEED)
+
 
 static func get_radius(radiusm: float) -> float:
 	return radiusm * BASE_RADIUS
@@ -15,10 +17,10 @@ static func get_radius(radiusm: float) -> float:
 class Single extends Formation:
 	#var enemy: String
 	var pos: Vector2
-	var speedm: Vector2
+	var speedm: Speed
 	var radiusm: float
 	var type: EnemyType
-	func _init(pos_: Vector2, speedm_: Vector2, radiusm_: float, type_ := EnemyType.Basic1):
+	func _init(pos_: Vector2, speedm_: Speed, radiusm_: float, type_ := EnemyType.Basic1):
 		pos = pos_
 		speedm = speedm_
 		radiusm = radiusm_
@@ -37,23 +39,25 @@ class Multiple extends Formation:
 	var amount: int
 	# Position of the closes enemy to the screen
 	var pos: Vector2
-	# Speed of the closes enemy to screen
-	var speedm: Vector2
+	# Speed of all enemies
+	var speedm: Speed
+	# Direction the line should spawn to (usually, opposite of speed)
+	var dir: Vector2
 	# Distance between enemies
 	var spacing: float
 	# Enemy radius
 	var radiusm: float
 	var types: Array[EnemyType]
-	func _init(amount_: int, pos_: Vector2, speedm_: Vector2, spacing_ := 5., radiusm_ := 1., types_: Array[EnemyType] = []):
+	func _init(amount_: int, pos_: Vector2, speedm_: Speed, dir_: Vector2, spacing_ := 5., radiusm_ := 1., types_: Array[EnemyType] = []):
 		self.amount = amount_
 		self.pos = pos_
 		self.speedm = speedm_
+		self.dir = dir_.normalized()
 		self.spacing = spacing_
 		self.radiusm = radiusm_
 		self.types = types_
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		var enemies: Array[EnemyToSpawn] = []
-		var dir := -speedm.normalized()
 		var speed := Formation.get_speed(speedm)
 		var radius := Formation.get_radius(radiusm)
 		for i in range(amount):
@@ -65,11 +69,15 @@ class Circle extends Formation:
 	var starting_angle: float
 	var speed_len: float
 	var types: Array[EnemyType]
+	var follow_player := false
 	func _init(amount_: int, starting_angle_ := 0., speed_len_ := 1., types_: Array[EnemyType] = []):
 		self.amount = amount_
 		self.starting_angle = starting_angle_
 		self.speed_len = speed_len_
 		self.types = types_
+	func set_follow_player() -> Formation:
+		follow_player = true
+		return self
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		var enemies: Array[EnemyToSpawn] = []
 		var n := self.amount
@@ -81,7 +89,11 @@ class Circle extends Formation:
 		for i in range(n):
 			var angle := Vector2(0, -1).rotated(starting_angle + i * (TAU / n))
 			var pos := center + angle * circle_radius
-			var speed := -angle * speed_len * BASE_SPEED
+			var speed: Speed
+			if follow_player:
+				speed = LevelEvent.FollowPlayer.new(speed_len * BASE_SPEED)
+			else:
+				speed = LevelEvent.Speed.from_vec(-angle * speed_len * BASE_SPEED)
 			enemies[i] = EnemyToSpawn.new(enemy_radius, pos, speed, Formation.get_enemy(types, i))
 		return enemies
 
@@ -180,7 +192,7 @@ class HorizontalLine extends Formation:
 			else:
 				pos.y = h + radius + pos.y
 				speed_y = -speed_len * BASE_SPEED
-			enemies.append(EnemyToSpawn.new(radius, pos, Vector2(0, speed_y), Formation.get_enemy(types, i)))
+			enemies.append(EnemyToSpawn.new(radius, pos, LevelEvent.BasicSpeed.new(0, speed_y), Formation.get_enemy(types, i)))
 		return enemies
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		return _inner_raw_enemies(LevelBuilder.W, LevelBuilder.H)
@@ -248,7 +260,7 @@ class VerticalLine extends Formation:
 		var enemies := HorizontalLine.new(amount, horizontal_side, placement.convert(), speed_len, radiusm, types)._inner_raw_enemies(LevelBuilder.H, LevelBuilder.W)
 		for enemy in enemies:
 			enemy.pos = Vector2(enemy.pos.y, enemy.pos.x)
-			enemy.speed = Vector2(enemy.speed.y, enemy.speed.x)
+			enemy.speed = enemy.speed.swap_coordinates()
 		return enemies
 
 class Spiral extends Formation:
@@ -277,7 +289,7 @@ class Spiral extends Formation:
 			var angle := Vector2(0, -1).rotated(i * 2 * PI / amount_in_circle)
 			var pos := center + angle * (screen_radius + radius + i * spacing)
 			var speed := -angle * speed_len * BASE_SPEED
-			enemies[i] = EnemyToSpawn.new(radius, pos, speed, Formation.get_enemy(types, i))
+			enemies[i] = EnemyToSpawn.new(radius, pos, LevelEvent.BasicSpeed.from_vec(speed), Formation.get_enemy(types, i))
 		return enemies
 
 # All enemies that should be spawned at exactly the same time

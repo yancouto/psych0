@@ -12,6 +12,7 @@ font_size = 100
 script = ExtResource("1_224jk")
 
 [node name="Player" parent="." instance=ExtResource("2_1y6tv")]
+unique_name_in_owner = true
 
 [node name="LevelOverText" type="Label" parent="."]
 visible = false

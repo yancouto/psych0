@@ -75,31 +75,66 @@ static func enemy_type_to_color(type: EnemyType) -> Color:
 			assert(false, "Invalid enemy type")
 			return Color()
 
+# Speed that may depend on player position
+class Speed:
+	func calc(cur_pos: Vector2, player_pos: Vector2) -> Vector2:
+		assert(false, "Must be implemented")
+		return Vector2.ZERO
+	func multiply(factor: float) -> Speed:
+		assert(false, "Must be implemented")
+		return Speed.new()
+	func swap_coordinates() -> Speed:
+		assert(false, "Must be implemented")
+		return Speed.new()
+	static func from_vec(speed: Vector2) -> Speed:
+		return BasicSpeed.new(speed.x, speed.y)
+
+class BasicSpeed extends Speed:
+	var speed: Vector2
+	func _init(x: float, y: float):
+		speed = Vector2(x, y)
+	func calc(_cur_pos: Vector2, _player_pos: Vector2) -> Vector2:
+		return speed
+	func multiply(factor: float) -> Speed:
+		return BasicSpeed.new(speed.x * factor, speed.y * factor)
+	func swap_coordinates() -> Speed:
+		return BasicSpeed.new(speed.y, speed.x)
+
+class FollowPlayer extends Speed:
+	var speed_len: float
+	func _init(speed_len_: float):
+		speed_len = speed_len_
+	func calc(cur_pos: Vector2, player_pos: Vector2) -> Vector2:
+		return (player_pos - cur_pos).normalized() * speed_len
+	func multiply(factor: float) -> Speed:
+		return FollowPlayer.new(speed_len * factor)
+	func swap_coordinates() -> Speed:
+		return FollowPlayer.new(speed_len)
 
 class EnemyToSpawn:
 	var radius: float
 	var pos: Vector2
-	var speed: Vector2
+	var speed: Speed
 	var type: EnemyType
-	func _init(radius_: float, pos_: Vector2, speed_: Vector2, type_: EnemyType):
+	func _init(radius_: float, pos_: Vector2, speed_: Speed, type_: EnemyType):
 		self.radius = radius_
 		self.pos = pos_
 		self.speed = speed_
 		self.type = type_
 	func spawn(root: Node, ago: float) -> void:
 		var enemy = preload("res://enemies/basic.tscn").instantiate()
-		enemy.start(pos, speed, radius, LevelEvent.map_enemy_type(type))
+		enemy.start(pos, speed.calc(pos, root.get_node('../%Player').position), radius, LevelEvent.map_enemy_type(type))
 		enemy.position += enemy.speed * ago
 		root.add_child(enemy)
 
 class IndicatorToSpawn:
 	# On the edge of the screen
 	var center: Vector2
-	var angle: float
+	var speed: Speed
 	var color: Color
-	func _init(center_: Vector2, angle_: float, color_: Color):
+	func _init(center_: Vector2, speed_: Speed, color_: Color):
 		self.center = center_
-		self.angle = angle_
+		self.speed = speed_
 		self.color = color_
 
 # Does nothing, just added in the end always, so we can wait for no enemies

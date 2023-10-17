@@ -2,6 +2,7 @@ extends LevelBuilder
 
 var F := Formation
 var E := LevelEvent.EnemyType
+const Speed := LevelEvent.BasicSpeed
 
 func _init():
 	const r := 0.9
@@ -9,7 +10,7 @@ func _init():
 	var screen_angle := Vector2(H/2, W/2).angle()
 
 	wait(2)
-	spawn(F.Single.new(Vector2(-r, H / 2), Vector2(s, 0), r))
+	spawn(F.Single.new(Vector2(-r, H / 2), Speed.new(s, 0), r))
 	wait_until_no_enemies()
 	spawn(F.Circle.new(2, -PI/2, 1, [E.Basic3]))
 	wait(3)
@@ -54,7 +55,7 @@ func _init():
 		spawn(F.VerticalLine.new(13, F.VerticalLineSide.Left, F.VerticalLinePlacement.Gap.new((i + 1) * (H / 6), 200), 1., 0.75, [E.Basic3]))
 	wait_until_no_enemies()
 
-	spawn(F.Multiple.new(50, Vector2(W + r, H / 2), Vector2(-0.75, 0), 0.1, r, [E.Basic3]))
+	spawn(F.Multiple.new(50, Vector2(W + r, H / 2), Speed.new(-0.75, 0), Vector2.RIGHT, 0.1, r, [E.Basic3]))
 	wait(5)
 	for i in range(5):
 		wait(1)
@@ -75,4 +76,10 @@ func _init():
 	for i in range(3):
 		wait(1.5)
 		spawn(F.HorizontalLine.new(11, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.V.new(50 + 50 * i), .5))
+	wait_until_no_enemies()
+
+	set_indicator_time(5)
+	wait(6)
+	spawn(F.Circle.new(16, 0, 0.5, [E.Basic1, E.Basic3]).set_follow_player())
+	reset_indicator_time()
 	wait_until_no_enemies()

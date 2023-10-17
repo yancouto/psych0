@@ -40,21 +40,26 @@ class EnemyWithTime:
 
 # This is done assuming squares and not circles, because the difference is minimal and the math is way simpler
 func move_next_to_screen(cur_time: LevelTime, enemy: EnemyToSpawn) -> EnemyWithTime:
-	var time_to_x := intersect_axis(enemy.pos.x - enemy.radius, enemy.pos.x + enemy.radius, 0, LevelBuilder.W, enemy.speed.x)
-	var time_to_y := intersect_axis(enemy.pos.y - enemy.radius, enemy.pos.y + enemy.radius, 0, LevelBuilder.H, enemy.speed.y)
+	var speed: Vector2
+	if enemy.speed is LevelEvent.BasicSpeed:
+		speed = (enemy.speed as LevelEvent.BasicSpeed).speed
+	else:
+		return EnemyWithTime.new(enemy, cur_time.clone())
+	var time_to_x := intersect_axis(enemy.pos.x - enemy.radius, enemy.pos.x + enemy.radius, 0, LevelBuilder.W, speed.x)
+	var time_to_y := intersect_axis(enemy.pos.y - enemy.radius, enemy.pos.y + enemy.radius, 0, LevelBuilder.H, speed.y)
 	# Must intersect screen at some point. This condition is not sufficient, but a good enough check.
 	assert(time_to_x >= 0 && time_to_y >= 0)
 	var time_to_screen := maxf(time_to_x, time_to_y)
 	var time = cur_time.clone()
 	time.secs_after += time_to_screen
-	enemy.pos += enemy.speed * time_to_screen
+	enemy.pos += speed * time_to_screen
 	return EnemyWithTime.new(enemy, time)
 
 # Assumes enemy is already compressed next to screen
 func enemy_to_indicator(enemy: EnemyToSpawn) -> IndicatorToSpawn:
 	const margin := 10
 	var center = enemy.pos.clamp(Vector2(margin, margin), Vector2(LevelBuilder.W - margin, LevelBuilder.H - margin))
-	return IndicatorToSpawn.new(center, enemy.speed.angle(), LevelEvent.enemy_type_to_color(enemy.type))
+	return IndicatorToSpawn.new(center, enemy.speed, LevelEvent.enemy_type_to_color(enemy.type))
 
 class Spawn extends BuilderEvent:
 	var formation: Formation
@@ -68,7 +73,7 @@ class Spawn extends BuilderEvent:
 		enemies.assign(raw_enemies.map(func(e): return move_next_to_screen(cur_time, e)))
 		enemies.sort_custom(func(a: EnemyWithTime, b: EnemyWithTime): return a.time.lt(b.time))
 		# Dummy sentinel at the end so the algorithm below doesn't need special casing
-		enemies.append(EnemyWithTime.new(EnemyToSpawn.new(0, Vector2(0, 0), Vector2(0, 0), LevelEvent.EnemyType.Basic1), LevelTime.new(ceili(1e9), INF)))
+		enemies.append(EnemyWithTime.new(EnemyToSpawn.new(0, Vector2(0, 0), LevelEvent.BasicSpeed.new(0, 0), LevelEvent.EnemyType.Basic1), LevelTime.new(ceili(1e9), INF)))
 		var events: Array[EventWithTime] = []
 		var last_enemies: Array[EnemyToSpawn] = []
 		var last_time := enemies[0].time
