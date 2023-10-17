@@ -1,6 +1,7 @@
 extends LevelBuilder
 
 var F := Formation
+var E := LevelEvent.EnemyType
 
 func _init():
 	const r := 0.9
@@ -10,12 +11,12 @@ func _init():
 	wait(2)
 	spawn(F.Single.new(Vector2(-r, H / 2), Vector2(s, 0), r))
 	wait_until_no_enemies()
-	spawn(F.Circle.new(2, -PI/2))
+	spawn(F.Circle.new(2, -PI/2, 1, [E.Basic3]))
 	wait(3)
-	spawn(F.Circle.new(4, 0, 1))
+	spawn(F.Circle.new(4, 0, 1, [E.Basic3, E.Basic1]))
 	wait(1.5)
-	spawn(F.Circle.new(2, -screen_angle, 1))
-	spawn(F.Circle.new(2, screen_angle, 1))
+	spawn(F.Circle.new(2, -screen_angle, 1, [E.Basic1, E.Basic3]))
+	spawn(F.Circle.new(2, screen_angle, 1, [E.Basic3, E.Basic1]))
 	wait_until_no_enemies()
 
 	wait(2)
@@ -29,13 +30,13 @@ func _init():
 	wait(1)
 	spawn(F.HorizontalLine.new(14, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.V.new(100), 1))
 	wait(1.5)
-	spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.V.new(100), 1))
+	spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.V.new(100), 1, 1, [E.Basic3, E.Basic1]))
 	wait_until_no_enemies()
 
 	set_indicator_time(1)
 	for i in range(5):
 		wait(1)
-		spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new((i + 1) * (W / 6), 200)))
+		spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new((i + 1) * (W / 6), 200), 1, 1, [E.Basic3]))
 	wait_until_no_enemies()
 	
 
@@ -50,10 +51,10 @@ func _init():
 		wait(1)
 		if extra[i] != null:
 			spawn(extra[i])
-		spawn(F.VerticalLine.new(13, F.VerticalLineSide.Left, F.VerticalLinePlacement.Gap.new((i + 1) * (H / 6), 200), 1., 0.75))
+		spawn(F.VerticalLine.new(13, F.VerticalLineSide.Left, F.VerticalLinePlacement.Gap.new((i + 1) * (H / 6), 200), 1., 0.75, [E.Basic3]))
 	wait_until_no_enemies()
 
-	spawn(F.Multiple.new(50, Vector2(W + r, H / 2), Vector2(-0.75, 0), 0.1, r))
+	spawn(F.Multiple.new(50, Vector2(W + r, H / 2), Vector2(-0.75, 0), 0.1, r, [E.Basic3]))
 	wait(5)
 	for i in range(5):
 		wait(1)

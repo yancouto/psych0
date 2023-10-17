@@ -68,7 +68,7 @@ class Spawn extends BuilderEvent:
 		enemies.assign(raw_enemies.map(func(e): return move_next_to_screen(cur_time, e)))
 		enemies.sort_custom(func(a: EnemyWithTime, b: EnemyWithTime): return a.time.lt(b.time))
 		# Dummy sentinel at the end so the algorithm below doesn't need special casing
-		enemies.append(EnemyWithTime.new(EnemyToSpawn.new(0, Vector2(0, 0), Vector2(0, 0)), LevelTime.new(ceili(1e9), INF)))
+		enemies.append(EnemyWithTime.new(EnemyToSpawn.new(0, Vector2(0, 0), Vector2(0, 0), LevelEvent.EnemyType.Basic1), LevelTime.new(ceili(1e9), INF)))
 		var events: Array[EventWithTime] = []
 		var last_enemies: Array[EnemyToSpawn] = []
 		var last_time := enemies[0].time

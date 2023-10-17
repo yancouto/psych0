@@ -1,5 +1,6 @@
 class_name LevelEvent
 
+enum EnemyType { Basic1, Basic3 }
 
 class LevelTimeDelta:
 	var wait_until_no_enemies: int
@@ -52,17 +53,31 @@ class EventWithTime:
 		self.event = event_
 		self.time = time_
 
+# TODO: On more complex enemies, this will need to be redone because we'll
+# need to instantiate a different scene
+static func map_enemy_type(type: EnemyType) -> BasicEnemy.Type:
+	match type:
+		EnemyType.Basic1:
+			return BasicEnemy.Type.One
+		EnemyType.Basic3:
+			return BasicEnemy.Type.Three
+		_:
+			assert(false, "Unkown enemy type")
+			return BasicEnemy.Type.One
+
 class EnemyToSpawn:
 	var radius: float
 	var pos: Vector2
 	var speed: Vector2
-	func _init(radius_: float, pos_: Vector2, speed_: Vector2):
+	var type: EnemyType
+	func _init(radius_: float, pos_: Vector2, speed_: Vector2, type_: EnemyType):
 		self.radius = radius_
 		self.pos = pos_
 		self.speed = speed_
+		self.type = type_
 	func spawn(root: Node, ago: float) -> void:
-		var enemy = preload("res://enemy.tscn").instantiate()
-		enemy.start(pos, speed, radius)
+		var enemy = preload("res://enemies/basic.tscn").instantiate()
+		enemy.start(pos, speed, radius, LevelEvent.map_enemy_type(type))
 		enemy.position += enemy.speed * ago
 		root.add_child(enemy)
 
