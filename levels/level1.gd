@@ -58,8 +58,11 @@ func _init():
 	wait(5)
 	for i in range(5):
 		wait(1)
-		var side := F.VerticalLineSide.Left if i % 2 == 0 else F.VerticalLineSide.Right
-		spawn(F.VerticalLine.new(13, side, F.VerticalLinePlacement.Distribute.new(), 0.9 + 0.25 * i))
+		const left := F.VerticalLineSide.Left
+		const right := F.VerticalLineSide.Right
+		var side := left if i % 2 == 0 else right
+		spawn(F.VerticalLine.new(6, side, F.VerticalLinePlacement.Distribute.new(0, LevelBuilder.H / 2 + Formation.get_radius(r)), 0.9 + 0.25 * i))
+		spawn(F.VerticalLine.new(6, left + right - side, F.VerticalLinePlacement.Distribute.new(LevelBuilder.H / 2 + Formation.get_radius(r), 0), 0.9 + 0.25 * i))
 	wait_until_no_enemies()
 	reset_indicator_time()
 

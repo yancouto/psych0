@@ -91,18 +91,22 @@ class HorizontalLinePlacement:
 	# Distribute enemies evenly in the screen
 	class Distribute extends HorizontalLinePlacement:
 		# Margin from the leftmost and rightmost enemy to the side of the screen
-		var margin: float
-		func _init(margin_: float = 0):
-			self.margin = margin_
+		var margin_left: float
+		var margin_right: float
+		func _init(margin_left_: float = 0, margin_right_: float = -1.):
+			self.margin_left = margin_left_
+			if margin_right_ == -1.:
+				margin_right_ = margin_left_
+			self.margin_right = margin_right_
 		func positions(n: int, radius: float, len: float) -> Array[Vector2]:
 			if n == 1:
 				return [Vector2(len / 2, 0)]
 			var pos: Array[Vector2] = []
-			len -= margin * 2
+			len -= margin_left + margin_right
 			for i in range(n):
 				var dist := (len - 2 * n * radius) / (n - 1)
 				var x := i * dist + radius * (2 * i + 1)
-				pos.append(Vector2(x + margin, 0))
+				pos.append(Vector2(x + margin_left, 0))
 			return pos
 
 	# Distribute enemies evenly, and make them V-shaped
@@ -186,12 +190,16 @@ enum VerticalLineSide { Left, Right }
 class VerticalLinePlacement:
 	# Distribute enemies evenly in the screen
 	class Distribute extends VerticalLinePlacement:
-		# Margin from the leftmost and rightmost enemy to the side of the screen
-		var margin: float
-		func _init(margin_: float = 0):
-			self.margin = margin_
+		# Margin from the topmost and bottommost enemy to the side of the screen
+		var margin_top: float
+		var margin_bottom: float
+		func _init(margin_top_: float = 0, margin_bottom_: float = -1.):
+			self.margin_top = margin_top_
+			if margin_bottom_ == -1.:
+				margin_bottom_ = margin_top_
+			self.margin_bottom = margin_bottom_
 		func convert() -> HorizontalLinePlacement:
-			return HorizontalLinePlacement.Distribute.new(margin)
+			return HorizontalLinePlacement.Distribute.new(margin_top, margin_bottom)
 
 	# Distribute enemies evenly, and make them V-shaped
 	class V extends VerticalLinePlacement:
