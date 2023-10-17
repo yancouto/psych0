@@ -65,6 +65,17 @@ static func map_enemy_type(type: EnemyType) -> BasicEnemy.Type:
 			assert(false, "Unkown enemy type")
 			return BasicEnemy.Type.One
 
+static func enemy_type_to_color(type: EnemyType) -> Color:
+	match type:
+		EnemyType.Basic1:
+			return Color.SEA_GREEN
+		EnemyType.Basic3:
+			return Color.YELLOW
+		_:
+			assert(false, "Invalid enemy type")
+			return Color()
+
+
 class EnemyToSpawn:
 	var radius: float
 	var pos: Vector2
@@ -85,9 +96,11 @@ class IndicatorToSpawn:
 	# On the edge of the screen
 	var center: Vector2
 	var angle: float
-	func _init(center_: Vector2, angle_: float):
+	var color: Color
+	func _init(center_: Vector2, angle_: float, color_: Color):
 		self.center = center_
 		self.angle = angle_
+		self.color = color_
 
 # Does nothing, just added in the end always, so we can wait for no enemies
 class LastEvent extends LevelEvent:

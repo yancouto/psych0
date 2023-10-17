@@ -3,11 +3,13 @@ extends Node2D
 var ttl: float
 var center: Vector2
 var angle: float
+var color: Color
 
 func start(to_spawn: LevelEvent.IndicatorToSpawn, duration: float) -> void:
 	self.ttl = duration
 	self.center = to_spawn.center
 	self.angle = to_spawn.angle
+	self.color = to_spawn.color
 	
 
 func _process(dt: float) -> void:
@@ -23,4 +25,4 @@ func _draw() -> void:
 	const radius := 45
 	for i in range(amount):
 		points.append(center + Vector2.from_angle(angle - angle_range / 2 + (angle_range / amount) * i) * radius)
-	self.draw_colored_polygon(points, Color.AQUA)
+	self.draw_colored_polygon(points, color)

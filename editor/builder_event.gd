@@ -54,7 +54,7 @@ func move_next_to_screen(cur_time: LevelTime, enemy: EnemyToSpawn) -> EnemyWithT
 func enemy_to_indicator(enemy: EnemyToSpawn) -> IndicatorToSpawn:
 	const margin := 10
 	var center = enemy.pos.clamp(Vector2(margin, margin), Vector2(LevelBuilder.W - margin, LevelBuilder.H - margin))
-	return IndicatorToSpawn.new(center, enemy.speed.angle())
+	return IndicatorToSpawn.new(center, enemy.speed.angle(), LevelEvent.enemy_type_to_color(enemy.type))
 
 class Spawn extends BuilderEvent:
 	var formation: Formation
