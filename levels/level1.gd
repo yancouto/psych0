@@ -35,9 +35,13 @@ func _init():
 	wait_until_no_enemies()
 
 	set_indicator_time(1)
-	for i in range(5):
+	for i in 5:
 		wait(1)
-		spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new((i + 1) * (W / 6), 200), 1, 1, [E.Basic3]))
+		spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new((i + 1) * (W / 6), 200), 1, 1, [E.Basic1, E.Basic3]))
+	for i in 4:
+		spawn(F.HorizontalLine.new(12, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.Distribute.new(), 0.6))
+		wait(1)
+		spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new(((4 - i) + 1) * (W / 6), 200), 1, 1, [E.Basic3]))
 	wait_until_no_enemies()
 	
 
