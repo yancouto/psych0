@@ -9,11 +9,15 @@ func _init():
 	const s := 0.75
 	var screen_angle := Vector2(H/2, W/2).angle()
 
+	wait(1)
+	level_part("Part I - The beginning of the end")
+
 	wait(2)
 	spawn(F.Single.new(Vector2(-r, H / 2), Speed.new(s, 0), r))
 	wait_until_no_enemies()
 	spawn(F.Circle.new(2, -PI/2, 1, [E.Basic3]))
 	wait(3)
+
 	spawn(F.Circle.new(4, 0, 1, [E.Basic1]))
 	wait(2)
 	spawn(F.Circle.new(2, -screen_angle, 1, [E.Basic3]))

@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://wyi8ts15lueo"]
+[gd_scene load_steps=7 format=3 uid="uid://wyi8ts15lueo"]
 
 [ext_resource type="Script" path="res://runner.gd" id="1_224jk"]
 [ext_resource type="PackedScene" uid="uid://dwqfguj644qf2" path="res://player.tscn" id="2_1y6tv"]
@@ -7,6 +7,9 @@
 
 [sub_resource type="LabelSettings" id="LabelSettings_kjhy5"]
 font_size = 100
+
+[sub_resource type="LabelSettings" id="LabelSettings_g5oon"]
+font_size = 27
 
 [node name="Level Runner" type="Node2D"]
 script = ExtResource("1_224jk")
@@ -33,6 +36,13 @@ script = ExtResource("3_kc0cc")
 unique_name_in_owner = true
 position = Vector2(8, 8)
 script = ExtResource("4_vvdtp")
+
+[node name="LevelPart" type="Label" parent="."]
+offset_top = 16.0
+offset_right = 1440.0
+offset_bottom = 42.0
+label_settings = SubResource("LabelSettings_g5oon")
+horizontal_alignment = 1
 
 [connection signal="activated" from="BulletTime" to="Player" method="_on_bullet_time_activated"]
 [connection signal="deactivated" from="BulletTime" to="Player" method="_on_bullet_time_deactivated"]

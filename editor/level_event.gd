@@ -139,14 +139,22 @@ class IndicatorToSpawn:
 
 # Does nothing, just added in the end always, so we can wait for no enemies
 class LastEvent extends LevelEvent:
-	func trigger(_root: Node, _ago: float) -> bool:
+	func trigger(_level: Level, _root: Node, _ago: float) -> bool:
+		return true
+
+class LevelPart extends LevelEvent:
+	var name: String
+	func _init(name_: String):
+		name = name_
+	func trigger(level: Level, _root: Node, _ago: float) -> bool:
+		level.change_level_part.emit(name)
 		return true
 
 class Spawn extends LevelEvent:
 	var to_spawn: Array[EnemyToSpawn]
 	func _init(to_spawn_: Array[EnemyToSpawn]):
 		self.to_spawn = to_spawn_
-	func trigger(root: Node, ago: float) -> bool:
+	func trigger(_level: Level, root: Node, ago: float) -> bool:
 		for enemy in to_spawn:
 			enemy.spawn(root, ago)
 		return true
@@ -157,7 +165,7 @@ class Indicator extends LevelEvent:
 	func _init(to_spawn_: Array[IndicatorToSpawn], duration_: float):
 		self.to_spawn = to_spawn_
 		self.duration = duration_
-	func trigger(root: Node, ago: float) -> bool:
+	func trigger(_level: Level, root: Node, ago: float) -> bool:
 		const IndicatorNode = preload("res://indicator.tscn")
 		for ind_to_spawn in to_spawn:
 			var indicator = IndicatorNode.instantiate()
@@ -166,6 +174,6 @@ class Indicator extends LevelEvent:
 		return true
 
 # Trigger the event, the event should have happened ago seconds ago
-func trigger(_root: Node, _ago: float) -> bool:
+func trigger(_level: Level, _root: Node, _ago: float) -> bool:
 	assert(false, "Must be implemented by all subclasses")
 	return false

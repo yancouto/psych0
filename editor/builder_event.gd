@@ -5,6 +5,14 @@ const EnemyToSpawn = LevelEvent.EnemyToSpawn
 const LevelTime = LevelEvent.LevelTime
 const EventWithTime = LevelEvent.EventWithTime
 
+class LevelPart extends BuilderEvent:
+	var name: String
+	func _init(name_: String):
+		name = name_
+	func process_and_update_time(cur_time: LevelTime) -> Array[EventWithTime]:
+		var time = cur_time.clone()
+		return [EventWithTime.new(LevelEvent.LevelPart.new(name), time)]
+
 class Wait extends BuilderEvent:
 	var secs: float
 	func _init(t: float):

@@ -14,6 +14,9 @@ func wait_until_no_enemies() -> void:
 func wait(secs: float) -> void:
 	events.append(BuilderEvent.Wait.new(secs))
 
+func level_part(name: String) -> void:
+	events.append(BuilderEvent.LevelPart.new(name))
+
 func spawn(f: Formation) -> void:
 	events.append(BuilderEvent.Spawn.new(f, cur_indicator_time))
 
