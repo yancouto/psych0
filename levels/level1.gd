@@ -3,6 +3,10 @@ extends LevelBuilder
 var F := Formation
 const E := LevelEvent.EnemyType
 const Speed := LevelEvent.BasicSpeed
+const Top := Formation.HorizontalLineSide.Top
+const Bottom := Formation.HorizontalLineSide.Bottom
+const Left := Formation.VerticalLineSide.Left
+const Right := Formation.VerticalLineSide.Right
 
 func top_bottom(amount: int) -> void:
 	spawn(F.VerticalLine.new(amount / 2, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(0, H / 2), 1.5))
@@ -25,22 +29,27 @@ func _init():
 	wait(2)
 	spawn(F.Single.new(Vector2(-r, H / 2), Speed.new(s, 0), r))
 	wait_until_no_enemies()
-	spawn(F.Circle.new(2, -PI/2, 1, [E.Basic3]))
+	spawn(F.Circle.new(2, -PI/2, 1, [E.Basic1]))
 	wait(3)
 
 	spawn(F.Circle.new(4, 0, 1, [E.Basic1]))
 	wait(2)
-	spawn(F.Circle.new(2, -screen_angle, 1, [E.Basic3]))
-	spawn(F.Circle.new(2, screen_angle, 1, [E.Basic3]))
+	spawn(F.Circle.new(2, -screen_angle, 1, [E.Basic1]))
+	spawn(F.Circle.new(2, screen_angle, 1, [E.Basic1]))
 	wait_until_no_enemies()
+	reset()
 
 	wait(2)
-	spawn(F.HorizontalLine.new(10, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Distribute.new()))
-	wait(1)
-	for _i in 3:
-		spawn(F.HorizontalLine.new(12, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.Distribute.new(), 1, 1))
-		wait(0.5)
+
+	for i in 4:
+		spawn(F.VerticalLine.new(12, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), 1.3 if i < 3 else 2, 1))
+		wait((4 - i) * 0.2 + 0.2)
+	wait(0.5)
+	spawn(F.VerticalLine.new(14, F.VerticalLineSide.Right, F.VerticalLinePlacement.Distribute.new(), 1.3))
 	wait_until_no_enemies()
+	
+	spawn(F.Spiral.new(4, 4, 400, 0., 1., 1., [E.Basic3]))
+	wait(8)
 
 
 	spawn(F.HorizontalLine.new(15, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.V.new(100), 1))
@@ -61,8 +70,19 @@ func _init():
 			spawn(F.VerticalLine.new(8, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), 0.5))
 		wait(1)
 		spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new(((4 - i) + 1) * (W / 6), 200), 1, 1, [E.Basic3]))
-	wait_until_no_enemies()
+	wait(4.5)
 
+	reset_indicator_time()
+	for side in [Top, Bottom]:
+		spawn(F.HorizontalLine.new(18, side, F.HorizontalLinePlacement.Gap.new(W / 2, 150)))
+	wait(1.5)
+	for side in [Left, Right]:
+		spawn(F.VerticalLine.new(14, side, F.VerticalLinePlacement.Distribute.new(125)))
+	for side in [Top, Bottom]:
+		spawn(F.HorizontalLine.new(6, side, F.HorizontalLinePlacement.Distribute.new(W * .35)))
+	wait_until_no_enemies()
+	
+	set_indicator_time(1)
 	var extra: Array[Formation] = [
 		F.VerticalLine.new(8, F.VerticalLineSide.Right, F.VerticalLinePlacement.Distribute.new(), 1),
 		null,
@@ -77,7 +97,7 @@ func _init():
 		spawn(F.VerticalLine.new(13, F.VerticalLineSide.Left, F.VerticalLinePlacement.Gap.new((i + 1) * (H / 6), 200), 1., 0.75, [E.Basic3]))
 	wait_until_no_enemies()
 
-	spawn(F.Multiple.new(50, Vector2(W + r, H / 2), Speed.new(-0.75, 0), Vector2.RIGHT, 0.1, r, [E.Basic3]))
+	spawn(F.Multiple.new(42, Vector2(W + r, H / 2), Speed.new(-0.75, 0), Vector2.RIGHT, 0.1, r, [E.Basic3]))
 	wait(5)
 	for i in range(5):
 		wait(1)
@@ -91,12 +111,12 @@ func _init():
 
 	wait(2)
 	spawn(F.Spiral.new(8, 8, 100, 0, 1))
-	wait(7)
+	wait(6)
 	spawn(F.Spiral.new(12, 20, 150, 0, 1.5).invert())
 	wait(4)
 	spawn(F.VerticalLine.new(10, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), .5))
 	spawn(F.VerticalLine.new(10, F.VerticalLineSide.Right, F.VerticalLinePlacement.Distribute.new(), .5))
-	wait(7)
+	wait(6)
 	spawn(F.Spiral.new(20, 100, 50))
 	wait(5)
 	spawn(F.VerticalLine.new(11, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), .75))
@@ -106,12 +126,6 @@ func _init():
 	for i in range(3):
 		wait(1.5)
 		spawn(F.HorizontalLine.new(11, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.V.new(50 + 50 * i), .5))
-	wait_until_no_enemies()
-
-	set_indicator_time(5)
-	wait(6)
-	spawn(F.Circle.new(16, 0, 0.5, [E.Basic1, E.Basic3]).set_follow_player())
-	reset_indicator_time()
 	wait_until_no_enemies()
 
 	level_part("Part II - Circle madness")
@@ -180,4 +194,11 @@ func _init():
 		spawn(F.HorizontalLine.new(4 + i * 3, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new(W / 2, 100 + (4 - i) * ((W - 100) / 5)), 0.7, 1., [E.Basic3]))
 		spawn(F.HorizontalLine.new(4 + i * 3, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.Gap.new(W / 2, 100 + (4 - i) * ((W - 100) / 5)), 0.7, 1., [E.Basic3]))
 		wait(1.2)
+	wait_until_no_enemies()
+
+	level_part("Part III - They're after you")
+	set_indicator_time(5)
+	wait(6)
+	spawn(F.Circle.new(16, 0, 0.5, [E.Basic1, E.Basic3]).set_follow_player())
+	reset_indicator_time()
 	wait_until_no_enemies()
