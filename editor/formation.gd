@@ -70,6 +70,7 @@ class Circle extends Formation:
 	var speed_len: float
 	var types: Array[EnemyType]
 	var follow_player := false
+	var center := LevelBuilder.MIDDLE
 	func _init(amount_: int, starting_angle_ := 0., speed_len_ := 1., types_: Array[EnemyType] = []):
 		self.amount = amount_
 		self.starting_angle = starting_angle_
@@ -78,14 +79,26 @@ class Circle extends Formation:
 	func set_follow_player() -> Formation:
 		follow_player = true
 		return self
+	func set_center(center_: Vector2) -> Formation:
+		center = center_
+		return self
+	func set_center_x(x: float) -> Formation:
+		center.x = x
+		return self
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		var enemies: Array[EnemyToSpawn] = []
 		var n := self.amount
 		enemies.resize(n)
-		var center := Vector2(LevelBuilder.W / 2.0, LevelBuilder.H / 2.0)
 		# TODO: Make customisable
 		const enemy_radius := BASE_RADIUS
-		var circle_radius := center.length() + enemy_radius
+		var circle_radius := enemy_radius
+		if center == LevelBuilder.MIDDLE:
+			circle_radius += center.length()
+		else:
+			var biggest := 0.0
+			for corner in LevelBuilder.CORNERS:
+				biggest = maxf(biggest, (center - corner).length_squared())
+			circle_radius += sqrt(biggest)
 		for i in range(n):
 			var angle := Vector2(0, -1).rotated(starting_angle + i * (TAU / n))
 			var pos := center + angle * circle_radius
@@ -290,7 +303,7 @@ class Spiral extends Formation:
 		var center := Vector2(LevelBuilder.W / 2, LevelBuilder.H / 2)
 		var screen_radius := center.length()
 		for i in range(amount):
-			var angle := Vector2(0, -1).rotated(i * 2 * PI * dir / amount_in_circle)
+			var angle := Vector2(0, -1).rotated(starting_angle + i * 2 * PI * dir / amount_in_circle)
 			var pos := center + angle * (screen_radius + radius + i * spacing)
 			var speed := -angle * speed_len * BASE_SPEED
 			enemies[i] = EnemyToSpawn.new(radius, pos, LevelEvent.BasicSpeed.from_vec(speed), Formation.get_enemy(types, i))

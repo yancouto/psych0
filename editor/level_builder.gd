@@ -1,8 +1,14 @@
 class_name LevelBuilder
 
-static var W := 1440.
-static var H := 1080.
-static var BASE_INDICATOR_TIME := 2.0
+const W := 1440.
+const H := 1080.
+const TOP_LEFT := Vector2.ZERO
+const TOP_RIGHT := Vector2(W, 0)
+const BOTTOM_RIGHT := Vector2(W, H)
+const BOTTOM_LEFT := Vector2(0, H)
+const CORNERS: Array[Vector2] = [TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT]
+const MIDDLE := BOTTOM_RIGHT / 2.
+const BASE_INDICATOR_TIME := 2.0
 
 var events: Array[BuilderEvent] = []
 var cur_indicator_time := BASE_INDICATOR_TIME

@@ -1,8 +1,18 @@
 extends LevelBuilder
 
 var F := Formation
-var E := LevelEvent.EnemyType
+const E := LevelEvent.EnemyType
 const Speed := LevelEvent.BasicSpeed
+
+func top_bottom(amount: int) -> void:
+	spawn(F.VerticalLine.new(amount / 2, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(0, H / 2), 1.5))
+	spawn(F.VerticalLine.new((amount + 1) / 2, F.VerticalLineSide.Right, F.VerticalLinePlacement.Distribute.new(H / 2, 0), 1.5))
+
+func left_right(amount: int, enemies: Array[E], invert := false) -> void:
+	const top := F.HorizontalLineSide.Top
+	const bottom := F.HorizontalLineSide.Bottom
+	spawn(F.HorizontalLine.new(amount / 2, top if invert else bottom, F.HorizontalLinePlacement.Distribute.new(0, W / 2), 1, 1., enemies))
+	spawn(F.HorizontalLine.new((amount + 1) / 2, bottom if invert else top, F.HorizontalLinePlacement.Distribute.new(W / 2, 0), 1, 1., enemies))
 
 func _init():
 	const r := 0.9
@@ -102,4 +112,72 @@ func _init():
 	wait(6)
 	spawn(F.Circle.new(16, 0, 0.5, [E.Basic1, E.Basic3]).set_follow_player())
 	reset_indicator_time()
+	wait_until_no_enemies()
+
+	level_part("Part II - Circle madness")
+	spawn(F.Circle.new(12))
+	wait_until_no_enemies()
+	spawn(F.Circle.new(20, 0, 1, [E.Basic1, E.Basic3]))
+	wait(5)
+	spawn(F.Circle.new(12).set_center_x(W / 3))
+	spawn(F.Circle.new(12).set_center_x(2 * W / 3))
+	wait(6.3)
+	spawn(F.Circle.new(15, 0, 1, [E.Basic1, E.Basic3, E.Basic1]).set_center_x(W/3))
+	spawn(F.Circle.new(15, 0, 1, [E.Basic1]).set_center_x(2*W/3))
+	wait(5.5)
+	spawn(F.Circle.new(15, 0, 1, [E.Basic1]).set_center_x(W/3))
+	spawn(F.Circle.new(15, 0, 1, [E.Basic3, E.Basic1, E.Basic3]).set_center_x(2*W/3))
+	wait(5.5)
+	spawn(F.Circle.new(18, 0, 1, [E.Basic1, E.Basic3]).set_center_x(W/3))
+	spawn(F.Circle.new(18, 0, 1, [E.Basic3, E.Basic1]).set_center_x(2*W/3))
+	wait_until_no_enemies()
+	
+	set_indicator_time(1.2)
+	spawn(F.Spiral.new(90, 80, 100, PI/2, 1.5, 1, [E.Basic1]))
+	wait(2)
+	spawn(F.Spiral.new(90, 60, 100, -PI/2, 1.5, 1, [E.Basic1, E.Basic3]).invert())
+	wait(4)
+	spawn(F.VerticalLine.new(12, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), 0.8))
+	wait(8)
+	
+	spawn(F.VerticalLine.new(12, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), 1.5))
+	wait(1)
+	spawn(F.VerticalLine.new(12, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), 1.5))
+	wait(0.5)
+	spawn(F.VerticalLine.new(12, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), 1.5))
+	wait(2)
+
+
+	spawn(F.Spiral.new(90, 80, 100, 0, 1.5, 1, [E.Basic1, E.Basic3]))
+	spawn(F.Spiral.new(90, 80, 100, TAU/3, 1.5, 1, [E.Basic3, E.Basic1]))
+	spawn(F.Spiral.new(90, 80, 100, 2*TAU/3, 1.5, 1, [E.Basic1, E.Basic3]))
+	
+	wait(3.5)
+	left_right(10, [])
+	wait(2.5)
+	top_bottom(12)
+	wait(5)
+	left_right(18, [E.Basic1, E.Basic3])
+	wait(1)
+	left_right(18, [E.Basic1], true)
+	
+	wait(3.5)
+
+
+	spawn(F.HorizontalLine.new(14, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.Gap.new(W / 2, W / 3), 1.2, 1., [E.Basic3]))
+	spawn(F.HorizontalLine.new(11, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.V.new(50, W / 4), 1.2, 1., [E.Basic1, E.Basic3]))
+	wait(.8)
+	spawn(F.HorizontalLine.new(11, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.V.new(50, W / 4), 1.2, 1., [E.Basic3]))
+	wait_until_no_enemies()
+
+	spawn(F.Circle.new(28, 0, 0.7))
+	wait(2.5)
+	spawn(F.Circle.new(28, 0, 0.5, [E.Basic1, E.Basic3]))
+	wait(1.5)
+	spawn(F.Circle.new(28, 0, 0.5, [E.Basic3]))
+	wait(2.5)
+	for i in 5:
+		spawn(F.HorizontalLine.new(4 + i * 3, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new(W / 2, 100 + (4 - i) * ((W - 100) / 5)), 0.7, 1., [E.Basic3]))
+		spawn(F.HorizontalLine.new(4 + i * 3, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.Gap.new(W / 2, 100 + (4 - i) * ((W - 100) / 5)), 0.7, 1., [E.Basic3]))
+		wait(1.2)
 	wait_until_no_enemies()

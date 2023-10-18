@@ -3,12 +3,15 @@ extends Node
 # Level to run, let's start by hardcoding 1
 var level: Level = preload("res://levels/level1.gd").new().build()
 var next_event: LevelEvent.EventWithTime
+var time_passed := 0.
 
 func _ready() -> void:
 	level.change_level_part.connect(_on_change_level_part)
 
 func _process(dt: float) -> void:
 	dt = %BulletTime.fix_delta(dt)
+	time_passed += dt
+	$DebugTimePassed.text = "%.02fs" % time_passed
 	if level != null && level.update($AllEnemies, dt):
 		$LevelOverText.visible = true
 		level = null
