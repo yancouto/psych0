@@ -19,11 +19,24 @@ func _process(dt: float) -> void:
 func _draw() -> void:
 	draw_circle(Vector2.ZERO, radius, Color.BLACK)
 
+func create_explosion() -> void:
+	var particles := $BallParticles
+	# Already died before
+	if particles == null:
+		return
+	remove_child(particles)
+	particles.configure(position, Color.BLACK, radius)
+	get_parent().add_child(particles)
+
+func die() -> void:
+	create_explosion()
+	queue_free()
+
 # Hit an enemy
 func _on_area_entered(enemy) -> void:
 	enemy.shot()
-	queue_free()
+	die()
 
 
 func _on_visible_on_screen_notifier_2d_screen_exited():
-	queue_free()
+	die()

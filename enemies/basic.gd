@@ -42,13 +42,27 @@ func _process(dt: float) -> void:
 	dt = get_node("../%BulletTime").fix_delta(dt)
 	position += speed * dt
 
+func create_explosion() -> void:
+	# Let's move the particle emitter to the parents (since we're deleting this)
+	# which works but we might want to do better later
+	var particles := $BallParticles
+	# Already died before
+	if particles == null:
+		return
+	remove_child(particles)
+	particles.configure(position, Color.SEA_GREEN if type == Type.One else Color.YELLOW, radius)
+	get_parent().add_child(particles)
+
+func die() -> void:
+	create_explosion()
+	queue_free()
+
 func shot() -> void:
 	health -= 1
 	if health <= 0:
-		queue_free()
+		die()
 	else:
 		queue_redraw()
 
-
 func _on_visible_on_screen_notifier_2d_screen_exited():
-	queue_free()
+	die()

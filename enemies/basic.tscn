@@ -1,10 +1,41 @@
-[gd_scene load_steps=3 format=3 uid="uid://2xi3oi8yv3c6"]
+[gd_scene load_steps=7 format=3 uid="uid://2xi3oi8yv3c6"]
 
 [ext_resource type="Script" path="res://enemies/basic.gd" id="1_s4fj4"]
+[ext_resource type="PackedScene" uid="uid://wr4we6qqcdi1" path="res://ball_particles.tscn" id="2_nskqo"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_76e1n"]
 resource_local_to_scene = true
 radius = 7.5
+
+[sub_resource type="Gradient" id="Gradient_be0lo"]
+offsets = PackedFloat32Array(0.597938, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_0iayt"]
+gradient = SubResource("Gradient_be0lo")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_3pckm"]
+resource_local_to_scene = true
+lifetime_randomness = 0.1
+emission_shape = 1
+emission_sphere_radius = 10.0
+particle_flag_disable_z = true
+spread = 180.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 20.0
+initial_velocity_max = 60.0
+angular_velocity_min = 100.0
+angular_velocity_max = 120.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+linear_accel_min = 4.84
+linear_accel_max = 67.74
+damping_min = 5.0
+damping_max = 20.0
+scale_min = 2.0
+scale_max = 4.0
+color_ramp = SubResource("GradientTexture1D_0iayt")
+attractor_interaction_enabled = false
 
 [node name="Basic Enemy" type="Area2D"]
 collision_layer = 2
@@ -16,5 +47,8 @@ scale = Vector2(0.991663, 1)
 shape = SubResource("CircleShape2D_76e1n")
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+
+[node name="BallParticles" parent="." instance=ExtResource("2_nskqo")]
+process_material = SubResource("ParticleProcessMaterial_3pckm")
 
 [connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]
