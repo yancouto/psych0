@@ -15,7 +15,7 @@ var radius : float:
 		radius = r
 var draw_radius : float
 var cur_shot_cooldown := 0.
-var lives := 5
+var lives := 10
 var state := State.ALIVE
 var recovering_cooldown := 0.
 var color_a := 1.

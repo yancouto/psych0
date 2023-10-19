@@ -8,11 +8,11 @@ const Bottom := Formation.HorizontalLineSide.Bottom
 const Left := Formation.VerticalLineSide.Left
 const Right := Formation.VerticalLineSide.Right
 
-func top_bottom(amount: int) -> void:
-	spawn(F.VerticalLine.new(amount / 2, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(0, H / 2), 1.5))
-	spawn(F.VerticalLine.new((amount + 1) / 2, F.VerticalLineSide.Right, F.VerticalLinePlacement.Distribute.new(H / 2, 0), 1.5))
+func top_bottom(amount: int, enemies: Array[E] = [], invert := false) -> void:
+	spawn(F.VerticalLine.new(amount / 2, Right if invert else Left, F.VerticalLinePlacement.Distribute.new(0, H / 2), 1.5, 1., enemies))
+	spawn(F.VerticalLine.new((amount + 1) / 2, Left if invert else Right, F.VerticalLinePlacement.Distribute.new(H / 2, 0), 1.5, 1., enemies))
 
-func left_right(amount: int, enemies: Array[E], invert := false) -> void:
+func left_right(amount: int, enemies: Array[E] = [], invert := false) -> void:
 	const top := F.HorizontalLineSide.Top
 	const bottom := F.HorizontalLineSide.Bottom
 	spawn(F.HorizontalLine.new(amount / 2, top if invert else bottom, F.HorizontalLinePlacement.Distribute.new(0, W / 2), 1, 1., enemies))
@@ -37,7 +37,6 @@ func _init():
 	spawn(F.Circle.new(2, -screen_angle, 1, [E.Basic1]))
 	spawn(F.Circle.new(2, screen_angle, 1, [E.Basic1]))
 	wait_until_no_enemies()
-	reset()
 
 	wait(2)
 
@@ -199,6 +198,86 @@ func _init():
 	level_part("Part III - They're after you")
 	set_indicator_time(5)
 	wait(6)
-	spawn(F.Circle.new(16, 0, 0.5, [E.Basic1, E.Basic3]).set_follow_player())
-	reset_indicator_time()
+	spawn(F.Circle.new(16, 0, 1, [E.Basic1]).set_follow_player())
+	set_indicator_time(3)
 	wait_until_no_enemies()
+
+	wait(2)
+	spawn(F.HorizontalLine.new(17, Top, F.HorizontalLinePlacement.V.new(100, 20), 1., 1., [E.Basic3]))
+	spawn(F.HorizontalLine.new(17, Bottom, F.HorizontalLinePlacement.V.new(100, 20), 1., 1., [E.Basic1]))
+	wait(2)
+	spawn(F.VerticalLine.new(13, Left, F.VerticalLinePlacement.Distribute.new(0), 1.2).set_follows_player())
+	spawn(F.VerticalLine.new(13, Right, F.VerticalLinePlacement.Distribute.new(0), 1.2, 1., [E.Basic3]).set_follows_player())
+	wait(4.5)
+	set_indicator_time(1.5)
+
+	left_right(15)
+	wait(0.75)
+	top_bottom(13)
+	wait(0.75)
+	left_right(15, [], true)
+	wait(1)
+	top_bottom(13, [], true)
+	wait_until_no_enemies()
+
+	spawn(F.Spiral.new(140, 235, 80, PI/2, 1.4, 1.2, [E.Basic1, E.Basic3]))
+	
+	wait(3)
+	top_bottom(12, [E.Basic3])
+	wait(3)
+	left_right(16, [E.Basic3])
+	wait(3)
+	top_bottom(12, [E.Basic3], true)
+	wait(3)
+	left_right(16, [E.Basic3], true)
+	
+	wait(3)
+	spawn(F.VerticalLine.new(8, Left, F.VerticalLinePlacement.Distribute.new(0, H * .4), 1.2, 1., [E.Basic3, E.Basic1]))
+	spawn(F.HorizontalLine.new(9, Top, F.HorizontalLinePlacement.Distribute.new(0, W * .5), 1.2, 1., [E.Basic3, E.Basic1]))
+	wait(3)
+	spawn(F.VerticalLine.new(8, Right, F.VerticalLinePlacement.Distribute.new(0, H * .4), 1.2, 1., [E.Basic3, E.Basic1]))
+	spawn(F.HorizontalLine.new(9, Top, F.HorizontalLinePlacement.Distribute.new(W * .5, 0), 1.2, 1., [E.Basic3, E.Basic1]))
+	wait(3)
+	spawn(F.VerticalLine.new(8, Right, F.VerticalLinePlacement.Distribute.new(H * .4, 0), 1.2, 1., [E.Basic3, E.Basic1]))
+	spawn(F.HorizontalLine.new(9, Bottom, F.HorizontalLinePlacement.Distribute.new(W * .5, 0), 1.2, 1., [E.Basic3, E.Basic1]))
+	wait(4)
+	spawn(F.VerticalLine.new(8, Left, F.VerticalLinePlacement.Distribute.new(H * .4, 0), 1.2, 1., [E.Basic3, E.Basic1]))
+	spawn(F.HorizontalLine.new(9, Bottom, F.HorizontalLinePlacement.Distribute.new(0, W * .5), 1.2, 1., [E.Basic3, E.Basic1]))
+	
+	wait(3)
+	spawn(F.VerticalLine.new(10, Right, F.VerticalLinePlacement.Distribute.new(0, H * .25)))
+	spawn(F.VerticalLine.new(10, Left, F.VerticalLinePlacement.Distribute.new(H * .25, 0)))
+	spawn(F.HorizontalLine.new(10, Bottom, F.HorizontalLinePlacement.Distribute.new(0, W * .3)))
+	spawn(F.HorizontalLine.new(10, Top, F.HorizontalLinePlacement.Distribute.new(W * .3, 0)))
+	wait(4)
+	spawn(F.VerticalLine.new(10, Left, F.VerticalLinePlacement.Distribute.new(0, H * .25)))
+	spawn(F.VerticalLine.new(10, Right, F.VerticalLinePlacement.Distribute.new(H * .25, 0)))
+	spawn(F.HorizontalLine.new(10, Top, F.HorizontalLinePlacement.Distribute.new(0, W * .3)))
+	spawn(F.HorizontalLine.new(10, Bottom, F.HorizontalLinePlacement.Distribute.new(W * .3, 0)))
+
+	wait_until_no_enemies()
+	set_indicator_time(2.5)
+	wait(3)
+	var shot_r := 0.4
+	var rand_pos := func() -> Vector2:
+		return LevelBuilder.point_around_screen(randf() * 4, shot_r * F.BASE_RADIUS)
+	spawn(F.Single.new(LevelBuilder.point_around_screen(0.5, shot_r * F.BASE_RADIUS), LevelEvent.FollowPlayer.new(5), shot_r))
+	wait(3)
+	set_indicator_time(1.2)
+	for i in range(30):
+		if i < 5:
+			spawn(F.Single.new(rand_pos.call(), LevelEvent.FollowPlayer.new(5), shot_r))
+			wait(2)
+		elif i < 15:
+			spawn(F.Single.new(rand_pos.call(), LevelEvent.FollowPlayer.new(6), shot_r, E.Basic3))
+			wait(1)
+		elif i < 24:
+			spawn(F.Single.new(rand_pos.call(), LevelEvent.FollowPlayer.new(7), shot_r, E.Basic3))
+			wait(.8)
+		else:
+			spawn(F.Single.new(rand_pos.call(), LevelEvent.FollowPlayer.new(7), shot_r, E.Basic3))
+			wait(.6)
+	wait_until_no_enemies()
+	
+	level_part("Part IV - The big one - TODO")
+	wait(5)

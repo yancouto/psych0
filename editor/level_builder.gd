@@ -13,6 +13,18 @@ const BASE_INDICATOR_TIME := 2.0
 var events: Array[BuilderEvent] = []
 var cur_indicator_time := BASE_INDICATOR_TIME
 
+# pos should be in the [0,4[ interval
+# It will return a point around the screen, at distance from it
+static func point_around_screen(pos: float, distance: float) -> Vector2:
+	if pos < 1:
+		return Vector2(pos * W, -distance)
+	elif pos < 2:
+		return Vector2(W + distance, (pos - 1) * H)
+	elif pos < 3:
+		return Vector2((3 - pos) * W, H + distance)
+	else:
+		assert(pos < 4)
+		return Vector2(-distance, (4 - pos) * H)
 
 func wait_until_no_enemies() -> void:
 	events.append(BuilderEvent.WaitUntilNoEnemies.new())
