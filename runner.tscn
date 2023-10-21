@@ -1,9 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://wyi8ts15lueo"]
+[gd_scene load_steps=13 format=3 uid="uid://wyi8ts15lueo"]
 
 [ext_resource type="Script" path="res://runner.gd" id="1_224jk"]
 [ext_resource type="PackedScene" uid="uid://dwqfguj644qf2" path="res://player.tscn" id="2_1y6tv"]
 [ext_resource type="Script" path="res://pausing.gd" id="3_kc0cc"]
 [ext_resource type="Script" path="res://bullet_time.gd" id="4_vvdtp"]
+[ext_resource type="Script" path="res://lives.gd" id="5_t5ia0"]
+[ext_resource type="Script" path="res://slowmo.gd" id="6_4qkgi"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_kjhy5"]
 font_size = 100
@@ -16,6 +18,12 @@ font_size = 100
 
 [sub_resource type="LabelSettings" id="LabelSettings_5vl1r"]
 font_size = 25
+
+[sub_resource type="LabelSettings" id="LabelSettings_7t52p"]
+font_size = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_w13s3"]
+font_size = 20
 
 [node name="Level Runner" type="Node2D"]
 script = ExtResource("1_224jk")
@@ -81,9 +89,27 @@ offset_bottom = 656.0
 text = "ESC to pause/unpause
 WASD to move
 Left click + aim to shoot
-Right click/Shift to bullet time
+Right click/Shift to slowmo
 "
 label_settings = SubResource("LabelSettings_5vl1r")
+
+[node name="Lives" type="Label" parent="."]
+offset_left = 16.0
+offset_top = 84.0
+offset_right = 85.0
+offset_bottom = 115.0
+text = "Lives: ?"
+label_settings = SubResource("LabelSettings_7t52p")
+script = ExtResource("5_t5ia0")
+
+[node name="Slowmo" type="Label" parent="."]
+offset_left = 16.0
+offset_top = 53.0
+offset_right = 122.0
+offset_bottom = 84.0
+text = "Slowmo: ?s"
+label_settings = SubResource("LabelSettings_w13s3")
+script = ExtResource("6_4qkgi")
 
 [connection signal="activated" from="BulletTime" to="Player" method="_on_bullet_time_activated"]
 [connection signal="deactivated" from="BulletTime" to="Player" method="_on_bullet_time_deactivated"]
