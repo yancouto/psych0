@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://wyi8ts15lueo"]
+[gd_scene load_steps=9 format=3 uid="uid://wyi8ts15lueo"]
 
 [ext_resource type="Script" path="res://runner.gd" id="1_224jk"]
 [ext_resource type="PackedScene" uid="uid://dwqfguj644qf2" path="res://player.tscn" id="2_1y6tv"]
@@ -10,6 +10,12 @@ font_size = 100
 
 [sub_resource type="LabelSettings" id="LabelSettings_g5oon"]
 font_size = 27
+
+[sub_resource type="LabelSettings" id="LabelSettings_qjpps"]
+font_size = 100
+
+[sub_resource type="LabelSettings" id="LabelSettings_5vl1r"]
+font_size = 25
 
 [node name="Level Runner" type="Node2D"]
 script = ExtResource("1_224jk")
@@ -50,6 +56,34 @@ offset_top = 16.0
 offset_right = 1416.0
 offset_bottom = 48.0
 text = "Time"
+
+[node name="PauseOverlay" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="PauseOverlay"]
+layout_mode = 0
+offset_left = 760.0
+offset_top = 248.0
+offset_right = 1184.0
+offset_bottom = 392.0
+text = "Paused"
+label_settings = SubResource("LabelSettings_qjpps")
+
+[node name="Label2" type="Label" parent="PauseOverlay"]
+layout_mode = 0
+offset_left = 792.0
+offset_top = 392.0
+offset_right = 1248.0
+offset_bottom = 656.0
+text = "ESC to pause/unpause
+WASD to move
+Left click + aim to shoot
+Right click/Shift to bullet time
+"
+label_settings = SubResource("LabelSettings_5vl1r")
 
 [connection signal="activated" from="BulletTime" to="Player" method="_on_bullet_time_activated"]
 [connection signal="deactivated" from="BulletTime" to="Player" method="_on_bullet_time_deactivated"]

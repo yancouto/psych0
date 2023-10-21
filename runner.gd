@@ -7,6 +7,7 @@ var time_passed := 0.
 
 func _ready() -> void:
 	level.change_level_part.connect(_on_change_level_part)
+	$Pausing.do_pause_unpause() # Start paused to show instructions
 
 func _process(dt: float) -> void:
 	dt = %BulletTime.fix_delta(dt)

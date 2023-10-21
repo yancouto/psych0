@@ -33,7 +33,7 @@ color_ramp = SubResource("GradientTexture1D_0iayt")
 attractor_interaction_enabled = false
 
 [node name="BallParticles" type="GPUParticles2D"]
-z_index = 2
+z_index = -5
 emitting = false
 amount = 50
 process_material = SubResource("ParticleProcessMaterial_1ts24")
