@@ -12,6 +12,7 @@ func configure(position_: Vector2, color: Color, radius: float) -> void:
 	position = position_
 	var material := process_material as ParticleProcessMaterial
 	material.emission_sphere_radius = radius
+	color.v = minf(1., color.v * 1.5)
 	material.color = color
 	amount = radius * 2
 	emitting = true

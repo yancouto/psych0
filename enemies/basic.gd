@@ -41,7 +41,7 @@ func _draw() -> void:
 		Type.One:
 			draw_circle(Vector2.ZERO, radius, color)
 		Type.Three:
-			draw_filled_arc((3 - health) * TAU / 3, TAU, color)
+			draw_filled_arc((3 - health) * TAU / 3 - .05, TAU + .05, color)
 			if health < 3:
 				draw_filled_arc(0, (3 - health) * TAU / 3, Color.DIM_GRAY)
 

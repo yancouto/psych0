@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://ball_particles.gd" id="1_aq6l4"]
 
 [sub_resource type="Gradient" id="Gradient_be0lo"]
-offsets = PackedFloat32Array(0.597938, 1)
+offsets = PackedFloat32Array(0.783505, 1)
 colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_0iayt"]
