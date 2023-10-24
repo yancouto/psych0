@@ -77,6 +77,9 @@ static func enemy_type_to_color(type: EnemyType) -> Color:
 
 # Speed that may depend on player position
 class Speed:
+	func length() -> float:
+		assert(false, "Must be implemented")
+		return 0
 	func calc(cur_pos: Vector2, player_pos: Vector2) -> Vector2:
 		assert(false, "Must be implemented")
 		return Vector2.ZERO
@@ -99,6 +102,8 @@ class BasicSpeed extends Speed:
 		return BasicSpeed.new(speed.x * factor, speed.y * factor)
 	func swap_coordinates() -> Speed:
 		return BasicSpeed.new(speed.y, speed.x)
+	func length() -> float:
+		return speed.length()
 
 class FollowPlayer extends Speed:
 	var speed_len: float
@@ -110,6 +115,8 @@ class FollowPlayer extends Speed:
 		return FollowPlayer.new(speed_len * factor)
 	func swap_coordinates() -> Speed:
 		return FollowPlayer.new(speed_len)
+	func length() -> float:
+		return speed_len
 
 class EnemyToSpawn:
 	var radius: float

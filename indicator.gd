@@ -23,7 +23,7 @@ func _draw() -> void:
 	var points: PackedVector2Array = [center]
 	var angle_range := (ttl / 5) * PI / 2
 	var amount := ceili(ttl) + 3
-	const radius := 45
+	var radius := smoothstep(0, Formation.BASE_SPEED * 2, speed.length()) * 60 + 20
 	var angle := speed.calc(center, get_node('../%Player').position).angle()
 	for i in range(amount):
 		points.append(center + Vector2.from_angle(angle - angle_range / 2 + (angle_range / amount) * i) * radius)
