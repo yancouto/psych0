@@ -9,10 +9,11 @@ const RECOVER := 0.4
 var secs_left := MAX_SECS
 
 func _draw() -> void:
-	draw_rect(Rect2(position, size), Color.BLACK, false, 2)
+	var color: Color = %Player/ColorChanger.get_color()
+	draw_rect(Rect2(position, size), color, false, 2)
 	var inner_size := size - 2 * Vector2(border, border)
 	inner_size.x *= secs_left / MAX_SECS
-	draw_rect(Rect2(position + Vector2(border, border), inner_size), Color.BLACK, true)
+	draw_rect(Rect2(position + Vector2(border, border), inner_size), color, true)
 
 func _process(dt: float) -> void:
 	var prev_secs_left := secs_left

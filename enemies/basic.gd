@@ -49,7 +49,7 @@ func _process(dt: float) -> void:
 	dt = get_node("../%BulletTime").fix_delta(dt)
 	position += speed * dt
 
-func create_explosion() -> void:
+func create_explosion(reason: DieReason) -> void:
 	# Let's move the particle emitter to the parents (since we're deleting this)
 	# which works but we might want to do better later
 	var particles := $BallParticles
@@ -59,15 +59,21 @@ func create_explosion() -> void:
 	remove_child(particles)
 	particles.configure(position, color, radius)
 	get_parent().add_child(particles)
+	if reason == DieReason.Shot:
+		var arc := preload("res://arc.tscn").instantiate()
+		arc.start(position, radius, color, 1, 1)
+		self.get_parent().get_parent().add_child(arc)
 
-func die() -> void:
-	create_explosion()
+enum DieReason { Shot, Other }
+
+func die(reason: DieReason = DieReason.Other) -> void:
+	create_explosion(reason)
 	queue_free()
 
 func shot() -> void:
 	health -= 1
 	if health <= 0:
-		die()
+		die(DieReason.Shot)
 	else:
 		queue_redraw()
 

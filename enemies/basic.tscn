@@ -14,7 +14,7 @@ colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_0iayt"]
 gradient = SubResource("Gradient_be0lo")
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_khr6k"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_o67f1"]
 resource_local_to_scene = true
 lifetime_randomness = 0.1
 emission_shape = 1
@@ -49,6 +49,6 @@ shape = SubResource("CircleShape2D_76e1n")
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
 
 [node name="BallParticles" parent="." instance=ExtResource("2_nskqo")]
-process_material = SubResource("ParticleProcessMaterial_khr6k")
+process_material = SubResource("ParticleProcessMaterial_o67f1")
 
 [connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]

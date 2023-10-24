@@ -8,7 +8,15 @@ var time_passed := 0.
 func _ready() -> void:
 	level.change_level_part.connect(_on_change_level_part)
 	$Pausing.do_pause_unpause() # Start paused to show instructions
+	fix_bg_color()
 
+func fix_bg_color() -> void:
+	var back_color: Color = $Player/ColorChanger.get_color()
+	back_color.h = fmod(back_color.h + .5, 1.)
+	back_color.v = 0.1
+	back_color.s = 0.9
+	RenderingServer.set_default_clear_color(back_color)
+	
 func _process(dt: float) -> void:
 	dt = %BulletTime.fix_delta(dt)
 	time_passed += dt
@@ -16,6 +24,8 @@ func _process(dt: float) -> void:
 	if level != null && level.update($AllEnemies, dt):
 		$LevelOverText.visible = true
 		level = null
+	fix_bg_color()
+
 
 func _on_change_level_part(name: String) -> void:
 	var tween = create_tween()

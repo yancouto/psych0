@@ -2,6 +2,7 @@ extends Area2D
 
 
 const BASE_RADIUS := 30.
+const ARC_COOLDOWN := 1.
 
 enum State { ALIVE, RECOVERING, DEAD }
 
@@ -20,6 +21,7 @@ var state := State.ALIVE
 var recovering_cooldown := 0.
 var color_a := 1.
 var color_a_tween: Tween = null
+var arc_cooldown := 0.
 
 func _ready() -> void:
 	position = Vector2(LevelBuilder.W / 2, LevelBuilder.H / 2)
@@ -63,6 +65,13 @@ func _process(dt: float) -> void:
 			shot.start(position + (radius - shot.radius) * dir, dir * 600, $ColorChanger.get_color())
 			# TODO: Make specific node for shots
 			self.get_parent().add_child(shot)
+		# Arcs
+		arc_cooldown -= dt
+		if arc_cooldown <= 0:
+			arc_cooldown = ARC_COOLDOWN
+			var arc := preload("res://arc.tscn").instantiate()
+			arc.start(position, radius, $ColorChanger.get_color(), 2) 
+			self.get_parent().add_child(arc)
 
 
 func _draw() -> void:
@@ -84,6 +93,7 @@ func _on_area_entered(_area: Area2D) -> void:
 		state = State.DEAD
 		hide()
 	state = State.RECOVERING
+	arc_cooldown = 0. # Throw an arc right away after recovering
 	recovering_cooldown = 2.
 	var tween := create_tween().set_loops()
 	tween.tween_property(self, 'color_a', 0., 0.1).set_delay(0.25)
