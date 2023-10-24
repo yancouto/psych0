@@ -15,15 +15,14 @@ func start(to_spawn: LevelEvent.IndicatorToSpawn, duration: float) -> void:
 func _process(dt: float) -> void:
 	dt = get_node("../%BulletTime").fix_delta(dt)
 	self.ttl -= dt
-	if !(speed is LevelEvent.BasicSpeed):
-		queue_redraw()
+	queue_redraw()
 	if self.ttl <= 0:
 		queue_free()
 
 func _draw() -> void:
 	var points: PackedVector2Array = [center]
-	const angle_range := PI / 6
-	const amount := 5
+	var angle_range := (ttl / 5) * PI / 2
+	var amount := ceili(ttl) + 3
 	const radius := 45
 	var angle := speed.calc(center, get_node('../%Player').position).angle()
 	for i in range(amount):

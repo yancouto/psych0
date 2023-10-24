@@ -66,6 +66,7 @@ offset_bottom = 48.0
 text = "Time"
 
 [node name="PauseOverlay" type="Control" parent="."]
+z_index = 20
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
