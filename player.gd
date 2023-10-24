@@ -60,7 +60,7 @@ func _process(dt: float) -> void:
 			var shot := preload("res://shot.tscn").instantiate()
 			# TODO: Support controller
 			var dir := (get_viewport().get_mouse_position() - position).normalized()
-			shot.start(position + (radius - shot.radius) * dir, dir * 600)
+			shot.start(position + (radius - shot.radius) * dir, dir * 600, $ColorChanger.get_color())
 			# TODO: Make specific node for shots
 			self.get_parent().add_child(shot)
 
@@ -69,7 +69,7 @@ func _draw() -> void:
 	if state == State.ALIVE:
 		var dir := get_local_mouse_position().normalized()
 		draw_line(Vector2.ZERO, dir * (LevelBuilder.H + LevelBuilder.W), Color(0, 0, 0, 0.15), 1, true)
-	var color := Color.DEEP_PINK if state == State.ALIVE else Color.DIM_GRAY
+	var color: Color = $ColorChanger.get_color() if state == State.ALIVE else Color.DIM_GRAY
 	color.a = color_a
 	draw_circle(Vector2(), draw_radius, color)
 

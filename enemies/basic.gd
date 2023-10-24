@@ -12,6 +12,7 @@ var radius: float:
 		$VisibleOnScreenNotifier2D.rect.position = Vector2(-r, -r)
 var type: Type
 var health: int
+var color: Color
 
 enum Type { One, Three }
 
@@ -23,18 +24,24 @@ func start(_position: Vector2, _speed: Vector2, _radius: float, _type: Type) -> 
 	match _type:
 		Type.One:
 			health = 1
+			color = Color.SEA_GREEN
 		Type.Three:
 			health = 3
+			color = Color.YELLOW
+			color.s = 0.9
+			color.v = 0.8
+	color.s = clampf(color.s + randf() * 0.4 - 0.2, 0, 1)
+	color.v = clampf(color.v + randf() * 0.4 - 0.2, 0, 1)
 
-func draw_filled_arc(start_angle: float, end_angle: float, color: Color) -> void:
-	draw_arc(Vector2.ZERO, radius / 2, start_angle, end_angle, 20, color, radius)
+func draw_filled_arc(start_angle: float, end_angle: float, colora: Color) -> void:
+	draw_arc(Vector2.ZERO, radius / 2, start_angle, end_angle, 20, colora, radius)
 
 func _draw() -> void:
 	match type:
 		Type.One:
-			draw_circle(Vector2.ZERO, radius, Color.SEA_GREEN)
+			draw_circle(Vector2.ZERO, radius, color)
 		Type.Three:
-			draw_filled_arc((3 - health) * TAU / 3, TAU, Color.YELLOW)
+			draw_filled_arc((3 - health) * TAU / 3, TAU, color)
 			if health < 3:
 				draw_filled_arc(0, (3 - health) * TAU / 3, Color.DIM_GRAY)
 
@@ -50,7 +57,7 @@ func create_explosion() -> void:
 	if particles == null:
 		return
 	remove_child(particles)
-	particles.configure(position, Color.SEA_GREEN if type == Type.One else Color.YELLOW, radius)
+	particles.configure(position, color, radius)
 	get_parent().add_child(particles)
 
 func die() -> void:

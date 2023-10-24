@@ -2,10 +2,12 @@ extends Area2D
 
 @export var radius := 7
 var speed: Vector2
+var color: Color
 
-func start(position_: Vector2, speed_: Vector2) -> void:
+func start(position_: Vector2, speed_: Vector2, color_: Color) -> void:
 	self.position = position_
 	self.speed = speed_
+	self.color = color_
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -17,7 +19,7 @@ func _process(dt: float) -> void:
 	position += speed * dt
 
 func _draw() -> void:
-	draw_circle(Vector2.ZERO, radius, Color.BLACK)
+	draw_circle(Vector2.ZERO, radius, color)
 
 func create_explosion() -> void:
 	var particles := $BallParticles
@@ -25,7 +27,7 @@ func create_explosion() -> void:
 	if particles == null:
 		return
 	remove_child(particles)
-	particles.configure(position, Color.BLACK, radius)
+	particles.configure(position, color, radius)
 	get_parent().add_child(particles)
 
 func die() -> void:
