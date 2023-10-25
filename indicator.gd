@@ -28,3 +28,7 @@ func _draw() -> void:
 	for i in range(amount):
 		points.append(center + Vector2.from_angle(angle - angle_range / 2 + (angle_range / amount) * i) * radius)
 	self.draw_colored_polygon(points, color)
+
+# This pretends to be an enemy sometimes
+func die(_reason) -> void:
+	queue_free()

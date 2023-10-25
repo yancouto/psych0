@@ -52,6 +52,8 @@ class EventWithTime:
 	func _init(event_: LevelEvent, time_: LevelTime):
 		self.event = event_
 		self.time = time_
+	func clone() -> EventWithTime:
+		return EventWithTime.new(event.clone(), time.clone())
 
 # TODO: On more complex enemies, this will need to be redone because we'll
 # need to instantiate a different scene
@@ -89,6 +91,9 @@ class Speed:
 	func swap_coordinates() -> Speed:
 		assert(false, "Must be implemented")
 		return Speed.new()
+	func clone() -> Speed:
+		assert(false, "Must be implemented")
+		return Speed.new()
 	static func from_vec(speed: Vector2) -> Speed:
 		return BasicSpeed.new(speed.x, speed.y)
 
@@ -104,6 +109,8 @@ class BasicSpeed extends Speed:
 		return BasicSpeed.new(speed.y, speed.x)
 	func length() -> float:
 		return speed.length()
+	func clone() -> Speed:
+		return BasicSpeed.new(speed.x, speed.y)
 
 class FollowPlayer extends Speed:
 	var speed_len: float
@@ -117,6 +124,8 @@ class FollowPlayer extends Speed:
 		return FollowPlayer.new(speed_len)
 	func length() -> float:
 		return speed_len
+	func clone() -> Speed:
+		return FollowPlayer.new(speed_len)
 
 class EnemyToSpawn:
 	var radius: float
@@ -133,6 +142,8 @@ class EnemyToSpawn:
 		enemy.start(pos, speed.calc(pos, root.get_node('../%Player').position), radius, LevelEvent.map_enemy_type(type))
 		enemy.position += enemy.speed * ago
 		root.add_child(enemy)
+	func clone() -> EnemyToSpawn:
+		return EnemyToSpawn.new(radius, pos, speed.clone(), type)
 
 class IndicatorToSpawn:
 	# On the edge of the screen
@@ -143,11 +154,26 @@ class IndicatorToSpawn:
 		self.center = center_
 		self.speed = speed_
 		self.color = color_
+	func clone() -> IndicatorToSpawn:
+		return IndicatorToSpawn.new(center, speed.clone(), color)
 
 # Does nothing, just added in the end always, so we can wait for no enemies
 class LastEvent extends LevelEvent:
 	func trigger(_level: Level, _root: Node, _ago: float) -> bool:
 		return true
+	func clone() -> LevelEvent:
+		return LastEvent.new()
+
+# Marker just for checkpointing, doesn't actually do anything
+# TODO: Make this actually work and not cut some stuff
+class Checkpoint extends LevelEvent:
+	var name: String
+	func _init(name_: String):
+		name = name_
+	func trigger(_level: Level, _root: Node, _ago: float) -> bool:
+		return true
+	func clone() -> LevelEvent:
+		return Checkpoint.new(name)
 
 class LevelPart extends LevelEvent:
 	var name: String
@@ -156,6 +182,8 @@ class LevelPart extends LevelEvent:
 	func trigger(level: Level, _root: Node, _ago: float) -> bool:
 		level.change_level_part.emit(name)
 		return true
+	func clone() -> LevelEvent:
+		return LevelPart.new(name)
 
 class Spawn extends LevelEvent:
 	var to_spawn: Array[EnemyToSpawn]
@@ -165,6 +193,10 @@ class Spawn extends LevelEvent:
 		for enemy in to_spawn:
 			enemy.spawn(root, ago)
 		return true
+	func clone() -> LevelEvent:
+		var to_spawn2: Array[EnemyToSpawn]
+		to_spawn2.assign(to_spawn.map(func(x): return x.clone()))
+		return Spawn.new(to_spawn2)
 
 class Indicator extends LevelEvent:
 	var to_spawn: Array[IndicatorToSpawn]
@@ -179,8 +211,16 @@ class Indicator extends LevelEvent:
 			indicator.start(ind_to_spawn, self.duration - ago)
 			root.add_child(indicator)
 		return true
+	func clone() -> LevelEvent:
+		var to_spawn2: Array[IndicatorToSpawn]
+		to_spawn2.assign(to_spawn.map(func(x): return x.clone()))
+		return Indicator.new(to_spawn2, duration)
 
 # Trigger the event, the event should have happened ago seconds ago
 func trigger(_level: Level, _root: Node, _ago: float) -> bool:
 	assert(false, "Must be implemented by all subclasses")
 	return false
+
+func clone() -> LevelEvent:
+	assert(false, "Must be implemented")
+	return LevelEvent.new()

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://wyi8ts15lueo"]
+[gd_scene load_steps=14 format=3 uid="uid://wyi8ts15lueo"]
 
 [ext_resource type="Script" path="res://runner.gd" id="1_224jk"]
 [ext_resource type="PackedScene" uid="uid://dwqfguj644qf2" path="res://player.tscn" id="2_1y6tv"]
@@ -24,6 +24,9 @@ font_size = 20
 
 [sub_resource type="LabelSettings" id="LabelSettings_w13s3"]
 font_size = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_w34n5"]
+font_size = 30
 
 [node name="Level Runner" type="Node2D"]
 script = ExtResource("1_224jk")
@@ -112,5 +115,15 @@ text = "Slowmo: ?s"
 label_settings = SubResource("LabelSettings_w13s3")
 script = ExtResource("6_4qkgi")
 
+[node name="DeadText" type="Label" parent="."]
+visible = false
+z_index = 10
+offset_left = 360.0
+offset_top = 400.0
+offset_right = 736.0
+offset_bottom = 576.0
+label_settings = SubResource("LabelSettings_w34n5")
+
+[connection signal="player_dead" from="Player" to="." method="_on_player_player_dead"]
 [connection signal="activated" from="BulletTime" to="Player" method="_on_bullet_time_activated"]
 [connection signal="deactivated" from="BulletTime" to="Player" method="_on_bullet_time_deactivated"]

@@ -2,10 +2,13 @@ extends Node
 
 # Level to run, let's start by hardcoding 1
 var level: Level = preload("res://levels/level1.gd").new().build()
+var blank_level: Level
 var next_event: LevelEvent.EventWithTime
 var time_passed := 0.
+var cur_level_part: String
 
 func _ready() -> void:
+	blank_level = level.clone()
 	level.change_level_part.connect(_on_change_level_part)
 	$Pausing.do_pause_unpause() # Start paused to show instructions
 	fix_bg_color()
@@ -26,9 +29,30 @@ func _process(dt: float) -> void:
 		level = null
 	fix_bg_color()
 
-
 func _on_change_level_part(name: String) -> void:
+	cur_level_part = name
 	var tween = create_tween()
 	tween.tween_property($LevelPart, 'position:y', -$LevelPart.size.y, 0 if $LevelPart.text.is_empty() else 0.5)
 	tween.tween_callback(func(): $LevelPart.text = name)
 	tween.tween_property($LevelPart, 'position:y', 10, 0.5)
+
+func restart_to_level_part(part: String) -> void:
+	$DeadText.hide()
+	$Player.respawn()
+	for enemy in $AllEnemies.get_children():
+		BasicEnemy.Type
+		enemy.die(BasicEnemy.DieReason.Reset)
+	level = blank_level.clone()
+	if !level.skip_till_level_part(cur_level_part):
+		print("Couldn't find part %s, starting from scratch" % cur_level_part)
+		cur_level_part = ""
+
+func _on_player_player_dead() -> void:
+	var dead_text := $DeadText
+	dead_text.text = "You died. Bummer.\nRestarting from %s\nCurrent difficulty: Hard" % cur_level_part
+	dead_text.show()
+	dead_text.label_settings.font_color.a = 0
+	var tween := create_tween()
+	tween.tween_property(dead_text.label_settings, 'font_color:a', 1, 1)
+	tween.tween_property(dead_text.label_settings, 'font_color:a', 0, 1).set_delay(3)
+	tween.tween_callback(restart_to_level_part.bind(cur_level_part))

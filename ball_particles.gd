@@ -17,3 +17,6 @@ func configure(position_: Vector2, color: Color, radius: float) -> void:
 	amount = radius * 2
 	emitting = true
 	was_emitting = true
+
+func die(_reason) -> void:
+	queue_free()

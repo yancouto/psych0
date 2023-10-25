@@ -24,7 +24,7 @@ func _init():
 	var screen_angle := Vector2(H/2, W/2).angle()
 
 	wait(1)
-	level_part("Part I - The beginning of the end")
+	level_part("Prelude - What am I?")
 
 	wait(2)
 	spawn(F.Single.new(Vector2(-r, H / 2), Speed.new(s, 0), r))
@@ -42,14 +42,18 @@ func _init():
 
 	for i in 4:
 		spawn(F.VerticalLine.new(12, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), 1.3 if i < 3 else 2, 1))
-		wait((4 - i) * 0.2 + 0.2)
+		var time := (4 - i) * 0.2 + 0.2
+		set_indicator_time(time)
+		wait(time)
+	reset_indicator_time()
 	wait(0.5)
 	spawn(F.VerticalLine.new(14, F.VerticalLineSide.Right, F.VerticalLinePlacement.Distribute.new(), 1.3))
 	wait_until_no_enemies()
 	
 	spawn(F.Spiral.new(4, 4, 400, 0., 1., 1., [E.Basic3]))
-	wait(8)
 
+	level_part("Part I - The beginning of the end")
+	wait(8)
 
 	spawn(F.HorizontalLine.new(15, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.V.new(100), 1))
 	wait(1)

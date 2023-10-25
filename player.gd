@@ -1,8 +1,12 @@
+class_name Player
 extends Area2D
 
+signal player_dead
 
 const BASE_RADIUS := 30.
 const ARC_COOLDOWN := 1.
+# Lives before resetting to nearest checkpoint
+const BASE_LIVES := 1
 
 enum State { ALIVE, RECOVERING, DEAD }
 
@@ -16,18 +20,28 @@ var radius : float:
 		radius = r
 var draw_radius : float
 var cur_shot_cooldown := 0.
-var lives := 10
-var state := State.ALIVE
+var lives
+var state
 var recovering_cooldown := 0.
 var color_a := 1.
 var color_a_tween: Tween = null
 var arc_cooldown := 0.
 
 func _ready() -> void:
-	position = Vector2(LevelBuilder.W / 2, LevelBuilder.H / 2)
+	spawn()
+
+func spawn() -> void:
+	position = LevelBuilder.MIDDLE
 	radius = BASE_RADIUS
 	draw_radius = radius
+	state = State.ALIVE
+	lives = BASE_LIVES
+	cur_shot_cooldown = 0
+	show()
 
+func respawn() -> void:
+	spawn()
+	set_recovering()
 
 func _process(dt: float) -> void:
 	if !is_visible():
@@ -82,6 +96,15 @@ func _draw() -> void:
 	color.a = color_a
 	draw_circle(Vector2(), draw_radius, color)
 
+func set_recovering() -> void:
+	state = State.RECOVERING
+	arc_cooldown = 0. # Throw an arc right away after recovering
+	recovering_cooldown = 2.
+	var tween := create_tween().set_loops()
+	tween.tween_property(self, 'color_a', 0., 0.1).set_delay(0.25)
+	tween.tween_property(self, 'color_a', 1., 0.1).set_delay(0.1)
+	color_a_tween = tween
+
 # Hit by an enemy
 func _on_area_entered(_area: Area2D) -> void:
 	if state != State.ALIVE:
@@ -92,15 +115,9 @@ func _on_area_entered(_area: Area2D) -> void:
 	if lives <= 0:
 		state = State.DEAD
 		hide()
-	state = State.RECOVERING
-	arc_cooldown = 0. # Throw an arc right away after recovering
-	recovering_cooldown = 2.
-	var tween := create_tween().set_loops()
-	tween.tween_property(self, 'color_a', 0., 0.1).set_delay(0.25)
-	tween.tween_property(self, 'color_a', 1., 0.1).set_delay(0.1)
-	color_a_tween = tween
-
-	
+		player_dead.emit()
+		return
+	set_recovering()
 
 func _on_bullet_time_activated():
 	radius = BASE_RADIUS * .8

@@ -15,6 +15,7 @@ var health: int
 var color: Color
 
 enum Type { One, Three }
+enum DieReason { Shot, Reset, Other }
 
 func start(_position: Vector2, _speed: Vector2, _radius: float, _type: Type) -> void:
 	self.position = _position
@@ -64,10 +65,9 @@ func create_explosion(reason: DieReason) -> void:
 		arc.start(position, radius, color, 1, 1)
 		self.get_parent().get_parent().add_child(arc)
 
-enum DieReason { Shot, Other }
-
 func die(reason: DieReason = DieReason.Other) -> void:
-	create_explosion(reason)
+	if reason != DieReason.Reset:
+		create_explosion(reason)
 	queue_free()
 
 func shot() -> void:
