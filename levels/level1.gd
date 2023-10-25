@@ -29,17 +29,17 @@ func _init():
 	wait(2)
 	spawn(F.Single.new(Vector2(-r, H / 2), Speed.new(s, 0), r))
 	wait_until_no_enemies()
+
 	spawn(F.Circle.new(2, -PI/2, 1, [E.Basic1]))
 	wait(3)
-
 	spawn(F.Circle.new(4, 0, 1, [E.Basic1]))
 	wait(2)
 	spawn(F.Circle.new(2, -screen_angle, 1, [E.Basic1]))
 	spawn(F.Circle.new(2, screen_angle, 1, [E.Basic1]))
 	wait_until_no_enemies()
+	checkpoint(&"check1")
 
 	wait(2)
-
 	for i in 4:
 		spawn(F.VerticalLine.new(12, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), 1.3 if i < 3 else 2, 1))
 		var time := (4 - i) * 0.2 + 0.2
@@ -49,6 +49,7 @@ func _init():
 	wait(0.5)
 	spawn(F.VerticalLine.new(14, F.VerticalLineSide.Right, F.VerticalLinePlacement.Distribute.new(), 1.3))
 	wait_until_no_enemies()
+	checkpoint(&"check2")
 	
 	spawn(F.Spiral.new(4, 4, 400, 0., 1., 1., [E.Basic3]))
 
@@ -62,6 +63,7 @@ func _init():
 	wait(1.5)
 	spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.V.new(100), 1, 1, [E.Basic3, E.Basic1]))
 	wait_until_no_enemies()
+	checkpoint(&"check3")
 
 	set_indicator_time(1)
 	for i in 5:
@@ -75,7 +77,7 @@ func _init():
 		wait(1)
 		spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new(((4 - i) + 1) * (W / 6), 200), 1, 1, [E.Basic3]))
 	wait(4.5)
-
+	checkpoint(&"check4")
 	reset_indicator_time()
 	for side in [Top, Bottom]:
 		spawn(F.HorizontalLine.new(18, side, F.HorizontalLinePlacement.Gap.new(W / 2, 150)))
@@ -85,7 +87,8 @@ func _init():
 	for side in [Top, Bottom]:
 		spawn(F.HorizontalLine.new(6, side, F.HorizontalLinePlacement.Distribute.new(W * .35)))
 	wait_until_no_enemies()
-	
+	checkpoint(&"check5")
+
 	set_indicator_time(1)
 	var extra: Array[Formation] = [
 		F.VerticalLine.new(8, F.VerticalLineSide.Right, F.VerticalLinePlacement.Distribute.new(), 1),
@@ -100,6 +103,7 @@ func _init():
 			spawn(extra[i])
 		spawn(F.VerticalLine.new(13, F.VerticalLineSide.Left, F.VerticalLinePlacement.Gap.new((i + 1) * (H / 6), 200), 1., 0.75, [E.Basic3]))
 	wait_until_no_enemies()
+	checkpoint(&"check6")
 
 	spawn(F.Multiple.new(42, Vector2(W + r, H / 2), Speed.new(-0.75, 0), Vector2.RIGHT, 0.1, r, [E.Basic3]))
 	wait(5)
@@ -112,6 +116,7 @@ func _init():
 		spawn(F.VerticalLine.new(6, left + right - side, F.VerticalLinePlacement.Distribute.new(LevelBuilder.H / 2 + Formation.get_radius(r), 0), 0.9 + 0.25 * i))
 	wait_until_no_enemies()
 	reset_indicator_time()
+	checkpoint(&"check7")
 
 	wait(2)
 	spawn(F.Spiral.new(8, 8, 100, 0, 1))
@@ -121,6 +126,7 @@ func _init():
 	spawn(F.VerticalLine.new(10, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), .5))
 	spawn(F.VerticalLine.new(10, F.VerticalLineSide.Right, F.VerticalLinePlacement.Distribute.new(), .5))
 	wait(6)
+	checkpoint(&"check8")
 	spawn(F.Spiral.new(20, 100, 50))
 	wait(5)
 	spawn(F.VerticalLine.new(11, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), .75))
@@ -137,6 +143,7 @@ func _init():
 	wait_until_no_enemies()
 	spawn(F.Circle.new(20, 0, 1, [E.Basic1, E.Basic3]))
 	wait(5)
+	checkpoint(&"check9")
 	spawn(F.Circle.new(12).set_center_x(W / 3))
 	spawn(F.Circle.new(12).set_center_x(2 * W / 3))
 	wait(6.3)
@@ -149,7 +156,8 @@ func _init():
 	spawn(F.Circle.new(18, 0, 1, [E.Basic1, E.Basic3]).set_center_x(W/3))
 	spawn(F.Circle.new(18, 0, 1, [E.Basic3, E.Basic1]).set_center_x(2*W/3))
 	wait_until_no_enemies()
-	
+	checkpoint(&"check10")
+
 	set_indicator_time(1.2)
 	spawn(F.Spiral.new(90, 80, 100, PI/2, 1.5, 1, [E.Basic1]))
 	wait(2)
@@ -164,6 +172,7 @@ func _init():
 	wait(0.5)
 	spawn(F.VerticalLine.new(12, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), 1.5))
 	wait(2)
+	checkpoint(&"check11")
 
 
 	spawn(F.Spiral.new(90, 80, 100, 0, 1.5, 1, [E.Basic1, E.Basic3]))
@@ -181,12 +190,12 @@ func _init():
 	
 	wait(3.5)
 
-
 	spawn(F.HorizontalLine.new(14, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.Gap.new(W / 2, W / 3), 1.2, 1., [E.Basic3]))
 	spawn(F.HorizontalLine.new(11, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.V.new(50, W / 4), 1.2, 1., [E.Basic1, E.Basic3]))
 	wait(.8)
 	spawn(F.HorizontalLine.new(11, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.V.new(50, W / 4), 1.2, 1., [E.Basic3]))
 	wait_until_no_enemies()
+	checkpoint(&"check12")
 
 	spawn(F.Circle.new(28, 0, 0.7))
 	wait(2.5)
@@ -206,6 +215,7 @@ func _init():
 	spawn(F.Circle.new(16, 0, 1, [E.Basic1]).set_follow_player())
 	set_indicator_time(3)
 	wait_until_no_enemies()
+	checkpoint(&"check13")
 
 	wait(2)
 	spawn(F.HorizontalLine.new(17, Top, F.HorizontalLinePlacement.V.new(100, 20), 1., 1., [E.Basic3]))
@@ -224,6 +234,7 @@ func _init():
 	wait(1)
 	top_bottom(13, [], true)
 	wait_until_no_enemies()
+	checkpoint(&"check14")
 
 	spawn(F.Spiral.new(140, 235, 80, PI/2, 1.4, 1.2, [E.Basic1, E.Basic3]))
 	
@@ -261,6 +272,7 @@ func _init():
 	spawn(F.HorizontalLine.new(10, Bottom, F.HorizontalLinePlacement.Distribute.new(W * .3, 0)))
 
 	wait_until_no_enemies()
+	checkpoint(&"check15")
 	set_indicator_time(2.5)
 	wait(3)
 	var shot_r := 0.4

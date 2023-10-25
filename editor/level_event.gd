@@ -174,6 +174,16 @@ class LevelPart extends LevelEvent:
 	func clone() -> LevelEvent:
 		return LevelPart.new(name)
 
+class Checkpoint extends LevelEvent:
+	var name: StringName
+	func _init(name_: StringName):
+		name = name_
+	func trigger(level: Level, _root: Node, _ago: float) -> bool:
+		level.new_checkpoint.emit(name)
+		return true
+	func clone() -> LevelEvent:
+		return Checkpoint.new(name)
+
 class Spawn extends LevelEvent:
 	var to_spawn: Array[EnemyToSpawn]
 	func _init(to_spawn_: Array[EnemyToSpawn]):

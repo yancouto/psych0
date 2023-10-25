@@ -13,6 +13,8 @@ const BASE_INDICATOR_TIME := 2.0
 var events: Array[BuilderEvent] = []
 var cur_indicator_time := BASE_INDICATOR_TIME
 
+var prev_checkpoints := {}
+
 # pos should be in the [0,4[ interval
 # It will return a point around the screen, at distance from it
 static func point_around_screen(pos: float, distance: float) -> Vector2:
@@ -32,7 +34,14 @@ func wait_until_no_enemies() -> void:
 func wait(secs: float) -> void:
 	events.append(BuilderEvent.Wait.new(secs))
 
+func checkpoint(name: StringName) -> void:
+	assert(!prev_checkpoints.has(name), "No repeated checkpoints: %s" % name)
+	prev_checkpoints[name] = true
+	events.append(BuilderEvent.Checkpoint.new(name))
+
 func level_part(name: String) -> void:
+	# Every level part is also a checkpoint
+	checkpoint(name)
 	events.append(BuilderEvent.LevelPart.new(name))
 
 func spawn(f: Formation) -> void:
@@ -66,9 +75,9 @@ func build() -> Level:
 	all_events.sort_custom(func(a, b): return a.time.lt(b.time))
 	return Level.new(all_events)
 
-func skip_till_level_part(part: String) -> bool:
+func skip_till_checkpoint(checkpoint: StringName) -> bool:
 	for i in events.size():
-		if events[i] is BuilderEvent.LevelPart and (events[i] as BuilderEvent.LevelPart).name == part:
+		if events[i] is BuilderEvent.Checkpoint and (events[i] as BuilderEvent.Checkpoint).name == checkpoint:
 			events = events.slice(i)
 			return true
 	return false

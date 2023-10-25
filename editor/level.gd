@@ -8,6 +8,7 @@ func _init(events_: Array[LevelEvent.EventWithTime]):
 	self.events = events_
 
 signal change_level_part(name: String)
+signal new_checkpoint(name: StringName)
 
 func update(root: Node, dt: float) -> bool:
 	cur_time.secs_after += dt
@@ -24,5 +25,3 @@ func clone() -> Level:
 	var events2: Array[LevelEvent.EventWithTime]
 	events2.assign(events.map(func(e): return e.clone()))
 	return Level.new(events2)
-
-

@@ -1,16 +1,31 @@
 extends Node
 
+enum Difficulty { Medium, Hard }
+enum State { Playing, WaitingForRestart }
+
 # Level to run, let's start by hardcoding 1
 var builder: LevelBuilder = preload("res://levels/level1.gd").new()
 var level: Level = builder.clone().build()
 var next_event: LevelEvent.EventWithTime
 var time_passed := 0.
 var cur_level_part: String
+var last_checkpoint: StringName
+var difficulty: Difficulty = Difficulty.Medium
+var state := State.Playing
+
 
 func _ready() -> void:
-	level.change_level_part.connect(_on_change_level_part)
+	connect_level()
 	$Pausing.do_pause_unpause() # Start paused to show instructions
 	fix_bg_color()
+
+func connect_level() -> void:
+	level.change_level_part.connect(_on_change_level_part)
+	level.new_checkpoint.connect(_on_checkpoint)
+
+func disconnect_level() -> void:
+	level.change_level_part.disconnect(_on_change_level_part)
+	level.new_checkpoint.disconnect(_on_checkpoint)
 
 func fix_bg_color() -> void:
 	var back_color: Color = $Player/ColorChanger.get_color()
@@ -29,34 +44,72 @@ func _process(dt: float) -> void:
 	fix_bg_color()
 
 func _on_change_level_part(name: String) -> void:
-	print("Reaching %s" % name)
+	if state != State.Playing:
+		return
 	cur_level_part = name
 	var tween = create_tween()
 	tween.tween_property($LevelPart, 'position:y', -$LevelPart.size.y, 0 if $LevelPart.text.is_empty() else 0.5)
 	tween.tween_callback(func(): $LevelPart.text = name)
 	tween.tween_property($LevelPart, 'position:y', 10, 0.5)
 
-func restart_to_level_part(part: String) -> void:
+func _on_checkpoint(name: StringName) -> void:
+	if state != State.Playing:
+		return
+	last_checkpoint = name
+	print("Checkpoint: %s" % name)
+
+func restart_to_checkpoint(checkpoint: StringName) -> void:
 	$DeadText.hide()
 	$Player.respawn()
 	for enemy in $AllEnemies.get_children():
 		BasicEnemy.Type
 		enemy.die(BasicEnemy.DieReason.Reset)
-	level.change_level_part.disconnect(_on_change_level_part)
+	disconnect_level()
 	var build := builder.clone()
-	if !build.skip_till_level_part(cur_level_part):
-		print("Couldn't find part %s, starting from scratch" % cur_level_part)
-		cur_level_part = ""
+	if !build.skip_till_checkpoint(checkpoint):
+		print("Couldn't find checkpoint %s, starting from scratch" % checkpoint)
 	level = build.build()
-	level.change_level_part.connect(_on_change_level_part)
+	connect_level()
+	cur_level_part = ""
+	state = State.Playing
 
+func restart_from_text() -> String:
+	match difficulty:
+		Difficulty.Medium:
+			return "the latest checkpoint"
+		Difficulty.Hard:
+			return cur_level_part
+		_:
+			assert(false, "Unknown difficulty")
+			return ""
+
+func difficulty_name() -> String:
+	match difficulty:
+		Difficulty.Medium:
+			return "Medium"
+		Difficulty.Hard:
+			return "Hard"
+		_:
+			assert(false, "Unknown difficulty")
+			return ""
+
+func checkpoint_from_difficulty() -> StringName:
+	match difficulty:
+		Difficulty.Medium:
+			return last_checkpoint
+		Difficulty.Hard:
+			return cur_level_part
+		_:
+			assert(false, "Unknown difficulty")
+			return ""
 
 func _on_player_player_dead() -> void:
+	state = State.WaitingForRestart
 	var dead_text := $DeadText
-	dead_text.text = "You died. Bummer.\nRestarting from %s\nCurrent difficulty: Hard" % cur_level_part
+	dead_text.text = "You died. Bummer.\nRestarting from %s\nCurrent difficulty: %s" % [restart_from_text(), difficulty_name()]
 	dead_text.show()
 	dead_text.label_settings.font_color.a = 0
 	var tween := create_tween()
 	tween.tween_property(dead_text.label_settings, 'font_color:a', 1, 1)
 	tween.tween_property(dead_text.label_settings, 'font_color:a', 0, 1).set_delay(3)
-	tween.tween_callback(restart_to_level_part.bind(cur_level_part))
+	tween.tween_callback(restart_to_checkpoint.bind(checkpoint_from_difficulty()))
