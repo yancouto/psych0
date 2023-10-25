@@ -92,7 +92,7 @@ offset_right = 1248.0
 offset_bottom = 656.0
 text = "ESC to pause/unpause
 WASD to move
-Left click + aim to shoot
+Left click or arrows to shoot
 Right click/Space to slowmo
 "
 label_settings = SubResource("LabelSettings_5vl1r")

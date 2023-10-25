@@ -48,17 +48,9 @@ func _process(dt: float) -> void:
 		return
 	queue_redraw()
 	dt = %BulletTime.fix_delta(dt)
-	var vel = Vector2.ZERO
-	if Input.is_action_pressed("move_down"):
-		vel.y += 1
-	if Input.is_action_pressed("move_up"):
-		vel.y -= 1
-	if Input.is_action_pressed("move_left"):
-		vel.x -= 1
-	if Input.is_action_pressed("move_right"):
-		vel.x += 1
+	var vel := ShootingInput.dir_from_inputs(&"move_up", &"move_down", &"move_left", &"move_right")
 	if !vel.is_zero_approx():
-		position += vel.normalized() * speed * dt
+		position += vel * speed * dt
 		position = position.clamp(Vector2(radius, radius), Vector2(LevelBuilder.W - radius, LevelBuilder.H - radius))
 	
 	if state == State.RECOVERING:
@@ -71,14 +63,14 @@ func _process(dt: float) -> void:
 	elif state == State.ALIVE:
 		# Shooting
 		cur_shot_cooldown -= dt
-		if cur_shot_cooldown <= 0 && Input.is_action_pressed("shoot"):
-			cur_shot_cooldown = SHOT_COOLDOWN
-			var shot := preload("res://shot.tscn").instantiate()
-			# TODO: Support controller
-			var dir := (get_viewport().get_mouse_position() - position).normalized()
-			shot.start(position + (radius - shot.radius) * dir, dir * 600, $ColorChanger.get_color())
-			# TODO: Make specific node for shots
-			self.get_parent().add_child(shot)
+		if cur_shot_cooldown <= 0:
+			var dir := ShootingInput.shooting_direction(get_viewport(), position)
+			if !dir.is_zero_approx():
+				cur_shot_cooldown = SHOT_COOLDOWN
+				var shot := preload("res://shot.tscn").instantiate()
+				shot.start(position + (radius - shot.radius) * dir, dir * 600, $ColorChanger.get_color())
+				# TODO: Make specific node for shots
+				self.get_parent().add_child(shot)
 		# Arcs
 		arc_cooldown -= dt
 		if arc_cooldown <= 0:
