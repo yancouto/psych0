@@ -52,8 +52,9 @@ func _init():
 	
 	spawn(F.Spiral.new(4, 4, 400, 0., 1., 1., [E.Basic3]))
 
+	wait(6)
 	level_part("Part I - The beginning of the end")
-	wait(8)
+	wait(2)
 
 	spawn(F.HorizontalLine.new(15, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.V.new(100), 1))
 	wait(1)

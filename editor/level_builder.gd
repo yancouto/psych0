@@ -49,6 +49,14 @@ func reset() -> void:
 	events.clear()
 	events.append(BuilderEvent.Wait.new(BASE_INDICATOR_TIME))
 
+# Probably not even necessary, but let's be safe as types can't guarantee
+# the builder isn't modified when building
+func clone() -> LevelBuilder:
+	var builder := LevelBuilder.new()
+	builder.events.assign(events.map(func(x): return x.clone()))
+	builder.cur_indicator_time = cur_indicator_time
+	return builder
+
 func build() -> Level:
 	var cur_time := LevelEvent.LevelTime.new(0, 0)
 	var all_events: Array[LevelEvent.EventWithTime] = []
@@ -57,3 +65,10 @@ func build() -> Level:
 	all_events.append(LevelEvent.EventWithTime.new(LevelEvent.LastEvent.new(), cur_time))
 	all_events.sort_custom(func(a, b): return a.time.lt(b.time))
 	return Level.new(all_events)
+
+func skip_till_level_part(part: String) -> bool:
+	for i in events.size():
+		if events[i] is BuilderEvent.LevelPart and (events[i] as BuilderEvent.LevelPart).name == part:
+			events = events.slice(i)
+			return true
+	return false

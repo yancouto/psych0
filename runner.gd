@@ -1,14 +1,13 @@
 extends Node
 
 # Level to run, let's start by hardcoding 1
-var level: Level = preload("res://levels/level1.gd").new().build()
-var blank_level: Level
+var builder: LevelBuilder = preload("res://levels/level1.gd").new()
+var level: Level = builder.clone().build()
 var next_event: LevelEvent.EventWithTime
 var time_passed := 0.
 var cur_level_part: String
 
 func _ready() -> void:
-	blank_level = level.clone()
 	level.change_level_part.connect(_on_change_level_part)
 	$Pausing.do_pause_unpause() # Start paused to show instructions
 	fix_bg_color()
@@ -30,6 +29,7 @@ func _process(dt: float) -> void:
 	fix_bg_color()
 
 func _on_change_level_part(name: String) -> void:
+	print("Reaching %s" % name)
 	cur_level_part = name
 	var tween = create_tween()
 	tween.tween_property($LevelPart, 'position:y', -$LevelPart.size.y, 0 if $LevelPart.text.is_empty() else 0.5)
@@ -42,10 +42,14 @@ func restart_to_level_part(part: String) -> void:
 	for enemy in $AllEnemies.get_children():
 		BasicEnemy.Type
 		enemy.die(BasicEnemy.DieReason.Reset)
-	level = blank_level.clone()
-	if !level.skip_till_level_part(cur_level_part):
+	level.change_level_part.disconnect(_on_change_level_part)
+	var build := builder.clone()
+	if !build.skip_till_level_part(cur_level_part):
 		print("Couldn't find part %s, starting from scratch" % cur_level_part)
 		cur_level_part = ""
+	level = build.build()
+	level.change_level_part.connect(_on_change_level_part)
+
 
 func _on_player_player_dead() -> void:
 	var dead_text := $DeadText

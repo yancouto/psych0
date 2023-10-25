@@ -38,7 +38,7 @@ class LevelTime:
 				wait_until_no_enemies = other.wait_until_no_enemies
 				secs_after = 0
 		if other.wait_until_no_enemies <= wait_until_no_enemies:
-			if secs_after == 0 && other.secs_after < 0:
+			if secs_after >= 0 && other.secs_after < 0:
 				# Makes it work with initial negative times
 				secs_after = other.secs_after
 		if wait_until_no_enemies >= other.wait_until_no_enemies && secs_after >= other.secs_after:
@@ -163,17 +163,6 @@ class LastEvent extends LevelEvent:
 		return true
 	func clone() -> LevelEvent:
 		return LastEvent.new()
-
-# Marker just for checkpointing, doesn't actually do anything
-# TODO: Make this actually work and not cut some stuff
-class Checkpoint extends LevelEvent:
-	var name: String
-	func _init(name_: String):
-		name = name_
-	func trigger(_level: Level, _root: Node, _ago: float) -> bool:
-		return true
-	func clone() -> LevelEvent:
-		return Checkpoint.new(name)
 
 class LevelPart extends LevelEvent:
 	var name: String

@@ -12,6 +12,8 @@ class LevelPart extends BuilderEvent:
 	func process_and_update_time(cur_time: LevelTime) -> Array[EventWithTime]:
 		var time = cur_time.clone()
 		return [EventWithTime.new(LevelEvent.LevelPart.new(name), time)]
+	func clone() -> BuilderEvent:
+		return LevelPart.new(name)
 
 class Wait extends BuilderEvent:
 	var secs: float
@@ -20,12 +22,16 @@ class Wait extends BuilderEvent:
 	func process_and_update_time(cur_time: LevelTime) -> Array[EventWithTime]:
 		cur_time.secs_after += secs
 		return []
+	func clone() -> BuilderEvent:
+		return Wait.new(secs)
 
 class WaitUntilNoEnemies extends BuilderEvent:
 	func process_and_update_time(cur_time: LevelTime) -> Array[EventWithTime]:
 		cur_time.wait_until_no_enemies += 1
 		cur_time.secs_after = 0
 		return []
+	func clone() -> BuilderEvent:
+		return self
 
 # In 1D, when will segment s1 intersect segment s2 if it moves with speed speed
 func intersect_axis(s1l: float, s1r: float, s2l: float, s2r: float, speed: float) -> float:
@@ -98,7 +104,13 @@ class Spawn extends BuilderEvent:
 				last_time = enemy.time
 				last_enemies = [enemy.enemy]
 		return events
+	func clone() -> BuilderEvent:
+		return Spawn.new(formation.clone(), indicator_time)
 
 func process_and_update_time(_cur_time: LevelTime) -> Array[EventWithTime]:
-	assert(false)
+	assert(false, "Must be implemented")
 	return []
+
+func clone() -> BuilderEvent:
+	assert(false, "Must be implemented")
+	return BuilderEvent.new()

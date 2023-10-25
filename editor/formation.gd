@@ -328,5 +328,9 @@ class Spiral extends Formation:
 
 # All enemies that should be spawned at exactly the same time
 func raw_enemies() -> Array[EnemyToSpawn]:
-	assert(false)
+	assert(false, "Must be implemented")
 	return []
+
+# Let's trust our formations are immutable, though there will be bugs if they're not
+func clone() -> Formation:
+	return self

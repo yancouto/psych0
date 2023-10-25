@@ -25,9 +25,4 @@ func clone() -> Level:
 	events2.assign(events.map(func(e): return e.clone()))
 	return Level.new(events2)
 
-func skip_till_level_part(name: String) -> bool:
-	for i in events.size():
-		if events[i].event is LevelEvent.LevelPart and (events[i].event as LevelEvent.LevelPart).name == name:
-			events = events.slice(i)
-			return true
-	return false
+
