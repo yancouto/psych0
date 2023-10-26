@@ -48,7 +48,7 @@ func _process(dt: float) -> void:
 	fix_bg_color()
 	if state == State.WaitingForRestart && timeout_for_respawn > 0:
 		timeout_for_respawn -= dt
-		if timeout_for_respawn <= 0 or ((RESPAWN_TIMEOUT - timeout_for_respawn) > 0.5 and Input.is_action_pressed(&"skip_dead_text")):
+		if timeout_for_respawn <= 0 or ((RESPAWN_TIMEOUT - timeout_for_respawn) > 0.5 and Input.is_action_just_pressed(&"skip_dead_text")):
 			dead_text_a_tween.kill()
 			dead_text_a_tween = create_tween()
 			dead_text_a_tween.tween_property($DeadText.label_settings, 'font_color:a', 0, 1)
