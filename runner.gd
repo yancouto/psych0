@@ -1,5 +1,7 @@
 extends Node
 
+const RESPAWN_TIMEOUT := 4.
+
 enum Difficulty { Medium, Hard }
 enum State { Playing, WaitingForRestart }
 
@@ -12,6 +14,8 @@ var cur_level_part: String
 var last_checkpoint: StringName
 var difficulty: Difficulty = Difficulty.Medium
 var state := State.Playing
+var dead_text_a_tween: Tween
+var timeout_for_respawn: float = 0
 
 
 func _ready() -> void:
@@ -42,6 +46,14 @@ func _process(dt: float) -> void:
 		$LevelOverText.visible = true
 		level = null
 	fix_bg_color()
+	if state == State.WaitingForRestart && timeout_for_respawn > 0:
+		timeout_for_respawn -= dt
+		if timeout_for_respawn <= 0 or ((RESPAWN_TIMEOUT - timeout_for_respawn) > 0.5 and Input.is_action_pressed(&"skip_dead_text")):
+			dead_text_a_tween.kill()
+			dead_text_a_tween = create_tween()
+			dead_text_a_tween.tween_property($DeadText.label_settings, 'font_color:a', 0, 1)
+			dead_text_a_tween.tween_callback(restart_to_checkpoint.bind(checkpoint_from_difficulty()))
+
 
 func _on_change_level_part(name: String) -> void:
 	if state != State.Playing:
@@ -59,6 +71,7 @@ func _on_checkpoint(name: StringName) -> void:
 	print("Checkpoint: %s" % name)
 
 func restart_to_checkpoint(checkpoint: StringName) -> void:
+	print("Restart to %s" % checkpoint)
 	$DeadText.hide()
 	$Player.respawn()
 	for enemy in $AllEnemies.get_children():
@@ -109,7 +122,7 @@ func _on_player_player_dead() -> void:
 	dead_text.text = "You died. Bummer.\nRestarting from %s\nCurrent difficulty: %s" % [restart_from_text(), difficulty_name()]
 	dead_text.show()
 	dead_text.label_settings.font_color.a = 0
-	var tween := create_tween()
-	tween.tween_property(dead_text.label_settings, 'font_color:a', 1, 1)
-	tween.tween_property(dead_text.label_settings, 'font_color:a', 0, 1).set_delay(3)
-	tween.tween_callback(restart_to_checkpoint.bind(checkpoint_from_difficulty()))
+	dead_text_a_tween = create_tween()
+	dead_text_a_tween.tween_property(dead_text.label_settings, 'font_color:a', 1, 1)
+	timeout_for_respawn = RESPAWN_TIMEOUT
+
