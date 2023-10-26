@@ -97,6 +97,11 @@ func set_recovering() -> void:
 	tween.tween_property(self, 'color_a', 1., 0.1).set_delay(0.1)
 	color_a_tween = tween
 
+func create_explosion() -> void:
+	var emitter := preload("res://ball_particles.tscn").instantiate()
+	emitter.configure(position, $ColorChanger.get_color(), radius)
+	get_parent().add_child(emitter)
+
 # Hit by an enemy
 func _on_area_entered(_area: Area2D) -> void:
 	if state != State.ALIVE:
@@ -108,6 +113,7 @@ func _on_area_entered(_area: Area2D) -> void:
 		state = State.DEAD
 		hide()
 		player_dead.emit()
+		create_explosion()
 		return
 	set_recovering()
 
