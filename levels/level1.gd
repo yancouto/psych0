@@ -19,6 +19,7 @@ func left_right(amount: int, enemies: Array[E] = [], invert := false) -> void:
 	spawn(F.HorizontalLine.new((amount + 1) / 2, bottom if invert else top, F.HorizontalLinePlacement.Distribute.new(W / 2, 0), 1, 1., enemies))
 
 func _init():
+	seed(42)
 	const r := 0.9
 	const s := 0.75
 	var screen_angle := Vector2(H/2, W/2).angle()
@@ -276,6 +277,7 @@ func _init():
 	set_indicator_time(2.5)
 	wait(3)
 	var shot_r := 0.4
+
 	var rand_pos := func() -> Vector2:
 		return LevelBuilder.point_around_screen(randf() * 4, shot_r * F.BASE_RADIUS)
 	spawn(F.Single.new(LevelBuilder.point_around_screen(0.5, shot_r * F.BASE_RADIUS), LevelEvent.FollowPlayer.new(5), shot_r))
@@ -296,5 +298,6 @@ func _init():
 			wait(.6)
 	wait_until_no_enemies()
 	
-	level_part("Part IV - The big one - TODO")
-	wait(5)
+	level_part("Part IV - The big one")
+	wait(2)
+	boss(Boss.Level1)

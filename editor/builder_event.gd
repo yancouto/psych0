@@ -117,6 +117,15 @@ class Spawn extends BuilderEvent:
 	func clone() -> BuilderEvent:
 		return Spawn.new(formation.clone(), indicator_time)
 
+class SpawnBoss extends BuilderEvent:
+	var boss: LevelEvent.Boss
+	func _init(boss_: LevelEvent.Boss):
+		boss = boss_
+	func process_and_update_time(cur_time: LevelTime) -> Array[EventWithTime]:
+		return [EventWithTime.new(LevelEvent.SpawnBoss.new(boss), cur_time.clone())]
+	func clone() -> BuilderEvent:
+		return SpawnBoss.new(boss)
+
 func process_and_update_time(_cur_time: LevelTime) -> Array[EventWithTime]:
 	assert(false, "Must be implemented")
 	return []

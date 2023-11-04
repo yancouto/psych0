@@ -45,6 +45,11 @@ class LevelTime:
 			return secs_after - other.secs_after
 		else:
 			return -1.
+	func serialized() -> Dictionary:
+		return {
+			wait_until_no_enemies = wait_until_no_enemies,
+			secs_after = secs_after
+		}
 
 class EventWithTime:
 	var event: LevelEvent
@@ -54,6 +59,11 @@ class EventWithTime:
 		self.time = time_
 	func clone() -> EventWithTime:
 		return EventWithTime.new(event.clone(), time.clone())
+	func serialized() -> Dictionary:
+		return {
+			event = event.serialized(),
+			time = time.serialized()
+		}
 
 # TODO: On more complex enemies, this will need to be redone because we'll
 # need to instantiate a different scene
@@ -94,6 +104,9 @@ class Speed:
 	func clone() -> Speed:
 		assert(false, "Must be implemented")
 		return Speed.new()
+	func serialized() -> Dictionary:
+		assert(false, "Must be implemented")
+		return {}
 	static func from_vec(speed: Vector2) -> Speed:
 		return BasicSpeed.new(speed.x, speed.y)
 
@@ -111,6 +124,8 @@ class BasicSpeed extends Speed:
 		return speed.length()
 	func clone() -> Speed:
 		return BasicSpeed.new(speed.x, speed.y)
+	func serialized() -> Dictionary:
+		return {speed = speed}
 
 class FollowPlayer extends Speed:
 	var speed_len: float
@@ -126,6 +141,8 @@ class FollowPlayer extends Speed:
 		return speed_len
 	func clone() -> Speed:
 		return FollowPlayer.new(speed_len)
+	func serialized() -> Dictionary:
+		return {speed_len = speed_len}
 
 class EnemyToSpawn:
 	var radius: float
@@ -144,6 +161,8 @@ class EnemyToSpawn:
 		root.add_child(enemy)
 	func clone() -> EnemyToSpawn:
 		return EnemyToSpawn.new(radius, pos, speed.clone(), type)
+	func serialized() -> Dictionary:
+		return {radius = radius, pos = pos, speed = speed.serialized(), type = type}
 
 class IndicatorToSpawn:
 	# On the edge of the screen
@@ -156,6 +175,8 @@ class IndicatorToSpawn:
 		self.color = color_
 	func clone() -> IndicatorToSpawn:
 		return IndicatorToSpawn.new(center, speed.clone(), color)
+	func serialized() -> Dictionary:
+		return {center = center, speed = speed.serialized(), color = color}
 
 # Does nothing, just added in the end always, so we can wait for no enemies
 class LastEvent extends LevelEvent:
@@ -163,6 +184,8 @@ class LastEvent extends LevelEvent:
 		return true
 	func clone() -> LevelEvent:
 		return LastEvent.new()
+	func serialized() -> Dictionary:
+		return {type = "LastEvent"}
 
 class LevelPart extends LevelEvent:
 	var name: String
@@ -173,6 +196,8 @@ class LevelPart extends LevelEvent:
 		return true
 	func clone() -> LevelEvent:
 		return LevelPart.new(name)
+	func serialized() -> Dictionary:
+		return {part_name = name}
 
 class Checkpoint extends LevelEvent:
 	var name: StringName
@@ -183,6 +208,8 @@ class Checkpoint extends LevelEvent:
 		return true
 	func clone() -> LevelEvent:
 		return Checkpoint.new(name)
+	func serialized() -> Dictionary:
+		return {checkpoint_name = name}
 
 class Spawn extends LevelEvent:
 	var to_spawn: Array[EnemyToSpawn]
@@ -196,6 +223,8 @@ class Spawn extends LevelEvent:
 		var to_spawn2: Array[EnemyToSpawn]
 		to_spawn2.assign(to_spawn.map(func(x): return x.clone()))
 		return Spawn.new(to_spawn2)
+	func serialized() -> Dictionary:
+		return {to_spawn = to_spawn.map(func(t): return t.serialized())}
 
 class Indicator extends LevelEvent:
 	var to_spawn: Array[IndicatorToSpawn]
@@ -214,6 +243,22 @@ class Indicator extends LevelEvent:
 		var to_spawn2: Array[IndicatorToSpawn]
 		to_spawn2.assign(to_spawn.map(func(x): return x.clone()))
 		return Indicator.new(to_spawn2, duration)
+	func serialized() -> Dictionary:
+		return {to_spawn = to_spawn.map(func(t): return t.serialized()), duration = duration}
+
+enum Boss { Level1 }
+
+class SpawnBoss extends LevelEvent:
+	var boss: Boss
+	func _init(boss_: Boss):
+		boss = boss_
+	func trigger(_level: Level, root: Node, _ago: float) -> bool:
+		# TODO
+		return true
+	func clone() -> LevelEvent:
+		return SpawnBoss.new(boss)
+	func serialized() -> Dictionary:
+		return {boss = boss}
 
 # Trigger the event, the event should have happened ago seconds ago
 func trigger(_level: Level, _root: Node, _ago: float) -> bool:
@@ -223,3 +268,7 @@ func trigger(_level: Level, _root: Node, _ago: float) -> bool:
 func clone() -> LevelEvent:
 	assert(false, "Must be implemented")
 	return LevelEvent.new()
+
+func serialized() -> Dictionary:
+	assert(false, "Must be implemented")
+	return {}

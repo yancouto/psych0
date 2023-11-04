@@ -25,3 +25,6 @@ func clone() -> Level:
 	var events2: Array[LevelEvent.EventWithTime]
 	events2.assign(events.map(func(e): return e.clone()))
 	return Level.new(events2)
+
+func serialized() -> Array:
+	return events.map(func(e): return e.serialized())

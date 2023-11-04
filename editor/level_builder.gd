@@ -9,6 +9,7 @@ const BOTTOM_LEFT := Vector2(0, H)
 const CORNERS: Array[Vector2] = [TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT]
 const MIDDLE := BOTTOM_RIGHT / 2.
 const BASE_INDICATOR_TIME := 2.0
+const Boss = LevelEvent.Boss
 
 var events: Array[BuilderEvent] = []
 var cur_indicator_time := BASE_INDICATOR_TIME
@@ -46,6 +47,9 @@ func level_part(name: String) -> void:
 
 func spawn(f: Formation) -> void:
 	events.append(BuilderEvent.Spawn.new(f, cur_indicator_time))
+
+func boss(b: Boss) -> void:
+	events.append(BuilderEvent.SpawnBoss.new(b))
 
 func set_indicator_time(indicator_time: float) -> void:
 	cur_indicator_time = indicator_time
