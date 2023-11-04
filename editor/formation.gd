@@ -14,19 +14,28 @@ static func get_speed(speedm: Speed) -> Speed:
 static func get_radius(radiusm: float) -> float:
 	return radiusm * BASE_RADIUS
 
+static func single() -> Single:
+	return Single.new()
+
 class Single extends Formation:
-	#var enemy: String
-	var pos: Vector2
-	var speedm: Speed
-	var radiusm: float
-	var type: EnemyType
-	func _init(pos_: Vector2, speedm_: Speed, radiusm_: float, type_ := EnemyType.Basic1):
-		pos = pos_
-		speedm = speedm_
-		radiusm = radiusm_
-		type = type_
+	var position_ := Vector2.ZERO
+	var speedm_ := Speed.from_vec(Vector2(100, 100))
+	var radiusm_ := 1.
+	var type_ := EnemyType.Basic1
+	func position(position__: Vector2) -> Single:
+		position_ = position__
+		return self
+	func speedm(speedm__: Speed) -> Single:
+		speedm_ = speedm__
+		return self
+	func radiusm(radiusm__: float) -> Single:
+		radiusm_ = radiusm__
+		return self
+	func type(type__: EnemyType) -> Single:
+		type_ = type__
+		return self
 	func raw_enemies() -> Array[EnemyToSpawn]:
-		return [EnemyToSpawn.new(Formation.get_radius(radiusm), pos, Formation.get_speed(speedm), type)]
+		return [EnemyToSpawn.new(Formation.get_radius(radiusm_), position_, Formation.get_speed(speedm_), type_)]
 
 static func get_enemy(enemies: Array[EnemyType], i: int) -> EnemyType:
 	if enemies.is_empty():

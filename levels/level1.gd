@@ -28,7 +28,7 @@ func _init():
 	level_part("Prelude - What am I?")
 
 	wait(2)
-	spawn(F.Single.new(Vector2(-r, H / 2), Speed.new(s, 0), r))
+	spawn(F.single().position(Vector2(-r, H / 2)).speedm(Speed.new(s, 0)).radiusm(r))
 	wait_until_no_enemies()
 
 	spawn(F.Circle.new(2, -PI/2, 1, [E.Basic1]))
@@ -280,21 +280,21 @@ func _init():
 
 	var rand_pos := func() -> Vector2:
 		return LevelBuilder.point_around_screen(randf() * 4, shot_r * F.BASE_RADIUS)
-	spawn(F.Single.new(LevelBuilder.point_around_screen(0.5, shot_r * F.BASE_RADIUS), LevelEvent.FollowPlayer.new(5), shot_r))
+	spawn(F.single().position(LevelBuilder.point_around_screen(0.5, shot_r * F.BASE_RADIUS)).speedm(LevelEvent.FollowPlayer.new(5)).radiusm(shot_r))
 	wait(3)
 	set_indicator_time(1.2)
 	for i in range(30):
 		if i < 5:
-			spawn(F.Single.new(rand_pos.call(), LevelEvent.FollowPlayer.new(5), shot_r))
+			spawn(F.single().position(rand_pos.call()).speedm(LevelEvent.FollowPlayer.new(5)).radiusm(shot_r))
 			wait(2)
 		elif i < 15:
-			spawn(F.Single.new(rand_pos.call(), LevelEvent.FollowPlayer.new(6), shot_r, E.Basic3))
+			spawn(F.single().position(rand_pos.call()).speedm(LevelEvent.FollowPlayer.new(6)).radiusm(shot_r).type(E.Basic3))
 			wait(1)
 		elif i < 24:
-			spawn(F.Single.new(rand_pos.call(), LevelEvent.FollowPlayer.new(7), shot_r, E.Basic3))
+			spawn(F.single().position(rand_pos.call()).speedm(LevelEvent.FollowPlayer.new(7)).radiusm(shot_r).type(E.Basic3))
 			wait(.8)
 		else:
-			spawn(F.Single.new(rand_pos.call(), LevelEvent.FollowPlayer.new(7), shot_r, E.Basic3))
+			spawn(F.single().position(rand_pos.call()).speedm(LevelEvent.FollowPlayer.new(7)).radiusm(shot_r).type(E.Basic3))
 			wait(.6)
 	wait_until_no_enemies()
 	
