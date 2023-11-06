@@ -5,14 +5,13 @@ var builder: LevelBuilder = preload("res://levels/level1.gd").new()
 
 const PATH := "user://serialized_level1.gd"
 
-func _on_save_pressed():
+func _on_save_pressed() -> void:
 	var level := builder.build()
 	var file := FileAccess.open(PATH, FileAccess.WRITE)
 	file.store_var(level.serialized())
 	print("Saved!")
 
-
-func _on_test_pressed():
+func _on_test_pressed() -> void:
 	var level: Array = builder.build().serialized()
 	var file := FileAccess.open(PATH, FileAccess.READ)
 	var level_stored = file.get_var()

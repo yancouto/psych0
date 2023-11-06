@@ -98,44 +98,54 @@ static func radius_from_center(center: Vector2) -> float:
 			biggest = maxf(biggest, (center - corner).length_squared())
 		return sqrt(biggest)
 
+static func circle(amount: int) -> Circle:
+	return Circle.new(amount)
+
 class Circle extends Formation:
-	var amount: int
-	var starting_angle: float
-	var speed_len: float
-	var types: Array[EnemyType]
-	var follow_player := false
-	var center := LevelBuilder.MIDDLE
-	func _init(amount_: int, starting_angle_ := 0., speed_len_ := 1., types_: Array[EnemyType] = []):
-		self.amount = amount_
-		self.starting_angle = starting_angle_
-		self.speed_len = speed_len_
-		self.types = types_
-	func set_follow_player() -> Formation:
-		follow_player = true
+	var _amount: int
+	var _starting_angle := 0.
+	var _speedm_len := 1.
+	var _types: Array[EnemyType]
+	var _follow_player := false
+	var _center := LevelBuilder.MIDDLE
+	func _init(amount_: int) -> void:
+		_amount = amount_
+	func starting_angle(starting_angle_: float) -> Circle:
+		_starting_angle = starting_angle_
 		return self
-	func set_center(center_: Vector2) -> Formation:
-		center = center_
+	func speedm_len(speedm_len_: float) -> Circle:
+		_speedm_len = speedm_len_
 		return self
-	func set_center_x(x: float) -> Formation:
-		center.x = x
+	func types(types_: Array[EnemyType]) -> Circle:
+		_types = types_
+		return self
+	func follow_player(follow_player_ := true) -> Circle:
+		_follow_player = follow_player_
+		return self
+	func center(center_: Vector2) -> Circle:
+		_center = center_
+		return self
+	func center_x(x: float) -> Circle:
+		_center.x = x
 		return self
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		var enemies: Array[EnemyToSpawn] = []
-		var n := self.amount
+		var n := _amount
 		enemies.resize(n)
 		# TODO: Make customisable
 		const enemy_radius := BASE_RADIUS
-		var circle_radius := enemy_radius + radius_from_center(center)
+		var circle_radius := enemy_radius + radius_from_center(_center)
 		for i in range(n):
-			var angle := Vector2(0, -1).rotated(starting_angle + i * (TAU / n))
-			var pos := center + angle * circle_radius
+			var angle := Vector2(0, -1).rotated(_starting_angle + i * (TAU / n))
+			var pos := _center + angle * circle_radius
 			var speed: Speed
-			if follow_player:
-				speed = LevelEvent.FollowPlayer.new(speed_len * BASE_SPEED)
+			if _follow_player:
+				speed = LevelEvent.FollowPlayer.new(_speedm_len * BASE_SPEED)
 			else:
-				speed = LevelEvent.Speed.from_vec(-angle * speed_len * BASE_SPEED)
-			enemies[i] = EnemyToSpawn.new(enemy_radius, pos, speed, Formation.get_enemy(types, i))
+				speed = LevelEvent.Speed.from_vec(-angle * _speedm_len * BASE_SPEED)
+			enemies[i] = EnemyToSpawn.new(enemy_radius, pos, speed, Formation.get_enemy(_types, i))
 		return enemies
+
 
 enum HorizontalLineSide { Top, Bottom }
 
