@@ -224,7 +224,7 @@ class HorizontalLine extends Formation:
 	var _speedm_len := 1.
 	var _radiusm := 1.
 	var _types: Array[EnemyType]
-	var _follows_player := false
+	var _follow_player := false
 	func _init(amount_: int):
 		_amount = amount_
 	func side(side_: HorizontalLineSide) -> HorizontalLine:
@@ -246,8 +246,8 @@ class HorizontalLine extends Formation:
 	func types(types_: Array[EnemyType]) -> HorizontalLine:
 		_types = types_
 		return self
-	func follows_player(follows_player_ := true) -> HorizontalLine:
-		_follows_player = follows_player_
+	func follow_player(follow_player_ := true) -> HorizontalLine:
+		_follow_player = follow_player_
 		return self
 	# Allows customisable width and height
 	func _inner_raw_enemies(w: float, h: float) -> Array[EnemyToSpawn]:
@@ -263,7 +263,7 @@ class HorizontalLine extends Formation:
 			else:
 				pos.y = h + radius + pos.y
 				speed_y = -_speedm_len * BASE_SPEED
-			var speed: Speed = LevelEvent.BasicSpeed.new(0, speed_y) if !_follows_player else LevelEvent.FollowPlayer.new(absf(speed_y))
+			var speed: Speed = LevelEvent.BasicSpeed.new(0, speed_y) if !_follow_player else LevelEvent.FollowPlayer.new(absf(speed_y))
 			enemies.append(EnemyToSpawn.new(radius, pos, speed, Formation.get_enemy(_types, i)))
 		return enemies
 	func raw_enemies() -> Array[EnemyToSpawn]:
@@ -313,33 +313,48 @@ class VerticalLinePlacement:
 		assert(false, "Must be implemented on all subclasses")
 		return null
 
+static func vertical_line(amount: int) -> VerticalLine:
+	return VerticalLine.new(amount)
+
 class VerticalLine extends Formation:
-	var amount: int
-	var side: VerticalLineSide
-	var placement: VerticalLinePlacement
-	var speed_len: float
-	var radiusm: float
-	var types: Array[EnemyType]
-	var follows_player := false
-	func _init(amount_: int, side_: VerticalLineSide, placement_: VerticalLinePlacement, speed_len_ := 1., radiusm_ := 1., types_: Array[EnemyType] = []):
-		self.amount = amount_
-		self.side = side_
-		self.placement = placement_
-		self.speed_len = speed_len_
-		self.radiusm = radiusm_
-		self.types = types_
-	func set_follows_player(follows_player_ := true) -> VerticalLine:
-		follows_player = follows_player_
+	var _amount: int
+	var _side: VerticalLineSide = VerticalLineSide.Left
+	var _placement: VerticalLinePlacement = VerticalLinePlacement.Distribute.new()
+	var _speedm_len := 1.
+	var _radiusm := 1.
+	var _types: Array[EnemyType]
+	var _follow_player := false
+	func _init(amount_: int) -> void:
+		_amount = amount_
+	func side(side_: VerticalLineSide) -> VerticalLine:
+		_side = side_
+		return self
+	func left() -> VerticalLine:
+		return side(VerticalLineSide.Left)
+	func right() -> VerticalLine:
+		return side(VerticalLineSide.Right)
+	func placement(placement_: VerticalLinePlacement) -> VerticalLine:
+		_placement = placement_
+		return self
+	func speedm_len(speedm_len_: float) -> VerticalLine:
+		_speedm_len = speedm_len_
+		return self
+	func radiusm(radiusm_: float) -> VerticalLine:
+		_radiusm = radiusm_
+		return self
+	func types(types_: Array[EnemyType]) -> VerticalLine:
+		_types = types_
+		return self
+	func follow_player(follow_player_ := true) -> VerticalLine:
+		_follow_player = follow_player_
 		return self
 	func raw_enemies() -> Array[EnemyToSpawn]:
-		var horizontal_side := HorizontalLineSide.Top if side == VerticalLineSide.Left else HorizontalLineSide.Bottom
-		var enemies := Formation.horizontal_line(amount).side(horizontal_side).placement(placement.convert()).speedm_len(speed_len).radiusm(radiusm).types(types).follows_player(follows_player)._inner_raw_enemies(LevelBuilder.H, LevelBuilder.W)
+		var horizontal_side := HorizontalLineSide.Top if _side == VerticalLineSide.Left else HorizontalLineSide.Bottom
+		var enemies := Formation.horizontal_line(_amount).side(horizontal_side).placement(_placement.convert()).speedm_len(_speedm_len).radiusm(_radiusm).types(_types).follow_player(_follow_player)._inner_raw_enemies(LevelBuilder.H, LevelBuilder.W)
 		for enemy in enemies:
 			enemy.pos = Vector2(enemy.pos.y, enemy.pos.x)
 			enemy.speed = enemy.speed.swap_coordinates()
 		return enemies
-
-
 
 class Spiral extends Formation:
 	var amount_in_circle: int
