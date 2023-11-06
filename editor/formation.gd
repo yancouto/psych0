@@ -192,9 +192,9 @@ class HorizontalLinePlacement:
 		var center: float
 		# Size of the gap
 		var size: float
-		func _init(center_: float, size_: float):
-			self.center = center_
+		func _init(size_: float, center_: float) -> void:
 			self.size = size_
+			self.center = center_
 		func positions(n: int, radius: float, len: float) -> Array[Vector2]:
 			var n_left := roundi(n * ((center - size / 2) / (len - size)))
 			# Adjust center a little to make balls look good on both sides
@@ -237,6 +237,12 @@ class HorizontalLine extends Formation:
 	func placement(placement_: HorizontalLinePlacement) -> HorizontalLine:
 		_placement = placement_
 		return self
+	func distribute(left_margin := 0., right_margin := -1.) -> HorizontalLine:
+		return placement(HorizontalLinePlacement.Distribute.new(left_margin, right_margin))
+	func v(dy: float, margin := 0.) -> HorizontalLine:
+		return placement(HorizontalLinePlacement.V.new(dy, margin))
+	func gap(size: float, center := LevelBuilder.W / 2) -> HorizontalLine:
+		return placement(HorizontalLinePlacement.Gap.new(size, center))
 	func speedm_len(speedm_len_: float) -> HorizontalLine:
 		_speedm_len = speedm_len_
 		return self
@@ -302,11 +308,11 @@ class VerticalLinePlacement:
 		var center: float
 		# Size of the gap
 		var size: float
-		func _init(center_: float, size_: float):
+		func _init(size_: float, center_: float) -> void:
 			self.center = center_
 			self.size = size_
 		func convert() -> HorizontalLinePlacement:
-			return HorizontalLinePlacement.Gap.new(center, size)
+			return HorizontalLinePlacement.Gap.new(size, center)
 
 	# Convert to Horizontal, to minimise code duplication. Remember to swap x and y
 	func convert() -> HorizontalLinePlacement:
@@ -336,6 +342,12 @@ class VerticalLine extends Formation:
 	func placement(placement_: VerticalLinePlacement) -> VerticalLine:
 		_placement = placement_
 		return self
+	func distribute(top_margin := 0., bottom_margin := -1.) -> VerticalLine:
+		return placement(VerticalLinePlacement.Distribute.new(top_margin, bottom_margin))
+	func v(dx: float, margin := 0.) -> VerticalLine:
+		return placement(VerticalLinePlacement.V.new(dx, margin))
+	func gap(size: float, center := LevelBuilder.H / 2) -> VerticalLine	:
+		return placement(VerticalLinePlacement.Gap.new(size, center))
 	func speedm_len(speedm_len_: float) -> VerticalLine:
 		_speedm_len = speedm_len_
 		return self
