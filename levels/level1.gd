@@ -50,7 +50,7 @@ func _init():
 	wait_until_no_enemies()
 	checkpoint(&"check2")
 	
-	spawn(F.Spiral.new(4, 4, 400, 0., 1., 1., [E.Basic3]))
+	spawn(F.spiral(4).spacing(400).types([E.Basic3]))
 
 	wait(6)
 	level_part("Part I - The beginning of the end")
@@ -118,15 +118,15 @@ func _init():
 	checkpoint(&"check7")
 
 	wait(2)
-	spawn(F.Spiral.new(8, 8, 100, 0, 1))
+	spawn(F.spiral(8).spacing(100))
 	wait(6)
-	spawn(F.Spiral.new(12, 20, 150, 0, 1.5).invert())
+	spawn(F.spiral(20).circle_amount(12).spacing(150).speedm_len(1.5).invert())
 	wait(4)
 	spawn(F.vertical_line(10).left().placement(F.VerticalLinePlacement.Distribute.new()).speedm_len(.5))
 	spawn(F.vertical_line(10).right().placement(F.VerticalLinePlacement.Distribute.new()).speedm_len(.5))
 	wait(6)
 	checkpoint(&"check8")
-	spawn(F.Spiral.new(20, 100, 50))
+	spawn(F.spiral(100).circle_amount(20).spacing(50).speedm_len(.75))
 	wait(5)
 	spawn(F.vertical_line(11).left().placement(F.VerticalLinePlacement.Distribute.new()).speedm_len(.75))
 	wait(0.5)
@@ -158,9 +158,9 @@ func _init():
 	checkpoint(&"check10")
 
 	set_indicator_time(1.2)
-	spawn(F.Spiral.new(90, 80, 100, PI/2, 1.5, 1, [E.Basic1]))
+	spawn(F.spiral(80).circle_amount(90).spacing(100).starting_angle(PI/2).speedm_len(1.5))
 	wait(2)
-	spawn(F.Spiral.new(90, 60, 100, -PI/2, 1.5, 1, [E.Basic1, E.Basic3]).invert())
+	spawn(F.spiral(60).circle_amount(90).spacing(100).starting_angle(-PI/2).speedm_len(1.5).types([E.Basic1, E.Basic3]).invert())
 	wait(4)
 	spawn(F.vertical_line(12).left().placement(F.VerticalLinePlacement.Distribute.new()).speedm_len(0.8))
 	wait(8)
@@ -174,9 +174,9 @@ func _init():
 	checkpoint(&"check11")
 
 
-	spawn(F.Spiral.new(90, 80, 100, 0, 1.5, 1, [E.Basic1, E.Basic3]))
-	spawn(F.Spiral.new(90, 80, 100, TAU/3, 1.5, 1, [E.Basic3, E.Basic1]))
-	spawn(F.Spiral.new(90, 80, 100, 2*TAU/3, 1.5, 1, [E.Basic1, E.Basic3]))
+	spawn(F.spiral(80).circle_amount(90).spacing(100).starting_angle(0).speedm_len(1.5).types([E.Basic1, E.Basic3]))
+	spawn(F.spiral(80).circle_amount(90).spacing(100).starting_angle(TAU/3).speedm_len(1.5).types([E.Basic3, E.Basic1]))
+	spawn(F.spiral(80).circle_amount(90).spacing(100).starting_angle(2*TAU/3).speedm_len(1.5).types([E.Basic1, E.Basic3]))
 	
 	wait(3.5)
 	left_right(10, [])
@@ -235,7 +235,7 @@ func _init():
 	wait_until_no_enemies()
 	checkpoint(&"check14")
 
-	spawn(F.Spiral.new(140, 235, 80, PI/2, 1.4, 1.2, [E.Basic1, E.Basic3]))
+	spawn(F.spiral(235).circle_amount(140).spacing(80).starting_angle(PI/2).speedm_len(1.4).radiusm(1.2).types([E.Basic1, E.Basic3]))
 	
 	wait(3)
 	top_bottom(12, [E.Basic3])

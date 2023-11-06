@@ -356,41 +356,59 @@ class VerticalLine extends Formation:
 			enemy.speed = enemy.speed.swap_coordinates()
 		return enemies
 
+static func spiral(amount: int) -> Spiral:
+	return Spiral.new(amount)
+
 class Spiral extends Formation:
-	var amount_in_circle: int
-	var amount: int
-	var spacing: float
-	var starting_angle: float
-	var speed_len: float
-	var radiusm: float
-	var types: Array[EnemyType]
-	var dir: float = 1.
-	var center := LevelBuilder.MIDDLE
-	func _init(amount_in_circle_: int, amount_: int, spacing_: float, starting_angle_ := 0., speed_len_ := .75, radiusm_ := 1., types_: Array[EnemyType] = []):
-		self.amount_in_circle = amount_in_circle_
-		self.amount = amount_
-		self.spacing = spacing_
-		self.starting_angle = starting_angle_
-		self.speed_len = speed_len_
-		self.radiusm = radiusm_
-		self.types = types_
-	func invert() -> Spiral:
-		self.dir = -self.dir
+	var _amount: int
+	# How many balls in the original circle the spiral is based on
+	var _circle_amount: int
+	# TODO: Does spacing need a multiplier?
+	var _spacing := 100.
+	var _starting_angle := 0.
+	var _speedm_len := 1.
+	var _radiusm := 1.
+	var _types: Array[EnemyType]
+	var _dir: float = 1.
+	var _center := LevelBuilder.MIDDLE
+	func _init(amount_: int) -> void:
+		_amount = amount_
+		_circle_amount = amount_
+	func circle_amount(circle_amount_: int) -> Spiral:
+		_circle_amount = circle_amount_
 		return self
-	func set_center(center_: Vector2) -> Spiral:
-		center = center_
+	func spacing(spacing_: float) -> Spiral:
+		_spacing = spacing_
+		return self
+	func starting_angle(starting_angle_: float) -> Spiral:
+		_starting_angle = starting_angle_
+		return self
+	func speedm_len(speedm_len_: float) -> Spiral:
+		_speedm_len = speedm_len_
+		return self
+	func radiusm(radiusm_: float) -> Spiral:
+		_radiusm = radiusm_
+		return self
+	func types(types_: Array[EnemyType]) -> Spiral:
+		_types = types_
+		return self
+	func invert() -> Spiral:
+		_dir = -_dir
+		return self
+	func center(center_: Vector2) -> Spiral:
+		_center = center_
 		return self
 	func raw_enemies() -> Array[EnemyToSpawn]:
-		var radius := Formation.get_radius(radiusm)
+		var radius := Formation.get_radius(_radiusm)
 		var enemies: Array[EnemyToSpawn] = []
-		enemies.resize(amount)
+		enemies.resize(_amount)
 
-		var screen_radius := radius_from_center(center)
-		for i in range(amount):
-			var angle := Vector2(0, -1).rotated(starting_angle + i * 2 * PI * dir / amount_in_circle)
-			var pos := center + angle * (screen_radius + radius + i * spacing)
-			var speed := -angle * speed_len * BASE_SPEED
-			enemies[i] = EnemyToSpawn.new(radius, pos, LevelEvent.BasicSpeed.from_vec(speed), Formation.get_enemy(types, i))
+		var screen_radius := radius_from_center(_center)
+		for i in _amount:
+			var angle := Vector2(0, -1).rotated(_starting_angle + i * 2 * PI * _dir / _circle_amount)
+			var pos := _center + angle * (screen_radius + radius + i * _spacing)
+			var speed := -angle * _speedm_len * BASE_SPEED
+			enemies[i] = EnemyToSpawn.new(radius, pos, LevelEvent.BasicSpeed.from_vec(speed), Formation.get_enemy(_types, i))
 		return enemies
 
 # All enemies that should be spawned at exactly the same time
