@@ -106,7 +106,7 @@ func _init():
 	wait_until_no_enemies()
 	checkpoint(&"check6")
 
-	spawn(F.Multiple.new(42, Vector2(W + r, H / 2), Speed.new(-0.75, 0), Vector2.RIGHT, 0.1, r, [E.Basic3]))
+	spawn(F.multiple(42).pos(Vector2(W + r, H / 2)).speedm(Speed.new(-0.75, 0)).dir(Vector2.RIGHT).spacing(0.1).radiusm(r).types([E.Basic3]))
 	wait(5)
 	for i in range(5):
 		wait(1)

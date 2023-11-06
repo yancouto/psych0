@@ -119,7 +119,7 @@ func checkpoint_from_difficulty() -> StringName:
 func _on_player_player_dead() -> void:
 	state = State.WaitingForRestart
 	var dead_text := $DeadText
-	dead_text.text = "You died. Bummer.\nRestarting from %s\nCurrent difficulty: %s" % [restart_from_text(), difficulty_name()]
+	dead_text.text = "You died. Bummer.\nRestarting from %s.\nCurrent difficulty: %s" % [restart_from_text(), difficulty_name()]
 	dead_text.show()
 	dead_text.label_settings.font_color.a = 0
 	dead_text_a_tween = create_tween()

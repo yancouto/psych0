@@ -6,6 +6,7 @@ const Speed = LevelEvent.Speed
 
 const BASE_SPEED := 400.
 const BASE_RADIUS := 30.
+const SQ2 := sqrt(2)
 
 static func get_speed(speedm: Speed) -> Speed:
 	return speedm.multiply(BASE_SPEED)
@@ -19,7 +20,7 @@ static func single() -> Single:
 
 class Single extends Formation:
 	var position_ := Vector2.ZERO
-	var speedm_ := Speed.from_vec(Vector2(100, 100))
+	var speedm_ := Speed.from_vec(Vector2(SQ2, SQ2))
 	var radiusm_ := 1.
 	var type_ := EnemyType.Basic1
 	func position(position__: Vector2) -> Single:
@@ -43,34 +44,49 @@ static func get_enemy(enemies: Array[EnemyType], i: int) -> EnemyType:
 	else:
 		return enemies[i % enemies.size()]
 
+static func multiple(amount: int) -> Multiple:
+	return Multiple.new(amount)
+
 # Multiple enemies in a line, one after another
 class Multiple extends Formation:
-	var amount: int
-	# Position of the closes enemy to the screen
-	var pos: Vector2
+	var _amount: int
+	# Position of the closest enemy to the screen
+	var _pos := Vector2.ZERO
 	# Speed of all enemies
-	var speedm: Speed
+	var _speedm := Speed.from_vec(Vector2(SQ2, SQ2))
 	# Direction the line should spawn to (usually, opposite of speed)
-	var dir: Vector2
+	var _dir := Vector2(-SQ2, -SQ2)
 	# Distance between enemies
-	var spacing: float
+	var _spacing := 100.
 	# Enemy radius
-	var radiusm: float
-	var types: Array[EnemyType]
-	func _init(amount_: int, pos_: Vector2, speedm_: Speed, dir_: Vector2, spacing_ := 5., radiusm_ := 1., types_: Array[EnemyType] = []):
-		self.amount = amount_
-		self.pos = pos_
-		self.speedm = speedm_
-		self.dir = dir_.normalized()
-		self.spacing = spacing_
-		self.radiusm = radiusm_
-		self.types = types_
+	var _radiusm := 1.
+	var _types: Array[EnemyType]
+	func _init(amount_: int):
+		_amount = amount_
+	func pos(pos_: Vector2) -> Multiple:
+		_pos = pos_
+		return self
+	func speedm(speedm_: Speed) -> Multiple:
+		_speedm = speedm_
+		return self
+	func dir(dir_: Vector2) -> Multiple:
+		_dir = dir_.normalized()
+		return self
+	func spacing(spacing_: float) -> Multiple:
+		_spacing = spacing_
+		return self
+	func radiusm(radiusm_: float) -> Multiple:
+		_radiusm = radiusm_
+		return self
+	func types(types_: Array[EnemyType]) -> Multiple:
+		_types = types_
+		return self
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		var enemies: Array[EnemyToSpawn] = []
-		var speed := Formation.get_speed(speedm)
-		var radius := Formation.get_radius(radiusm)
-		for i in range(amount):
-			enemies.append(EnemyToSpawn.new(radius, pos + dir * i * (spacing + 2 * radius), speed, Formation.get_enemy(types, i)))
+		var speed := Formation.get_speed(_speedm)
+		var radius := Formation.get_radius(_radiusm)
+		for i in range(_amount):
+			enemies.append(EnemyToSpawn.new(radius, _pos + _dir * i * (_spacing + 2 * radius), speed, Formation.get_enemy(_types, i)))
 		return enemies
 
 static func radius_from_center(center: Vector2) -> float:
