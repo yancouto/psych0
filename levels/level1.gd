@@ -13,10 +13,8 @@ func top_bottom(amount: int, enemies: Array[E] = [], invert := false) -> void:
 	spawn(F.VerticalLine.new((amount + 1) / 2, Left if invert else Right, F.VerticalLinePlacement.Distribute.new(H / 2, 0), 1.5, 1., enemies))
 
 func left_right(amount: int, enemies: Array[E] = [], invert := false) -> void:
-	const top := F.HorizontalLineSide.Top
-	const bottom := F.HorizontalLineSide.Bottom
-	spawn(F.HorizontalLine.new(amount / 2, top if invert else bottom, F.HorizontalLinePlacement.Distribute.new(0, W / 2), 1, 1., enemies))
-	spawn(F.HorizontalLine.new((amount + 1) / 2, bottom if invert else top, F.HorizontalLinePlacement.Distribute.new(W / 2, 0), 1, 1., enemies))
+	spawn(F.horizontal_line(amount / 2).side(Top if invert else Bottom).placement(F.HorizontalLinePlacement.Distribute.new(0, W / 2)).types(enemies))
+	spawn(F.horizontal_line((amount + 1) / 2).side(Bottom if invert else Top).placement(F.HorizontalLinePlacement.Distribute.new(W / 2, 0)).types(enemies))
 
 func _init():
 	seed(42)
@@ -58,11 +56,11 @@ func _init():
 	level_part("Part I - The beginning of the end")
 	wait(2)
 
-	spawn(F.HorizontalLine.new(15, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.V.new(100), 1))
+	spawn(F.horizontal_line(15).top().placement(F.HorizontalLinePlacement.V.new(100)))
 	wait(1)
-	spawn(F.HorizontalLine.new(14, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.V.new(100), 1))
+	spawn(F.horizontal_line(14).top().placement(F.HorizontalLinePlacement.V.new(100)))
 	wait(1.5)
-	spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.V.new(100), 1, 1, [E.Basic3, E.Basic1]))
+	spawn(F.horizontal_line(17).bottom().placement(F.HorizontalLinePlacement.V.new(100)).types([E.Basic3, E.Basic1]))
 	wait_until_no_enemies()
 	checkpoint(&"check3")
 
@@ -71,22 +69,22 @@ func _init():
 		if i > 3:
 			spawn(F.VerticalLine.new(8, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), 0.5))
 		wait(1)
-		spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new((i + 1) * (W / 6), 200), 1, 1, [E.Basic1, E.Basic3]))
+		spawn(F.horizontal_line(17).top().placement(F.HorizontalLinePlacement.Gap.new((i + 1) * (W / 6), 200)).types([E.Basic1, E.Basic3]))
 	for i in 4:
 		if i < 3:
 			spawn(F.VerticalLine.new(8, F.VerticalLineSide.Left, F.VerticalLinePlacement.Distribute.new(), 0.5))
 		wait(1)
-		spawn(F.HorizontalLine.new(17, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new(((4 - i) + 1) * (W / 6), 200), 1, 1, [E.Basic3]))
+		spawn(F.horizontal_line(17).top().placement(F.HorizontalLinePlacement.Gap.new(((4 - i) + 1) * (W / 6), 200)).types([E.Basic3]))
 	wait(4.5)
 	checkpoint(&"check4")
 	reset_indicator_time()
 	for side in [Top, Bottom]:
-		spawn(F.HorizontalLine.new(18, side, F.HorizontalLinePlacement.Gap.new(W / 2, 150)))
+		spawn(F.horizontal_line(18).side(side).placement(F.HorizontalLinePlacement.Gap.new(W / 2, 150)))
 	wait(1.5)
 	for side in [Left, Right]:
 		spawn(F.VerticalLine.new(14, side, F.VerticalLinePlacement.Distribute.new(125)))
 	for side in [Top, Bottom]:
-		spawn(F.HorizontalLine.new(6, side, F.HorizontalLinePlacement.Distribute.new(W * .35)))
+		spawn(F.horizontal_line(6).side(side).placement(F.HorizontalLinePlacement.Distribute.new(W * .35)))
 	wait_until_no_enemies()
 	checkpoint(&"check5")
 
@@ -136,7 +134,7 @@ func _init():
 	wait(4)
 	for i in range(3):
 		wait(1.5)
-		spawn(F.HorizontalLine.new(11, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.V.new(50 + 50 * i), .5))
+		spawn(F.horizontal_line(11).top().placement(F.HorizontalLinePlacement.V.new(50 + 50 * i)).speedm_len(.5))
 	wait_until_no_enemies()
 
 	level_part("Part II - Circle madness")
@@ -191,10 +189,10 @@ func _init():
 	
 	wait(3.5)
 
-	spawn(F.HorizontalLine.new(14, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.Gap.new(W / 2, W / 3), 1.2, 1., [E.Basic3]))
-	spawn(F.HorizontalLine.new(11, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.V.new(50, W / 4), 1.2, 1., [E.Basic1, E.Basic3]))
+	spawn(F.horizontal_line(14).bottom().placement(F.HorizontalLinePlacement.Gap.new(W / 2, W / 3)).speedm_len(1.2).types([E.Basic3]))
+	spawn(F.horizontal_line(11).top().placement(F.HorizontalLinePlacement.V.new(50, W / 4)).speedm_len(1.2).types([E.Basic1, E.Basic3]))
 	wait(.8)
-	spawn(F.HorizontalLine.new(11, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.V.new(50, W / 4), 1.2, 1., [E.Basic3]))
+	spawn(F.horizontal_line(11).top().placement(F.HorizontalLinePlacement.V.new(50, W / 4)).speedm_len(1.2).types([E.Basic3]))
 	wait_until_no_enemies()
 	checkpoint(&"check12")
 
@@ -205,8 +203,8 @@ func _init():
 	spawn(F.circle(28).speedm_len(0.5).types([E.Basic3]))
 	wait(2.5)
 	for i in 5:
-		spawn(F.HorizontalLine.new(4 + i * 3, F.HorizontalLineSide.Top, F.HorizontalLinePlacement.Gap.new(W / 2, 100 + (4 - i) * ((W - 100) / 5)), 0.7, 1., [E.Basic3]))
-		spawn(F.HorizontalLine.new(4 + i * 3, F.HorizontalLineSide.Bottom, F.HorizontalLinePlacement.Gap.new(W / 2, 100 + (4 - i) * ((W - 100) / 5)), 0.7, 1., [E.Basic3]))
+		spawn(F.horizontal_line(4 + i * 3).top().placement(F.HorizontalLinePlacement.Gap.new(W / 2, 100 + (4 - i) * ((W - 100) / 5))).speedm_len(0.7).types([E.Basic3]))
+		spawn(F.horizontal_line(4 + i * 3).bottom().placement(F.HorizontalLinePlacement.Gap.new(W / 2, 100 + (4 - i) * ((W - 100) / 5))).speedm_len(0.7).types([E.Basic3]))
 		wait(1.2)
 	wait_until_no_enemies()
 
@@ -219,8 +217,8 @@ func _init():
 	checkpoint(&"check13")
 
 	wait(2)
-	spawn(F.HorizontalLine.new(17, Top, F.HorizontalLinePlacement.V.new(100, 20), 1., 1., [E.Basic3]))
-	spawn(F.HorizontalLine.new(17, Bottom, F.HorizontalLinePlacement.V.new(100, 20), 1., 1., [E.Basic1]))
+	spawn(F.horizontal_line(17).top().placement(F.HorizontalLinePlacement.V.new(100, 20)).types([E.Basic3]))
+	spawn(F.horizontal_line(17).bottom().placement(F.HorizontalLinePlacement.V.new(100, 20)).types([E.Basic1]))
 	wait(2)
 	spawn(F.VerticalLine.new(13, Left, F.VerticalLinePlacement.Distribute.new(0), 1.2).set_follows_player())
 	spawn(F.VerticalLine.new(13, Right, F.VerticalLinePlacement.Distribute.new(0), 1.2, 1., [E.Basic3]).set_follows_player())
@@ -250,27 +248,27 @@ func _init():
 	
 	wait(3)
 	spawn(F.VerticalLine.new(8, Left, F.VerticalLinePlacement.Distribute.new(0, H * .4), 1.2, 1., [E.Basic3, E.Basic1]))
-	spawn(F.HorizontalLine.new(9, Top, F.HorizontalLinePlacement.Distribute.new(0, W * .5), 1.2, 1., [E.Basic3, E.Basic1]))
+	spawn(F.horizontal_line(9).top().placement(F.HorizontalLinePlacement.Distribute.new(0, W * .5)).speedm_len(1.2).types([E.Basic3, E.Basic1]))
 	wait(3)
 	spawn(F.VerticalLine.new(8, Right, F.VerticalLinePlacement.Distribute.new(0, H * .4), 1.2, 1., [E.Basic3, E.Basic1]))
-	spawn(F.HorizontalLine.new(9, Top, F.HorizontalLinePlacement.Distribute.new(W * .5, 0), 1.2, 1., [E.Basic3, E.Basic1]))
+	spawn(F.horizontal_line(9).top().placement(F.HorizontalLinePlacement.Distribute.new(W * .5, 0)).speedm_len(1.2).types([E.Basic3, E.Basic1]))
 	wait(3)
 	spawn(F.VerticalLine.new(8, Right, F.VerticalLinePlacement.Distribute.new(H * .4, 0), 1.2, 1., [E.Basic3, E.Basic1]))
-	spawn(F.HorizontalLine.new(9, Bottom, F.HorizontalLinePlacement.Distribute.new(W * .5, 0), 1.2, 1., [E.Basic3, E.Basic1]))
+	spawn(F.horizontal_line(9).bottom().placement(F.HorizontalLinePlacement.Distribute.new(W * .5, 0)).speedm_len(1.2).types([E.Basic3, E.Basic1]))
 	wait(4)
 	spawn(F.VerticalLine.new(8, Left, F.VerticalLinePlacement.Distribute.new(H * .4, 0), 1.2, 1., [E.Basic3, E.Basic1]))
-	spawn(F.HorizontalLine.new(9, Bottom, F.HorizontalLinePlacement.Distribute.new(0, W * .5), 1.2, 1., [E.Basic3, E.Basic1]))
-	
+	spawn(F.horizontal_line(9).bottom().placement(F.HorizontalLinePlacement.Distribute.new(0, W * .5)).speedm_len(1.2).types([E.Basic3, E.Basic1]))
+
 	wait(3)
 	spawn(F.VerticalLine.new(10, Right, F.VerticalLinePlacement.Distribute.new(0, H * .25)))
 	spawn(F.VerticalLine.new(10, Left, F.VerticalLinePlacement.Distribute.new(H * .25, 0)))
-	spawn(F.HorizontalLine.new(10, Bottom, F.HorizontalLinePlacement.Distribute.new(0, W * .3)))
-	spawn(F.HorizontalLine.new(10, Top, F.HorizontalLinePlacement.Distribute.new(W * .3, 0)))
+	spawn(F.horizontal_line(10).bottom().placement(F.HorizontalLinePlacement.Distribute.new(0, W * .3)))
+	spawn(F.horizontal_line(10).top().placement(F.HorizontalLinePlacement.Distribute.new(W * .3, 0)))
 	wait(4)
 	spawn(F.VerticalLine.new(10, Left, F.VerticalLinePlacement.Distribute.new(0, H * .25)))
 	spawn(F.VerticalLine.new(10, Right, F.VerticalLinePlacement.Distribute.new(H * .25, 0)))
-	spawn(F.HorizontalLine.new(10, Top, F.HorizontalLinePlacement.Distribute.new(0, W * .3)))
-	spawn(F.HorizontalLine.new(10, Bottom, F.HorizontalLinePlacement.Distribute.new(W * .3, 0)))
+	spawn(F.horizontal_line(10).top().placement(F.HorizontalLinePlacement.Distribute.new(0, W * .3)))
+	spawn(F.horizontal_line(10).bottom().placement(F.HorizontalLinePlacement.Distribute.new(W * .3, 0)))
 
 	wait_until_no_enemies()
 	checkpoint(&"check15")

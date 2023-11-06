@@ -214,40 +214,57 @@ class HorizontalLinePlacement:
 		assert(false, "Must be implemented by all subclasses")
 		return []
 
+static func horizontal_line(amount: int) -> HorizontalLine:
+	return HorizontalLine.new(amount)
+
 class HorizontalLine extends Formation:
-	var amount: int
-	var side: HorizontalLineSide
-	var placement: HorizontalLinePlacement
-	var speed_len: float
-	var radiusm: float
-	var types: Array[EnemyType]
-	var follows_player := false
-	func _init(amount_: int, side_: HorizontalLineSide, placement_: HorizontalLinePlacement, speed_len_ := 1., radiusm_ := 1., types_: Array[EnemyType] = []):
-		self.amount = amount_
-		self.side = side_
-		self.placement = placement_
-		self.speed_len = speed_len_
-		self.radiusm = radiusm_
-		self.types = types_
-	func set_follows_player(follows_player_ := true) -> HorizontalLine:
-		follows_player = follows_player_
+	var _amount: int
+	var _side := HorizontalLineSide.Top
+	var _placement: HorizontalLinePlacement = HorizontalLinePlacement.Distribute.new()
+	var _speedm_len := 1.
+	var _radiusm := 1.
+	var _types: Array[EnemyType]
+	var _follows_player := false
+	func _init(amount_: int):
+		_amount = amount_
+	func side(side_: HorizontalLineSide) -> HorizontalLine:
+		_side = side_
+		return self
+	func top() -> HorizontalLine:
+		return side(HorizontalLineSide.Top)
+	func bottom() -> HorizontalLine:
+		return side(HorizontalLineSide.Bottom)
+	func placement(placement_: HorizontalLinePlacement) -> HorizontalLine:
+		_placement = placement_
+		return self
+	func speedm_len(speedm_len_: float) -> HorizontalLine:
+		_speedm_len = speedm_len_
+		return self
+	func radiusm(radiusm_: float) -> HorizontalLine:
+		_radiusm = radiusm_
+		return self
+	func types(types_: Array[EnemyType]) -> HorizontalLine:
+		_types = types_
+		return self
+	func follows_player(follows_player_ := true) -> HorizontalLine:
+		_follows_player = follows_player_
 		return self
 	# Allows customisable width and height
 	func _inner_raw_enemies(w: float, h: float) -> Array[EnemyToSpawn]:
-		var radius := Formation.get_radius(radiusm)
-		var positions := placement.positions(amount, radius, w)
+		var radius := Formation.get_radius(_radiusm)
+		var positions := _placement.positions(_amount, radius, w)
 		var enemies: Array[EnemyToSpawn] = []
 		for i in positions.size():
 			var pos := positions[i]
 			var speed_y: float
-			if side == HorizontalLineSide.Top:
+			if _side == HorizontalLineSide.Top:
 				pos.y = -radius - pos.y
-				speed_y = speed_len * BASE_SPEED
+				speed_y = _speedm_len * BASE_SPEED
 			else:
 				pos.y = h + radius + pos.y
-				speed_y = -speed_len * BASE_SPEED
-			var speed: Speed = LevelEvent.BasicSpeed.new(0, speed_y) if !follows_player else LevelEvent.FollowPlayer.new(absf(speed_y))
-			enemies.append(EnemyToSpawn.new(radius, pos, speed, Formation.get_enemy(types, i)))
+				speed_y = -_speedm_len * BASE_SPEED
+			var speed: Speed = LevelEvent.BasicSpeed.new(0, speed_y) if !_follows_player else LevelEvent.FollowPlayer.new(absf(speed_y))
+			enemies.append(EnemyToSpawn.new(radius, pos, speed, Formation.get_enemy(_types, i)))
 		return enemies
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		return _inner_raw_enemies(LevelBuilder.W, LevelBuilder.H)
@@ -316,7 +333,7 @@ class VerticalLine extends Formation:
 		return self
 	func raw_enemies() -> Array[EnemyToSpawn]:
 		var horizontal_side := HorizontalLineSide.Top if side == VerticalLineSide.Left else HorizontalLineSide.Bottom
-		var enemies := HorizontalLine.new(amount, horizontal_side, placement.convert(), speed_len, radiusm, types).set_follows_player(follows_player)._inner_raw_enemies(LevelBuilder.H, LevelBuilder.W)
+		var enemies := Formation.horizontal_line(amount).side(horizontal_side).placement(placement.convert()).speedm_len(speed_len).radiusm(radiusm).types(types).follows_player(follows_player)._inner_raw_enemies(LevelBuilder.H, LevelBuilder.W)
 		for enemy in enemies:
 			enemy.pos = Vector2(enemy.pos.y, enemy.pos.x)
 			enemy.speed = enemy.speed.swap_coordinates()
