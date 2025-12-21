@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="LuauPluginSettings">
+    <option name="customDefinitionsPaths">
+      <list>
+        <option value="$PROJECT_DIR$/real_globals.d.luau" />
+      </list>
+    </option>
+    <option name="runStyLua" value="RunInsteadOfFormatter" />
+  </component>
+</project>

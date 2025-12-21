@@ -1,0 +1,8 @@
+{
+	"definitionFiles": [
+		"real_globals.d.luau"
+	],
+	"aliases": {
+		"packages": "luau_packages"
+	}
+}

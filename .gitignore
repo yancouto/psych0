@@ -1,3 +1,6 @@
+.build
+dist
 *.tmp
-.vscode/
 *.swp
+# Automatically updated by kaledis but we want to change
+globals.d.luau
