@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://5k0kg5vtiwjf"]
-
-[ext_resource type="Script" path="res://color_changer.gd" id="1_yicvf"]
-
-[node name="ColorChanger" type="Node"]
-script = ExtResource("1_yicvf")
