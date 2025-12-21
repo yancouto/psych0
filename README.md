@@ -1,2 +1,2 @@
 # psych0
-Psycho in godot
+Psycho in godot. Very abandoned.
