@@ -1154,7 +1154,7 @@ declare love: {
 		setBackgroundColor: ((red:number,green:number,blue:number,alpha:number) -> ())&((rgba:{number}) -> ()),
 		setBlendMode: ((mode:BlendMode) -> ())&((mode:BlendMode,alphamode:BlendAlphaMode) -> ()),
 		setCanvas: ((canvas:Canvas,mipmap:number) -> ())&(() -> ())&((canvas1:Canvas,canvas2:Canvas,...Canvas) -> ())&((canvas:Canvas,slice:number,mipmap:number) -> ())&((setup:{number}) -> ()),
-		setColor: ((red:number,green:number,blue:number,alpha:number) -> ())&((rgba:{number}) -> ()),
+		setColor: ((red:number,green:number,blue:number,alpha:number?) -> ())&((rgba:{number}) -> ()),
 		setColorMask: ((red:boolean,green:boolean,blue:boolean,alpha:boolean) -> ())&(() -> ()),
 		setDefaultFilter: ((min:FilterMode,mag:FilterMode,anisotropy:number) -> ()),
 		setDepthMode: ((comparemode:CompareMode,write:boolean) -> ())&(() -> ()),

@@ -7,5 +7,7 @@
       </list>
     </option>
     <option name="runStyLua" value="RunInsteadOfFormatter" />
+    <option name="styLuaPath" value="C:\Users\razer\.cargo\bin\stylua.exe" />
+    <option name="styluaConfigurationType" value="Manual" />
   </component>
 </project>
