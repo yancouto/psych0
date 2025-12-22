@@ -1,7 +1,5 @@
 {
-	"definitionFiles": [
-		"real_globals.d.luau"
-	],
+	"lintErrors": true,
 	"aliases": {
 		"packages": "luau_packages"
 	}

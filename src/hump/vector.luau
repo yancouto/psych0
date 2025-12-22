@@ -31,46 +31,29 @@ local sqrt, cos, sin, atan2 = math.sqrt, math.cos, math.sin, math.atan2
 local vector = {}
 vector.__index = vector
 
-export type Vector = {
+export type VectorData = {
 	x: number,
 	y: number,
-	clone: (self: Vector) -> Vector,
-	unpack: (self: Vector) -> (number, number),
-	toPolar: (self: Vector) -> Vector,
-	len2: (self: Vector) -> number,
-	len: (self: Vector) -> number,
-	normalizeInplace: (self: Vector) -> Vector,
-	normalized: (self: Vector) -> Vector,
-	rotateInplace: (self: Vector, phi: number) -> Vector,
-	rotated: (self: Vector, phi: number) -> Vector,
-	perpendicular: (self: Vector) -> Vector,
-	projectOn: (self: Vector, v: Vector) -> Vector,
-	mirrorOn: (self: Vector, v: Vector) -> Vector,
-	cross: (self: Vector, v: Vector) -> number,
-	trimInplace: (self: Vector, maxLen: number) -> Vector,
-	angleTo: (self: Vector, other: Vector?) -> number,
-	trimmed: (self: Vector, maxLen: number) -> Vector,
 }
+
+export type Vector = typeof(setmetatable({} :: VectorData, vector))
 
 local function new(x: number?, y: number?): Vector return setmetatable({ x = x or 0, y = y or 0 }, vector) :: any end
 local zero = new(0, 0)
 
 local function fromPolar(angle: number, radius: number?): Vector
 	radius = radius or 1
-	return new(cos(angle) * (radius :: number), sin(angle) * (radius :: number))
+	return new(cos(angle) * radius, sin(angle) * radius)
 end
 
 local function randomDirection(len_min: number?, len_max: number?): Vector
-	len_min = len_min or 1
-	len_max = len_max or len_min
+	local l_min = len_min or 1
+	local l_max = len_max or l_min
 
-	assert((len_max :: number) > 0, "len_max must be greater than zero")
-	assert((len_max :: number) >= (len_min :: number), "len_max must be greater than or equal to len_min")
+	assert(l_max > 0, "len_max must be greater than zero")
+	assert(l_max >= l_min, "len_max must be greater than or equal to len_min")
 
-	return fromPolar(
-		math.random() * 2 * math.pi,
-		math.random() * ((len_max :: number) - (len_min :: number)) + (len_min :: number)
-	)
+	return fromPolar(math.random() * 2 * math.pi, math.random() * (l_max - l_min) + l_min)
 end
 
 local function isvector(v: any): boolean return type(v) == "table" and type(v.x) == "number" and type(v.y) == "number" end
@@ -79,9 +62,7 @@ function vector:clone(): Vector return new(self.x, self.y) end
 
 function vector:unpack(): (number, number) return self.x, self.y end
 
-function vector:__tostring(): string
-	return "(" .. tonumber(self.x) :: number .. "," .. tonumber(self.y) :: number .. ")"
-end
+function vector:__tostring(): string return "(" .. self.x .. "," .. self.y .. ")" end
 
 function vector.__unm(a: Vector): Vector return new(-a.x, -a.y) end
 
@@ -129,14 +110,12 @@ function vector:len2(): number return self.x * self.x + self.y * self.y end
 function vector:len(): number return sqrt(self.x * self.x + self.y * self.y) end
 
 function vector.dist(a: Vector, b: Vector): number
-	assert(isvector(a) and isvector(b), "dist: wrong argument types (<vector> expected)")
 	local dx = a.x - b.x
 	local dy = a.y - b.y
 	return sqrt(dx * dx + dy * dy)
 end
 
 function vector.dist2(a: Vector, b: Vector): number
-	assert(isvector(a) and isvector(b), "dist: wrong argument types (<vector> expected)")
 	local dx = a.x - b.x
 	local dy = a.y - b.y
 	return (dx * dx + dy * dy)
@@ -166,21 +145,18 @@ end
 function vector:perpendicular(): Vector return new(-self.y, self.x) end
 
 function vector:projectOn(v: Vector): Vector
-	assert(isvector(v), "invalid argument: cannot project vector on " .. type(v))
 	-- (self * v) * v / v:len2()
 	local s = (self.x * v.x + self.y * v.y) / (v.x * v.x + v.y * v.y)
 	return new(s * v.x, s * v.y)
 end
 
 function vector:mirrorOn(v: Vector): Vector
-	assert(isvector(v), "invalid argument: cannot mirror vector on " .. type(v))
 	-- 2 * self:projectOn(v) - self
 	local s = 2 * (self.x * v.x + self.y * v.y) / (v.x * v.x + v.y * v.y)
 	return new(s * v.x - self.x, s * v.y - self.y)
 end
 
 function vector:cross(v: Vector): number
-	assert(isvector(v), "cross: wrong argument types (<vector> expected)")
 	return self.x * v.y - self.y * v.x
 end
 
@@ -207,5 +183,5 @@ return setmetatable({
 	isvector = isvector,
 	zero = zero,
 }, {
-	__call = function(_, ...) return new(...) end,
+	__call = function(_, ...): Vector return new(...) end,
 })

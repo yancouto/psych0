@@ -33,60 +33,15 @@ camera.__index = camera
 
 export type Smoother = (dx: number, dy: number, ...any) -> (number, number)
 
-export type Camera = {
+export type CameraData = {
 	x: number,
 	y: number,
 	scale: number,
 	rot: number,
 	smoother: Smoother,
-	_sx: number,
-	_sy: number,
-	_sw: number,
-	_sh: number,
-	lookAt: (self: Camera, x: number, y: number) -> Camera,
-	move: (self: Camera, dx: number, dy: number) -> Camera,
-	position: (self: Camera) -> (number, number),
-	rotate: (self: Camera, phi: number) -> Camera,
-	rotateTo: (self: Camera, phi: number) -> Camera,
-	zoom: (self: Camera, mul: number) -> Camera,
-	zoomTo: (self: Camera, zoom: number) -> Camera,
-	attach: (self: Camera, x: number?, y: number?, w: number?, h: number?, noclip: boolean?) -> (),
-	detach: (self: Camera) -> (),
-	draw: (self: Camera, ...any) -> (),
-	cameraCoords: (
-		self: Camera,
-		x: number,
-		y: number,
-		ox: number?,
-		oy: number?,
-		w: number?,
-		h: number?
-	) -> (number, number),
-	worldCoords: (
-		self: Camera,
-		x: number,
-		y: number,
-		ox: number?,
-		oy: number?,
-		w: number?,
-		h: number?
-	) -> (number, number),
-	mousePosition: (self: Camera, ox: number?, oy: number?, w: number?, h: number?) -> (number, number),
-	lockX: (self: Camera, x: number, smoother: Smoother?, ...any) -> Camera,
-	lockY: (self: Camera, y: number, smoother: Smoother?, ...any) -> Camera,
-	lockPosition: (self: Camera, x: number, y: number, smoother: Smoother?, ...any) -> Camera,
-	lockWindow: (
-		self: Camera,
-		x: number,
-		y: number,
-		x_min: number,
-		x_max: number,
-		y_min: number,
-		y_max: number,
-		smoother: Smoother?,
-		...any
-	) -> (),
 }
+
+export type Camera = typeof(setmetatable({} :: CameraData, camera))
 
 -- Movement interpolators (for camera locking/windowing)
 camera.smooth = {}

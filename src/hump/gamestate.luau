@@ -50,8 +50,6 @@ local state_is_dirty = true
 
 local GS = {}
 
-function GS.new(t: GameState?): GameState return t or {} end -- constructor - deprecated!
-
 local function change_state(stack_offset: number, to: GameState, ...)
 	local pre = stack[#stack]
 
@@ -106,8 +104,7 @@ end
 
 function GS.registerEvents(callbacks: { string }?)
 	local registry = {}
-	callbacks = callbacks or all_callbacks
-	for _, f in ipairs(callbacks :: { string }) do
+	for _, f in ipairs(callbacks or all_callbacks) do
 		registry[f] = (love)[f] or __NULL__;
 		(love)[f] = function(...)
 			registry[f](...)

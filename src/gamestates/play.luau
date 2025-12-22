@@ -5,11 +5,13 @@ local Vec = require "../hump/vector"
 
 local gs: Gamestate.GameState = {}
 
-local ball_pos = Vec(50, 50)
-local hello_pos = Vec(150, 150)
+local ball_pos = Vec(400, 300)
 local cam = Camera(ball_pos.x, ball_pos.y)
-local timer = Timer.new()
+local timer = Timer()
 cam.smoother = Camera.smooth.damped(7)
+
+local bullets = {}
+local enemies = {}
 
 local keys_tracked = {
 	w = false,
@@ -18,11 +20,19 @@ local keys_tracked = {
 	d = false,
 }
 
+local function spawn_enemy()
+	local angle = math.random() * math.pi * 2
+	local distance = 500 -- distance from player
+	local pos = ball_pos + Vec(math.cos(angle), math.sin(angle)) * distance
+	local vel = Vec(math.random() - 0.5, math.random() - 0.5):normalized() * 100
+	table.insert(enemies, { pos = pos, vel = vel, radius = 15 })
+end
+
 function gs:enter()
-	local goup, godown
-	function goup() timer:tween(1, hello_pos, { x = 100, y = 100 }, nil, godown) end
-	function godown() timer:tween(1, hello_pos, { x = 200, y = 200 }, nil, goup) end
-	goup()
+	bullets = {}
+	enemies = {}
+	timer:clear()
+	timer:every(2, spawn_enemy)
 end
 
 function gs:update(dt)
@@ -35,15 +45,75 @@ function gs:update(dt)
 	speed:normalizeInplace()
 
 	ball_pos += speed * 400 * dt
+
+	-- Update bullets
+	for i = #bullets, 1, -1 do
+		local b = bullets[i]
+		b.pos += b.vel * dt
+		-- Remove off-screen bullets (rough estimation)
+		if (b.pos - ball_pos):len() > 1000 then
+			table.remove(bullets, i)
+		end
+	end
+
+	-- Update enemies
+	for i = #enemies, 1, -1 do
+		local e = enemies[i]
+		e.pos += e.vel * dt
+
+		-- Remove far away enemies
+		if (e.pos - ball_pos):len() > 1500 then
+			table.remove(enemies, i)
+			continue
+		end
+
+		-- Collision with bullets
+		for j = #bullets, 1, -1 do
+			local b = bullets[j]
+			if (e.pos - b.pos):len() < e.radius + 5 then
+				table.remove(enemies, i)
+				table.remove(bullets, j)
+				break
+			end
+		end
+	end
 end
 
 function gs:draw()
 	cam:lockPosition(ball_pos.x, ball_pos.y)
 	cam:attach()
-	love.graphics.print("hello world", hello_pos.x, hello_pos.y)
-	love.graphics.setColor(1, 0, 0)
+
+	-- Draw player
+	love.graphics.setColor(1, 1, 1)
 	love.graphics.circle("fill", ball_pos.x, ball_pos.y, 20)
+
+	-- Draw bullets
+	love.graphics.setColor(1, 1, 0)
+	for _, b in bullets do
+		love.graphics.circle("fill", b.pos.x, b.pos.y, 5)
+	end
+
+	-- Draw enemies
+	love.graphics.setColor(1, 0, 0)
+	for _, e in enemies do
+		love.graphics.circle("fill", e.pos.x, e.pos.y, e.radius)
+	end
+
 	cam:detach()
+end
+
+function gs:mousepressed(x, y, button)
+	if button == 1 then
+		local mx, my = cam:worldCoords(x, y)
+		local target = Vec(mx, my)
+		local dir = (target - ball_pos):normalized()
+		-- Shoot 3 tiny balls in a small spread
+		for i = -1, 1 do
+			local angle = i * 0.1
+			local bdir = dir:rotated(angle)
+			table.insert(bullets, { pos = ball_pos:clone(), vel = bdir * 600 })
+		end
+	end
 end
 
 function gs:keypressed(k)
