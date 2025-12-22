@@ -45,12 +45,12 @@ local state_init: GameState = setmetatable(
 	{ __index = function() error "Gamestate not initialized. Use Gamestate.switch()" end }
 )
 local stack: { GameState } = { state_init }
-local initialized_states: { [GameState]: any } = setmetatable({}, { __mode = "k" }) :: any
+local initialized_states: { [GameState]: any } = setmetatable({} :: any, { __mode = "k" })
 local state_is_dirty = true
 
 local GS = {}
 
-function GS.new(t: GameState?): GameState return t or {} :: any end -- constructor - deprecated!
+function GS.new(t: GameState?): GameState return t or {} end -- constructor - deprecated!
 
 local function change_state(stack_offset: number, to: GameState, ...)
 	local pre = stack[#stack]
@@ -58,7 +58,7 @@ local function change_state(stack_offset: number, to: GameState, ...)
 	-- initialize only on first call
 	local init = initialized_states[to] or to.init or __NULL__;
 	(init :: (GameState) -> ())(to)
-	initialized_states[to] = __NULL__ :: any
+	initialized_states[to] = __NULL__
 
 	stack[#stack + stack_offset] = to
 	state_is_dirty = true
@@ -68,7 +68,7 @@ end
 
 function GS.switch(to: GameState, ...)
 	assert(to, "Missing argument: Gamestate to switch to")
-	assert(to ~= GS :: any, "Can't call switch with colon operator")
+	assert(to ~= GS, "Can't call switch with colon operator")
 	local leave = stack[#stack].leave or __NULL__;
 	(leave :: (GameState) -> ())(stack[#stack])
 	return change_state(0, to, ...)
@@ -76,14 +76,14 @@ end
 
 function GS.push(to: GameState, ...)
 	assert(to, "Missing argument: Gamestate to switch to")
-	assert(to ~= GS :: any, "Can't call push with colon operator")
+	assert(to ~= GS, "Can't call push with colon operator")
 	return change_state(1, to, ...)
 end
 
 function GS.pop(...)
 	assert(#stack > 1, "No more states to pop!")
 	local pre, to = stack[#stack], stack[#stack - 1]
-	stack[#stack] = nil :: any
+	stack[#stack] = nil
 	local leave = pre.leave or __NULL__;
 	(leave :: (GameState) -> ())(pre)
 	state_is_dirty = true
@@ -108,10 +108,10 @@ function GS.registerEvents(callbacks: { string }?)
 	local registry = {}
 	callbacks = callbacks or all_callbacks
 	for _, f in ipairs(callbacks :: { string }) do
-		registry[f] = (love :: any)[f] or __NULL__;
-		(love :: any)[f] = function(...)
+		registry[f] = (love)[f] or __NULL__;
+		(love)[f] = function(...)
 			registry[f](...)
-			return (GS :: any)[f](...)
+			return (GS)[f](...)
 		end
 	end
 end
