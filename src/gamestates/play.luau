@@ -18,21 +18,11 @@ local keys_tracked = {
 	d = false,
 }
 
-function gs:goup()
-	print "up"
-	print(hello_pos)
-	print("upt", timer:tween(0.3, hello_pos, { x = 100, y = 100 }, nil, gs.godown))
-end
-
-function gs:godown()
-	print "down"
-	print(hello_pos)
-	print("downt",timer:tween(0.3, hello_pos, { x = 400, y = 200 }, nil, gs.goup))
-end
-
 function gs:enter()
-	print("aftert ", timer:after(1, function() print "hey" end))
-	gs:goup()
+	local goup, godown
+	function goup() timer:tween(1, hello_pos, { x = 100, y = 100 }, nil, godown) end
+	function godown() timer:tween(1, hello_pos, { x = 200, y = 200 }, nil, goup) end
+	goup()
 end
 
 function gs:update(dt)

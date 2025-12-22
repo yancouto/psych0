@@ -32,3 +32,30 @@ usedpiscale = true
 [audio]
 mic = false
 mix_with_system = true
+
+[polyfill]
+repository = "https://github.com/CavefulGames/dalbit-polyfill"
+injection_path = "__polyfill__"
+
+[polyfill.config]
+# this setting allows type checking (usually for tables. because userdata mimics using tables)
+# if you really sure userdata is not used as table, you can disable it for extra optimization.
+# while still not recommended to disable it, you can turn this off if you don't use any newproxy().
+runtime_type_checking = false
+
+# common settings
+hash_iterator = false # not recommended to disable it since it's an important luau's feature.
+allow_debug_library_usage = false # if you allow, the polyfill will use like debug.getmetatable thing.
+test = false # enable it if you want to test polyfill.
+
+# disable emulating settings if you want more runtime-optimized code.
+emulate_frozen_table = false # emulates frozen tables
+emulate_newproxy = false # emulates userdata's behavior
+emulate_type_error = false # emulates luau's type error and messages too
+
+# next
+emulate_next = false
+luau_hash_table = false
+
+# buffer
+buffer_out_of_bounds = false # if you want to enable checking out of bounds error for buffer
