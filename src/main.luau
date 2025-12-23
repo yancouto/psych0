@@ -1,6 +1,6 @@
-local Gamestate = require "hump/gamestate"
+local Gamestate = require "libs/gamestate"
 local Play = require "gamestates/play"
-local Timer = require "hump/timer"
+local Timer = require "libs/timer"
 
 function love.load()
 	Gamestate.registerEvents()

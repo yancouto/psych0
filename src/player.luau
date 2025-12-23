@@ -1,4 +1,4 @@
-local Vec = require "hump/vector"
+local Vec = require "libs/vector"
 
 local Player = {}
 Player.__index = Player

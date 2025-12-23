@@ -1,4 +1,4 @@
-local Vec = require "hump/vector"
+local Vec = require "libs/vector"
 
 local Bullet = {}
 Bullet.__index = Bullet

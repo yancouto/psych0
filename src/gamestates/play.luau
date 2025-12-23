@@ -1,11 +1,11 @@
 local Bullet = require "../bullet"
-local Camera = require "../hump/camera"
+local Camera = require "../libs/camera"
 local Enemy = require "../enemy"
-local Gamestate = require "../hump/gamestate"
+local Gamestate = require "../libs/gamestate"
 local ObjectList = require "../object_list"
 local Player = require "../player"
-local Timer = require "../hump/timer"
-local Vec = require "../hump/vector"
+local Timer = require "../libs/timer"
+local Vec = require "../libs/vector"
 
 local gs: Gamestate.GameState = {}
 
