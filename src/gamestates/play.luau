@@ -1,19 +1,22 @@
+local Bullet = require "../bullet"
 local Camera = require "../hump/camera"
+local Enemy = require "../enemy"
 local Gamestate = require "../hump/gamestate"
+local ObjectList = require "../object_list"
+local Player = require "../player"
 local Timer = require "../hump/timer"
 local Vec = require "../hump/vector"
 
 local gs: Gamestate.GameState = {}
 
-local ball_pos = Vec(400, 300)
-local cam = Camera(ball_pos.x, ball_pos.y)
+local player = Player.new(400, 300)
+local cam = Camera(400, 300)
 local timer = Timer()
-cam.smoother = Camera.smooth.damped(7)
 
-local bullets = {}
-local enemies = {}
+local bullets: ObjectList.ObjectList<Bullet.Bullet> = ObjectList.new()
+local enemies: ObjectList.ObjectList<Enemy.Enemy> = ObjectList.new()
 
-local keys_tracked = {
+local keys_tracked: { [string]: boolean } = {
 	w = false,
 	a = false,
 	s = false,
@@ -21,83 +24,60 @@ local keys_tracked = {
 }
 
 local function spawn_enemy()
-	local angle = math.random() * math.pi * 2
-	local distance = 500 -- distance from player
-	local pos = ball_pos + Vec(math.cos(angle), math.sin(angle)) * distance
-	local vel = Vec(math.random() - 0.5, math.random() - 0.5):normalized() * 100
-	table.insert(enemies, { pos = pos, vel = vel, radius = 15 })
+	local w, h = love.graphics.getDimensions()
+	local side = math.random(1, 4) -- 1: top, 2: bottom, 3: left, 4: right
+	local pos = Vec(0, 0)
+	if side == 1 then
+		pos = Vec(math.random(0, w), -20)
+	elseif side == 2 then
+		pos = Vec(math.random(0, w), h + 20)
+	elseif side == 3 then
+		pos = Vec(-20, math.random(0, h))
+	else
+		pos = Vec(w + 20, math.random(0, h))
+	end
+
+	local vel = (player.pos - pos):normalized() * 100
+	enemies:add(Enemy.new(pos, vel, 15))
 end
 
 function gs:enter()
-	bullets = {}
-	enemies = {}
+	player = Player.new(400, 300)
 	timer:clear()
 	timer:every(2, spawn_enemy)
 end
 
 function gs:update(dt)
 	timer:update(dt)
-	local speed = Vec(0, 0)
-	if keys_tracked.a then speed.x = -1 end
-	if keys_tracked.d then speed.x = 1 end
-	if keys_tracked.s then speed.y = 1 end
-	if keys_tracked.w then speed.y = -1 end
-	speed:normalizeInplace()
+	player:update(dt, keys_tracked)
 
-	ball_pos += speed * 400 * dt
+	bullets:update(dt)
+	enemies:update(dt)
 
-	-- Update bullets
-	for i = #bullets, 1, -1 do
-		local b = bullets[i]
-		b.pos += b.vel * dt
-		-- Remove off-screen bullets (rough estimation)
-		if (b.pos - ball_pos):len() > 1000 then
-			table.remove(bullets, i)
-		end
+	-- Remove off-screen bullets
+	local w, h = love.graphics.getDimensions()
+	for _, b in ipairs(bullets.all) do
+		if b.pos.x < -100 or b.pos.x > w + 100 or b.pos.y < -100 or b.pos.y > h + 100 then b.to_remove = true end
 	end
 
-	-- Update enemies
-	for i = #enemies, 1, -1 do
-		local e = enemies[i]
-		e.pos += e.vel * dt
-
-		-- Remove far away enemies
-		if (e.pos - ball_pos):len() > 1500 then
-			table.remove(enemies, i)
-			continue
+	enemies:check_collision(bullets, function(e: Enemy.Enemy, b: Bullet.Bullet)
+		local r = e.radius + b.radius
+		return e.pos:dist2(b.pos) < r * r
+	end, function(e: Enemy.Enemy, b: Bullet.Bullet)
+		if not e.to_remove and not b.to_remove then
+			e.to_remove = true
+			b.to_remove = true
 		end
-
-		-- Collision with bullets
-		for j = #bullets, 1, -1 do
-			local b = bullets[j]
-			if (e.pos - b.pos):len() < e.radius + 5 then
-				table.remove(enemies, i)
-				table.remove(bullets, j)
-				break
-			end
-		end
-	end
+	end)
 end
 
 function gs:draw()
-	cam:lockPosition(ball_pos.x, ball_pos.y)
+	-- Camera is static now, but we still use it for potential screen shakes or zooming later
 	cam:attach()
 
-	-- Draw player
-	love.graphics.setColor(1, 1, 1)
-	love.graphics.circle("fill", ball_pos.x, ball_pos.y, 20)
-
-	-- Draw bullets
-	love.graphics.setColor(1, 1, 0)
-	for _, b in bullets do
-		love.graphics.circle("fill", b.pos.x, b.pos.y, 5)
-	end
-
-	-- Draw enemies
-	love.graphics.setColor(1, 0, 0)
-	for _, e in enemies do
-		love.graphics.circle("fill", e.pos.x, e.pos.y, e.radius)
-	end
+	player:draw()
+	bullets:draw()
+	enemies:draw()
 
 	cam:detach()
 end
@@ -106,12 +86,12 @@ function gs:mousepressed(x, y, button)
 	if button == 1 then
 		local mx, my = cam:worldCoords(x, y)
 		local target = Vec(mx, my)
-		local dir = (target - ball_pos):normalized()
+		local dir = (target - player.pos):normalizeInplace()
 		-- Shoot 3 tiny balls in a small spread
 		for i = -1, 1 do
 			local angle = i * 0.1
 			local bdir = dir:rotated(angle)
-			table.insert(bullets, { pos = ball_pos:clone(), vel = bdir * 600 })
+			bullets:add(Bullet.new(player.pos:clone(), bdir * 600))
 		end
 	end
 end
