@@ -142,8 +142,9 @@ function sandbox.protect(code: string, options_: ProtectOptions?): () -> any
 			env[k] = v
 		end
 	end
-	-- TODO: Remove this once https://github.com/orpos/kaledis/issues/9 is fixed
-	env["require"] = function() return {} end
+	-- TODO: Remove this once https://github.com/orpos/kaledis/issues/9 is fixede
+	-- Actually, it will probably still need to accept __polyfill__ requires
+	env["require"] = require
 	setmetatable(env, { __index = options.env })
 	env._G = env
 

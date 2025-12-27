@@ -7,8 +7,8 @@ function love.load(arg)
 	for _, v in ipairs(arg) do
 		if v == "--test" then
 			love.window.close()
-			Tests.runAllLevels()
-			love.event.quit()
+			local ok = Tests.runAllLevels()
+			love.event.quit(if not ok then 1 else 0)
 			return
 		end
 	end
