@@ -117,7 +117,7 @@ end
 
 export type ProtectOptions = {
 	quota: (number | false)?,
-	env: {[string]: any}?,
+	env: { [string]: any }?,
 }
 
 -- Public interface: sandbox.protect
@@ -142,6 +142,8 @@ function sandbox.protect(code: string, options_: ProtectOptions?): () -> any
 			env[k] = v
 		end
 	end
+	-- TODO: Remove this once https://github.com/orpos/kaledis/issues/9 is fixed
+	env["require"] = function() return {} end
 	setmetatable(env, { __index = options.env })
 	env._G = env
 
@@ -164,13 +166,14 @@ function sandbox.protect(code: string, options_: ProtectOptions?): () -> any
 
 		string.rep = nil :: any
 
-		local t = table.pack(pcall(f, ...))
+		-- We don't have table.unpack, so let's do our own.
+		local t = { pcall(f, ...) }
 
 		cleanup()
 
 		if not t[1] then error(t[2]) end
 
-		return table.unpack(t, 2, t.n)
+		return unpack(t, 2)
 	end
 end
 
