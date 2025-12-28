@@ -26,9 +26,9 @@ API.CustomSpawn {
 }.Circle {
     enemies = { Enemy.Simple, Enemy.Double },
     amount = 8,
-    speed = 20,
+    speed = -20,
     formation_radius = 100,
-    formation_center = Vec2(400, 300)
+    formation_center = Vec2(WIDTH / 2, HEIGHT / 2)
 }
 
 API.Wait(3)

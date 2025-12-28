@@ -21,7 +21,17 @@ local function runAllLevels()
 		local content = love.filesystem.read("string", levelPath)
 		if not content then error("Could not read level file: " .. levelPath) end
 
-		local success, err = pcall(function() interpreter.runLevel(content) end)
+		local success, err = pcall(function()
+			local instance = interpreter.runLevel(content, {
+				spawnCallback = function() end,
+				getEnemyCount = function() return 0 end,
+			})
+			-- Run until finished or some limit to avoid infinite loops if script has bugs
+			local iters = 0
+			while not instance:update(1) and iters < 10000 do
+				iters += 1
+			end
+		end)
 
 		if not success then
 			print(COLOR_RED .. "Level " .. levelPath .. " failed: " .. tostring(err) .. COLOR_RESET)

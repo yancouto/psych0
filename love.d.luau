@@ -1055,7 +1055,7 @@ declare love: {
 		mount: ((archive:string,mountpoint:string,appendToPath:boolean) -> (boolean))&((filedata:FileData,mountpoint:string,appendToPath:boolean) -> (boolean))&((data:Data,archivename:string,mountpoint:string,appendToPath:boolean) -> (boolean)),
 		newFile: ((filename:string) -> (File))&((filename:string,mode:FileMode) -> (File,string)),
 		newFileData: ((contents:string,name:string) -> (FileData))&((originaldata:Data,name:string) -> (FileData))&((filepath:string) -> (FileData,string)),
-		read: ((name:string,size:number) -> (string,number,nil,string))&((container:ContainerType,name:string,size:number) -> (FileData|string,number,nil,string)),
+		read: ((name:string,size:number) -> (string,number,nil,string))&((container:ContainerType,name:string,size:number?) -> (FileData|string,number,nil,string)),
 		remove: ((name:string) -> (boolean)),
 		setCRequirePath: ((paths:string) -> ()),
 		setIdentity: ((name:string) -> ())&((name:string) -> ()),

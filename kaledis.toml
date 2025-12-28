@@ -13,6 +13,8 @@ gamma_correct = false
 src_path = "src"
 asset_path = "assets"
 
+# These configs are all ignored and overrided in conf.luau
+# They are kept here because of the Schema
 [window]
 title = "Untitled"
 width = 800

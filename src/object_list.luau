@@ -75,4 +75,14 @@ function ol.check_collision(
 	end
 end
 
+function ol.remove_offscreen(self: ObjectList<Collidable & Updatable>, w: number, h: number, margin_: number?)
+	local margin = margin_ or 0
+	for _, obj in ipairs(self.all) do
+		local x, y, ow, oh = obj:aabb()
+		if x + ow < -margin or x > w + margin or y + oh < -margin or y > h + margin then
+			obj.to_remove = true
+		end
+	end
+end
+
 return ol

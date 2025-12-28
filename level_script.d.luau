@@ -9,7 +9,8 @@ API, for example: API.Wait(2); API.Spawn.VerticalLine { enemies = API.new.Enemy.
 export type int = number
 export type float = number
 
-type EnemyList = { Enemy } | Enemy
+declare WIDTH: number
+declare HEIGHT: number
 
 declare API: {
 	Wait: (float) -> (),
@@ -35,7 +36,7 @@ type Spawner = {
 	) -> (),
 	Multiple: (
 	{
-		enemies: EnemyList,
+		enemies: {Enemy},
 		amount: int,
 		spacing: float?, -- default: 5
 		pos: Vec2,
@@ -45,7 +46,7 @@ type Spawner = {
 	) -> (),
 	VerticalLine: (
 	{
-		enemies: EnemyList,
+		enemies: {Enemy},
 		amount: int,
 		speed: float?, -- default: 15
 		radius: float?, -- default: 20
@@ -55,7 +56,7 @@ type Spawner = {
 	) -> (),
 	HorizontalLine: (
 	{
-		enemies: EnemyList,
+		enemies: {Enemy},
 		amount: int,
 		speed: float?, -- default: 15
 		radius: float?, -- default: 20
@@ -65,7 +66,7 @@ type Spawner = {
 	) -> (),
 	Circle: (
 	{
-		enemies: EnemyList,
+		enemies: {Enemy},
 		amount: int,
 		speed: float?, -- default: 15
 		enemy_radius: float?, -- default: 20
@@ -76,7 +77,7 @@ type Spawner = {
 	) -> (),
 	Spiral: (
 	{
-		enemies: EnemyList,
+		enemies: {Enemy},
 		amount_in_circle: int,
 		amount: int,
 		spacing: float,
@@ -109,6 +110,9 @@ declare Side: {
 	Top: "Top",
 	Bottom: "Bottom",
 }
+
+declare WIDTH: number
+declare HEIGHT: number
 
 -- You do not need to actually see these, only if you're doing something advanced.
 -- You can just use something like Placement.FromRight {...}  instead of seeing the FromRight type.

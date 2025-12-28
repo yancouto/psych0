@@ -2,6 +2,7 @@ local Bullet = require "../bullet"
 local Camera = require "../libs/camera"
 local Enemy = require "../enemy"
 local Gamestate = require "../libs/gamestate"
+local Interpreter = require "../interpreter/init"
 local ObjectList = require "../object_list"
 local Player = require "../player"
 local Timer = require "../libs/timer"
@@ -9,12 +10,14 @@ local Vec = require "../libs/vector"
 
 local gs: Gamestate.GameState = {}
 
-local player = Player.new(400, 300)
-local cam = Camera(400, 300)
+local player = Player.new(0, 0)
+local cam = Camera(0, 0)
 local timer = Timer()
 
 local bullets: ObjectList.ObjectList<Bullet.Bullet> = ObjectList.new()
 local enemies: ObjectList.ObjectList<Enemy.Enemy> = ObjectList.new()
+
+local level_instance: Interpreter.LevelInstance? = nil
 
 local keys_tracked: { [string]: boolean } = {
 	w = false,
@@ -23,42 +26,42 @@ local keys_tracked: { [string]: boolean } = {
 	d = false,
 }
 
-local function spawn_enemy()
-	local w, h = love.graphics.getDimensions()
-	local side = math.random(1, 4) -- 1: top, 2: bottom, 3: left, 4: right
-	local pos = Vec(0, 0)
-	if side == 1 then
-		pos = Vec(math.random(0, w), -20)
-	elseif side == 2 then
-		pos = Vec(math.random(0, w), h + 20)
-	elseif side == 3 then
-		pos = Vec(-20, math.random(0, h))
-	else
-		pos = Vec(w + 20, math.random(0, h))
-	end
-
-	local vel = (player.pos - pos):normalized() * 100
-	enemies:add(Enemy.new(pos, vel, 15))
+local function spawn_enemy(params: any)
+	local pos = Vec(params.pos[1], params.pos[2])
+	local vel = Vec(params.vel[1], params.vel[2]) * 50
+	enemies:add(Enemy.new(pos, vel, params.radius))
 end
 
 function gs:enter()
-	player = Player.new(400, 300)
+	local w, h = love.graphics.getDimensions()
+	player = Player.new(w / 2, h / 2)
+	cam:lookAt(w / 2, h / 2)
 	timer:clear()
-	timer:every(2, spawn_enemy)
+	bullets = ObjectList.new()
+	enemies = ObjectList.new()
+
+	local levelCode = love.filesystem.read("string", "levels/level1.lua")
+
+	if levelCode then
+		level_instance = Interpreter.runLevel(levelCode, {
+			spawnCallback = spawn_enemy,
+			getEnemyCount = function() return #enemies.all end,
+		})
+	end
 end
 
 function gs:update(dt)
 	timer:update(dt)
 	player:update(dt, keys_tracked)
 
+	if level_instance then level_instance:update(dt) end
+
 	bullets:update(dt)
 	enemies:update(dt)
 
-	-- Remove off-screen bullets
 	local w, h = love.graphics.getDimensions()
-	for _, b in ipairs(bullets.all) do
-		if b.pos.x < -100 or b.pos.x > w + 100 or b.pos.y < -100 or b.pos.y > h + 100 then b.to_remove = true end
-	end
+	bullets:remove_offscreen(w, h)
+	enemies:remove_offscreen(w, h)
 
 	enemies:check_collision(bullets, function(e: Enemy.Enemy, b: Bullet.Bullet)
 		local r = e.radius + b.radius
