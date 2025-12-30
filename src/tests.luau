@@ -24,6 +24,7 @@ local function runAllLevels()
 		local success, err = pcall(function()
 			local instance = interpreter.runLevel(content, {
 				spawnCallback = function() end,
+				spawnIndicatorCallback = function() end,
 				getEnemyCount = function() return 0 end,
 			})
 			-- Run until finished or some limit to avoid infinite loops if script has bugs

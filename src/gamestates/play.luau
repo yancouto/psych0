@@ -2,6 +2,7 @@ local Bullet = require "../bullet"
 local Camera = require "../libs/camera"
 local Enemy = require "../enemy"
 local Gamestate = require "../libs/gamestate"
+local Indicator = require "../indicator"
 local Interpreter = require "../interpreter/init"
 local ObjectList = require "../object_list"
 local Player = require "../player"
@@ -16,6 +17,7 @@ local timer = Timer()
 
 local bullets: ObjectList.ObjectList<Bullet.Bullet> = ObjectList.new()
 local enemies: ObjectList.ObjectList<Enemy.Enemy> = ObjectList.new()
+local indicators: ObjectList.ObjectList<Indicator.Indicator> = ObjectList.new()
 
 local level_instance: Interpreter.LevelInstance? = nil
 
@@ -29,7 +31,19 @@ local keys_tracked: { [string]: boolean } = {
 local function spawn_enemy(params: any)
 	local pos = Vec(params.pos[1], params.pos[2])
 	local vel = Vec(params.vel[1], params.vel[2]) * 50
-	enemies:add(Enemy.new(pos, vel, params.radius))
+	local duration = params.indicatorDuration or 0
+	if duration > 0 then
+		timer:after(duration, function() enemies:add(Enemy.new(pos, vel, params.radius)) end)
+	else
+		enemies:add(Enemy.new(pos, vel, params.radius))
+	end
+end
+
+local function spawn_indicator(params: any)
+	local pos = Vec(params.pos[1], params.pos[2])
+	local vel = Vec(params.vel[1], params.vel[2])
+	local duration = params.duration
+	indicators:add(Indicator.new(pos, vel, duration, params.radius))
 end
 
 function gs:enter()
@@ -39,13 +53,15 @@ function gs:enter()
 	timer:clear()
 	bullets = ObjectList.new()
 	enemies = ObjectList.new()
+	indicators = ObjectList.new()
 
 	local levelCode = love.filesystem.read("string", "levels/level1.lua")
 
 	if levelCode then
 		level_instance = Interpreter.runLevel(levelCode, {
 			spawnCallback = spawn_enemy,
-			getEnemyCount = function() return #enemies.all end,
+			spawnIndicatorCallback = spawn_indicator,
+			getEnemyCount = function() return #enemies.all + #indicators.all end,
 		})
 	end
 end
@@ -58,6 +74,7 @@ function gs:update(dt)
 
 	bullets:update(dt)
 	enemies:update(dt)
+	indicators:update(dt)
 
 	local w, h = love.graphics.getDimensions()
 	bullets:remove_offscreen(w, h)
@@ -81,6 +98,7 @@ function gs:draw()
 	player:draw()
 	bullets:draw()
 	enemies:draw()
+	indicators:draw()
 
 	cam:detach()
 end

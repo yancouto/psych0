@@ -10,6 +10,13 @@ type SpawnParams = {
 	radius: number,
 }
 
+type IndicatorParams = {
+	pos: Vec2,
+	vel: Vec2,
+	duration: number,
+	radius: number,
+}
+
 export type LevelInstanceData = {
 	coro: any,
 	waitTimer: number,
@@ -17,6 +24,7 @@ export type LevelInstanceData = {
 	isFinished: boolean,
 	defaultIndicatorDuration: number,
 	spawnCallback: (SpawnParams) -> (),
+	spawnIndicatorCallback: (IndicatorParams) -> (),
 	getEnemyCount: () -> number,
 }
 
@@ -71,15 +79,52 @@ local function get_enemy_type(enemies: string | { string }, index: number): stri
 	return "Simple"
 end
 
+local function clamp_to_screen(pos: Vec2, radius: number): Vec2
+	local w, h = love.graphics.getDimensions()
+	return {
+		math.max(radius, math.min(w - radius, pos[1])),
+		math.max(radius, math.min(h - radius, pos[2])),
+	}
+end
+
+local function handle_spawn(
+	self: any,
+	enemyType: string,
+	pos: Vec2,
+	vel: Vec2,
+	radius: number,
+	indicatorDuration: number
+)
+	if indicatorDuration > 0 then
+		local indicatorPos = clamp_to_screen(pos, radius)
+		self.spawnIndicatorCallback {
+			pos = indicatorPos,
+			vel = vel,
+			duration = indicatorDuration,
+			radius = radius,
+		}
+	end
+
+	self.spawnCallback {
+		enemyType = enemyType,
+		pos = pos,
+		vel = vel,
+		radius = radius,
+		indicatorDuration = indicatorDuration,
+	}
+end
+
 local SpawnerImpl = {}
 
 function SpawnerImpl:Single(params: { enemy: string, pos: Vec2, speed: Vec2, radius: number? })
-	self.spawnCallback {
-		enemyType = params.enemy,
-		pos = params.pos,
-		vel = params.speed,
-		radius = params.radius or 20,
-	}
+	handle_spawn(
+		self,
+		params.enemy,
+		params.pos,
+		params.speed,
+		params.radius or 20,
+		self.indicatorDuration
+	)
 end
 
 function SpawnerImpl:Multiple(params: {
@@ -101,12 +146,14 @@ function SpawnerImpl:Multiple(params: {
 
 	for i = 1, amount do
 		local offset = (i - 1) * spacing
-		self.spawnCallback {
-			enemyType = get_enemy_type(params.enemies, i),
-			pos = { params.pos[1] - dir[1] * offset, params.pos[2] - dir[2] * offset },
-			vel = { vel[1], vel[2] },
-			radius = radius,
-		}
+		handle_spawn(
+			self,
+			get_enemy_type(params.enemies, i),
+			{ params.pos[1] - dir[1] * offset, params.pos[2] - dir[2] * offset },
+			{ vel[1], vel[2] },
+			radius,
+			self.indicatorDuration
+		)
 	end
 end
 
@@ -162,12 +209,14 @@ function SpawnerImpl:VerticalLine(params: {
 	end
 
 	for i, y in ipairs(yPositions) do
-		self.spawnCallback {
-			enemyType = get_enemy_type(params.enemies, i),
-			pos = { x, y },
-			vel = { velX, 0 },
-			radius = radius,
-		}
+		handle_spawn(
+			self,
+			get_enemy_type(params.enemies, i),
+			{ x, y },
+			{ velX, 0 },
+			radius,
+			self.indicatorDuration
+		)
 	end
 end
 
@@ -223,12 +272,14 @@ function SpawnerImpl:HorizontalLine(params: {
 	end
 
 	for i, x in ipairs(xPositions) do
-		self.spawnCallback {
-			enemyType = get_enemy_type(params.enemies, i),
-			pos = { x, y },
-			vel = { 0, velY },
-			radius = radius,
-		}
+		handle_spawn(
+			self,
+			get_enemy_type(params.enemies, i),
+			{ x, y },
+			{ 0, velY },
+			radius,
+			self.indicatorDuration
+		)
 	end
 end
 
@@ -256,12 +307,14 @@ function SpawnerImpl:Circle(params: {
 			formation_center[2] + math.sin(angle) * formation_radius,
 		}
 		local vel = { -math.cos(angle) * speed, -math.sin(angle) * speed }
-		self.spawnCallback {
-			enemyType = get_enemy_type(params.enemies, i),
-			pos = pos,
-			vel = vel,
-			radius = enemy_radius,
-		}
+		handle_spawn(
+			self,
+			get_enemy_type(params.enemies, i),
+			pos,
+			vel,
+			enemy_radius,
+			self.indicatorDuration
+		)
 	end
 end
 
@@ -286,12 +339,14 @@ function SpawnerImpl:Spiral(params: {
 		local r = (i - 1) * spacing
 		local pos = { centerX + math.cos(angle) * r, centerY + math.sin(angle) * r }
 		local vel = { math.cos(angle) * speed, math.sin(angle) * speed }
-		self.spawnCallback {
-			enemyType = get_enemy_type(params.enemies, i),
-			pos = pos,
-			vel = vel,
-			radius = enemy_radius,
-		}
+		handle_spawn(
+			self,
+			get_enemy_type(params.enemies, i),
+			pos,
+			vel,
+			enemy_radius,
+			self.indicatorDuration
+		)
 	end
 end
 
@@ -305,9 +360,16 @@ local SpawnerMetatable = {
 	end,
 }
 
-local function createSpawner(spawnCallback: (SpawnParams) -> (), customParams: any?)
+local function createSpawner(
+	spawnCallback: (SpawnParams) -> (),
+	spawnIndicatorCallback: (IndicatorParams) -> (),
+	indicatorDuration: number,
+	customParams: any?
+)
 	return setmetatable({
 		spawnCallback = spawnCallback,
+		spawnIndicatorCallback = spawnIndicatorCallback,
+		indicatorDuration = indicatorDuration,
 		customParams = customParams,
 	}, SpawnerMetatable)
 end
@@ -339,6 +401,7 @@ local function runLevel(
 	levelCode: string,
 	options: {
 		spawnCallback: (SpawnParams) -> (),
+		spawnIndicatorCallback: (IndicatorParams) -> (),
 		getEnemyCount: () -> number,
 	}
 ): LevelInstance
@@ -347,16 +410,29 @@ local function runLevel(
 		waitTimer = 0,
 		waitingForNoEnemies = false,
 		isFinished = false,
-		defaultIndicatorDuration = 2,
+		defaultIndicatorDuration = 1,
 		spawnCallback = options.spawnCallback,
+		spawnIndicatorCallback = options.spawnIndicatorCallback,
 		getEnemyCount = options.getEnemyCount,
 	}
 
 	local API_impl = {
 		Wait = function(seconds: number) coroutine.yield { type = "wait", duration = seconds } end,
 		WaitUntilNoEnemies = function() coroutine.yield { type = "wait_no_enemies" } end,
-		Spawn = createSpawner(options.spawnCallback),
-		CustomSpawn = function(params) return createSpawner(options.spawnCallback, params) end,
+		Spawn = (setmetatable({
+			spawnCallback = options.spawnCallback,
+			spawnIndicatorCallback = options.spawnIndicatorCallback,
+			indicatorDuration = 1, -- Initial value
+		}, {
+			__index = function(t, k)
+				(t :: any).indicatorDuration = instance.defaultIndicatorDuration
+				return SpawnerMetatable.__index(t, k)
+			end,
+		}) :: any),
+		CustomSpawn = function(params)
+			local duration = params.indicator_duration or instance.defaultIndicatorDuration
+			return createSpawner(options.spawnCallback, options.spawnIndicatorCallback, duration, params)
+		end,
 		SetDefaultIndicatorDuration = function(duration: number) instance.defaultIndicatorDuration = duration end,
 	}
 

@@ -142,9 +142,8 @@ function sandbox.protect(code: string, options_: ProtectOptions?): () -> any
 			env[k] = v
 		end
 	end
-	-- TODO: Remove this once https://github.com/orpos/kaledis/issues/9 is fixede
-	-- Actually, it will probably still need to accept __polyfill__ requires
-	env["require"] = require
+	-- We accept only __polyfill__ requires because of luau transpiling
+	env["require"] = function(name) if name == "./__polyfill__" then return require(name) else return nil end end
 	setmetatable(env, { __index = options.env })
 	env._G = env
 

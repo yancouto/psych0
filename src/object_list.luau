@@ -75,11 +75,21 @@ function ol.check_collision(
 	end
 end
 
-function ol.remove_offscreen(self: ObjectList<Collidable & Updatable>, w: number, h: number, margin_: number?)
+export type Movable = {
+	vel: { x: number, y: number },
+}
+
+function ol.remove_offscreen(self: ObjectList<Collidable & Updatable & Movable>, w: number, h: number, margin_: number?)
 	local margin = margin_ or 0
 	for _, obj in ipairs(self.all) do
 		local x, y, ow, oh = obj:aabb()
-		if x + ow < -margin or x > w + margin or y + oh < -margin or y > h + margin then
+		local vx, vy = obj.vel.x, obj.vel.y
+		local off_left = x + ow < -margin
+		local off_right = x > w + margin
+		local off_top = y + oh < -margin
+		local off_bottom = y > h + margin
+
+		if (off_left and vx < 0) or (off_right and vx > 0) or (off_top and vy < 0) or (off_bottom and vy > 0) then
 			obj.to_remove = true
 		end
 	end
