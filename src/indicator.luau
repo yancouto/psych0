@@ -25,14 +25,14 @@ function Indicator.new(pos: Vec.Vector, vel: Vec.Vector, duration: number, radiu
 	}, Indicator)
 end
 
-function Indicator:update(dt: number)
+function Indicator.update(self: Indicator, dt: number)
 	self.elapsed += dt
 	if self.elapsed >= self.duration then
 		self.to_remove = true
 	end
 end
 
-function Indicator:draw()
+function Indicator.draw(self: Indicator)
 	local alpha = 0.5 + 0.5 * math.sin(self.elapsed * 20) -- Flashing
 	love.graphics.setColor(1, 1, 0, alpha)
 

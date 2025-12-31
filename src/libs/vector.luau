@@ -76,7 +76,7 @@ function vector.__sub(a: Vector, b: Vector): Vector
 	return new(a.x - b.x, a.y - b.y)
 end
 
-function vector.__mul(a: Vector | number, b: Vector | number): Vector | number
+function vector.__mul(a: any, b: any): any
 	if type(a) == "number" then
 		return new(a * (b :: Vector).x, a * (b :: Vector).y)
 	elseif type(b) == "number" then

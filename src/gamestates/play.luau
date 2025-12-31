@@ -1,6 +1,8 @@
+local Background = require "../background"
 local Bullet = require "../bullet"
 local Camera = require "../libs/camera"
 local Enemy = require "../enemy"
+local Explosion = require "../explosion"
 local Gamestate = require "../libs/gamestate"
 local Indicator = require "../indicator"
 local Interpreter = require "../interpreter/init"
@@ -14,10 +16,12 @@ local gs: Gamestate.GameState = {}
 local player = Player.new(0, 0)
 local cam = Camera(0, 0)
 local timer = Timer()
+local background = Background.new()
 
 local bullets: ObjectList.ObjectList<Bullet.Bullet> = ObjectList.new()
 local enemies: ObjectList.ObjectList<Enemy.Enemy> = ObjectList.new()
 local indicators: ObjectList.ObjectList<Indicator.Indicator> = ObjectList.new()
+local explosions: ObjectList.ObjectList<Explosion.Explosion> = ObjectList.new()
 
 local level_instance: Interpreter.LevelInstance? = nil
 
@@ -26,6 +30,8 @@ local keys_tracked: { [string]: boolean } = {
 	a = false,
 	s = false,
 	d = false,
+	lshift = false,
+	rshift = false,
 }
 
 local function spawn_enemy(params: any)
@@ -54,6 +60,8 @@ function gs:enter()
 	bullets = ObjectList.new()
 	enemies = ObjectList.new()
 	indicators = ObjectList.new()
+	explosions = ObjectList.new()
+	background = Background.new()
 
 	local levelCode = love.filesystem.read("string", "levels/level1.lua")
 
@@ -67,31 +75,52 @@ function gs:enter()
 end
 
 function gs:update(dt)
-	timer:update(dt)
+	local time_scale = 1
+	if player.is_focusing then time_scale = 0.2 end
+
+	local scaled_dt = dt * time_scale
+
+	background:update(scaled_dt)
+	timer:update(scaled_dt)
 	player:update(dt, keys_tracked)
 
-	if level_instance then level_instance:update(dt) end
+	if not player.dead then
+		if level_instance then level_instance:update(scaled_dt) end
 
-	bullets:update(dt)
-	enemies:update(dt)
-	indicators:update(dt)
+		bullets:update(scaled_dt)
+		enemies:update(scaled_dt)
+		indicators:update(scaled_dt)
+		explosions:update(scaled_dt)
 
-	local w, h = love.graphics.getDimensions()
-	bullets:remove_offscreen(w, h)
-	enemies:remove_offscreen(w, h)
+		local w, h = love.graphics.getDimensions()
+		bullets:remove_offscreen(w, h)
+		enemies:remove_offscreen(w, h)
 
-	enemies:check_collision(bullets, function(e: Enemy.Enemy, b: Bullet.Bullet)
-		local r = e.radius + b.radius
-		return e.pos:dist2(b.pos) < r * r
-	end, function(e: Enemy.Enemy, b: Bullet.Bullet)
-		if not e.to_remove and not b.to_remove then
-			e.to_remove = true
-			b.to_remove = true
+		enemies:check_collision(bullets, function(e: Enemy.Enemy, b: Bullet.Bullet)
+			local r = e.radius + b.radius
+			return e.pos:dist2(b.pos) < r * r
+		end, function(e: Enemy.Enemy, b: Bullet.Bullet)
+			if not e.to_remove and not b.to_remove then
+				e.to_remove = true
+				b.to_remove = true
+				explosions:add(Explosion.new(e.pos:clone(), e.radius, e.hue))
+			end
+		end)
+
+		-- Collision with player
+		for _, e in ipairs(enemies.all) do
+			local r = e.radius + player.radius
+			if e.pos:dist2(player.pos) < r * r then
+				player.dead = true
+				break
+			end
 		end
-	end)
+	end
 end
 
 function gs:draw()
+	background:draw()
+
 	-- Camera is static now, but we still use it for potential screen shakes or zooming later
 	cam:attach()
 
@@ -99,11 +128,19 @@ function gs:draw()
 	bullets:draw()
 	enemies:draw()
 	indicators:draw()
+	explosions:draw()
 
 	cam:detach()
+
+	if player.dead then
+		local w, h = love.graphics.getDimensions()
+		love.graphics.setColor(1, 1, 1)
+		love.graphics.printf("GAME OVER\nPress 'R' to Restart", 0, h / 2 - 20, w, "center")
+	end
 end
 
 function gs:mousepressed(x, y, button)
+	if player.dead then return end
 	if button == 1 then
 		local mx, my = cam:worldCoords(x, y)
 		local target = Vec(mx, my)
@@ -119,6 +156,9 @@ end
 
 function gs:keypressed(k)
 	if keys_tracked[k] ~= nil then keys_tracked[k] = true end
+	if k == "r" and player.dead then
+		self:enter()
+	end
 end
 
 function gs:keyreleased(k)

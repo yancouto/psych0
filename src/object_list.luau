@@ -32,14 +32,14 @@ end
 
 function ol.update<T>(self: ObjectList<T>, dt: number)
 	local any_to_remove = false
-	for i, obj in ipairs(self.all) do
+	for _, obj in ipairs(self.all) do
 		local o = (obj :: any) :: Updatable
 		if not o.to_remove then o:update(dt) end
 		any_to_remove = any_to_remove or o.to_remove
 	end
 	if not any_to_remove then return end
 	local new_all, count = {}, 0
-	for i, obj in ipairs(self.all) do
+	for _, obj in ipairs(self.all) do
 		local o = (obj :: any) :: Updatable
 		if not o.to_remove then
 			count += 1
@@ -67,9 +67,7 @@ function ol.check_collision(
 		for j, b in ipairs(other.all) do
 			local xb, yb, wb, hb = b:aabb()
 			if not (xa + wa < xb or xa > xb + wb or ya + ha < yb or ya > yb + hb) then
-				if do_collide(a, b) then
-					on_collision(a, b)
-				end
+				if do_collide(a, b) then on_collision(a, b) end
 			end
 		end
 	end
