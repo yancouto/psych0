@@ -8,6 +8,7 @@ local Indicator = require "../indicator"
 local Interpreter = require "../interpreter/init"
 local ObjectList = require "../object_list"
 local Player = require "../player"
+local Ring = require "../ring"
 local Timer = require "../libs/timer"
 local Vec = require "../libs/vector"
 
@@ -21,7 +22,7 @@ local background = Background.new()
 local bullets: ObjectList.ObjectList<Bullet.Bullet> = ObjectList.new()
 local enemies: ObjectList.ObjectList<Enemy.Enemy> = ObjectList.new()
 local indicators: ObjectList.ObjectList<Indicator.Indicator> = ObjectList.new()
-local explosions: ObjectList.ObjectList<Explosion.Explosion> = ObjectList.new()
+local rings: ObjectList.ObjectList<Ring.Ring> = ObjectList.new()
 
 local level_instance: Interpreter.LevelInstance? = nil
 
@@ -62,8 +63,9 @@ function gs:enter()
 	bullets = ObjectList.new()
 	enemies = ObjectList.new()
 	indicators = ObjectList.new()
-	explosions = ObjectList.new()
+	rings = ObjectList.new()
 	background = Background.new()
+	Explosion.init()
 
 	local levelCode = love.filesystem.read("string", "levels/level1.lua")
 
@@ -86,7 +88,7 @@ function gs:update(dt)
 
 	background:update(scaled_dt)
 	timer:update(scaled_dt)
-	player:update(dt, keys_tracked)
+	player:update(dt, keys_tracked, function(r) rings:add(r) end)
 
 	if not player.dead then
 		if level_instance then level_instance:update(scaled_dt) end
@@ -94,7 +96,8 @@ function gs:update(dt)
 		bullets:update(scaled_dt)
 		enemies:update(scaled_dt)
 		indicators:update(scaled_dt)
-		explosions:update(scaled_dt)
+		rings:update(scaled_dt)
+		Explosion.update(scaled_dt)
 
 		local w, h = love.graphics.getDimensions()
 		bullets:remove_offscreen(w, h)
@@ -107,7 +110,8 @@ function gs:update(dt)
 			if not e.to_remove and not b.to_remove then
 				e.to_remove = true
 				b.to_remove = true
-				explosions:add(Explosion.new(e.pos:clone(), e.radius, e.hue))
+				Explosion.spawn(e.pos:clone(), e.radius, e.hue)
+				rings:add(Ring.new(e.pos:clone(), e.radius, 6, e.hue, 250))
 			end
 		end)
 
@@ -128,11 +132,12 @@ function gs:draw()
 	-- Camera is static now, but we still use it for potential screen shakes or zooming later
 	cam:attach()
 
-	player:draw()
+	indicators:draw()
+	rings:draw()
+	Explosion.draw()
 	bullets:draw()
 	enemies:draw()
-	indicators:draw()
-	explosions:draw()
+	player:draw()
 
 	cam:detach()
 

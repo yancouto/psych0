@@ -6,6 +6,8 @@ local Timer = require "libs/timer"
 local Player = {}
 Player.__index = Player
 
+local Ring = require "ring"
+
 export type PlayerProps = {
 	pos: Vec.Vector,
 	radius: number,
@@ -16,6 +18,7 @@ export type PlayerProps = {
 	focus: number, -- 0 to 1
 	is_focusing: boolean,
 	timer: Timer.Timer,
+	ring_timer: number,
 }
 
 export type Player = typeof(setmetatable({} :: PlayerProps, Player))
@@ -31,14 +34,21 @@ function Player.new(x: number, y: number): Player
 		focus = 1,
 		is_focusing = false,
 		timer = Timer(),
+		ring_timer = 0,
 	}, Player) :: Player
 end
 
-function Player.update(self: Player, dt: number, keys: { [string]: boolean })
+function Player.update(self: Player, dt: number, keys: { [string]: boolean }, spawn_ring: (r: any) -> ())
 	if self.dead then return end
 
 	self.timer:update(dt)
 	self.hue = (self.hue + dt * 100) % 360
+
+	self.ring_timer += dt
+	if self.ring_timer >= 0.5 then
+		self.ring_timer = 0
+		spawn_ring(Ring.new(self.pos:clone(), self.radius, 3, self.hue, 250))
+	end
 
 	local was_focusing = self.is_focusing
 	self.is_focusing = keys.lshift or keys.rshift
