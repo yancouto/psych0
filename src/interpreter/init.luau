@@ -145,7 +145,7 @@ function SpawnerImpl:Multiple(params: {
 	if velLen > 0 then dir = { vel[1] / velLen, vel[2] / velLen } end
 
 	for i = 1, amount do
-		local offset = (i - 1) * spacing
+		local offset = (i - 1) * (2 * radius + spacing)
 		handle_spawn(
 			self,
 			get_enemy_type(params.enemies, i),
@@ -189,16 +189,16 @@ function SpawnerImpl:VerticalLine(params: {
 		end
 	elseif placement.type == "FromTop" then
 		for i = 1, amount do
-			table.insert(yPositions, margin + (i - 1) * placement.spacing)
+			table.insert(yPositions, margin + (i - 1) * (2 * radius + placement.spacing))
 		end
 	elseif placement.type == "FromBottom" then
 		for i = 1, amount do
-			table.insert(yPositions, h - margin - (i - 1) * placement.spacing)
+			table.insert(yPositions, h - margin - (i - 1) * (2 * radius + placement.spacing))
 		end
 	elseif placement.type == "V" then
 		local centerY = h / 2
 		for i = 1, amount do
-			local offset = math.floor(i / 2) * placement.spacing
+			local offset = math.floor(i / 2) * (2 * radius + placement.spacing)
 			if i % 2 == 0 then
 				table.insert(yPositions, centerY + offset)
 			else
@@ -252,16 +252,16 @@ function SpawnerImpl:HorizontalLine(params: {
 		end
 	elseif placement.type == "FromLeft" then
 		for i = 1, amount do
-			table.insert(xPositions, margin + (i - 1) * placement.spacing)
+			table.insert(xPositions, margin + (i - 1) * (2 * radius + placement.spacing))
 		end
 	elseif placement.type == "FromRight" then
 		for i = 1, amount do
-			table.insert(xPositions, w - margin - (i - 1) * placement.spacing)
+			table.insert(xPositions, w - margin - (i - 1) * (2 * radius + placement.spacing))
 		end
 	elseif placement.type == "V" then
 		local centerX = w / 2
 		for i = 1, amount do
-			local offset = math.floor(i / 2) * placement.spacing
+			local offset = math.floor(i / 2) * (2 * radius + placement.spacing)
 			if i % 2 == 0 then
 				table.insert(xPositions, centerX + offset)
 			else

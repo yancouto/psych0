@@ -25,6 +25,8 @@ local explosions: ObjectList.ObjectList<Explosion.Explosion> = ObjectList.new()
 
 local level_instance: Interpreter.LevelInstance? = nil
 
+local paused = false
+
 local keys_tracked: { [string]: boolean } = {
 	w = false,
 	a = false,
@@ -75,6 +77,8 @@ function gs:enter()
 end
 
 function gs:update(dt)
+	if paused then return end
+
 	local time_scale = 1
 	if player.is_focusing then time_scale = 0.2 end
 
@@ -132,6 +136,14 @@ function gs:draw()
 
 	cam:detach()
 
+	if paused then
+		local w, h = love.graphics.getDimensions()
+		love.graphics.setColor(0, 0, 0, 0.5)
+		love.graphics.rectangle("fill", 0, 0, w, h)
+		love.graphics.setColor(1, 1, 1)
+		love.graphics.printf("PAUSED", 0, h / 2 - 10, w, "center")
+	end
+
 	if player.dead then
 		local w, h = love.graphics.getDimensions()
 		love.graphics.setColor(1, 1, 1)
@@ -155,6 +167,12 @@ function gs:mousepressed(x, y, button)
 end
 
 function gs:keypressed(k)
+	if k == "escape" then
+		paused = not paused
+	end
+
+	if paused then return end
+
 	if keys_tracked[k] ~= nil then keys_tracked[k] = true end
 	if k == "r" and player.dead then
 		self:enter()
@@ -162,6 +180,7 @@ function gs:keypressed(k)
 end
 
 function gs:keyreleased(k)
+	if k == "escape" then return end
 	if keys_tracked[k] ~= nil then keys_tracked[k] = false end
 end
 
