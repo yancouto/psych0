@@ -20,7 +20,7 @@ function Background.update(self: Background, dt: number)
 end
 
 function Background.draw(self: Background)
-	local w, h = love.graphics.getDimensions()
+	local w, h = WIDTH, HEIGHT
 	local cellSize = 40
 	local cols = math.ceil(w / cellSize) + 1
 	local rows = math.ceil(h / cellSize) + 1

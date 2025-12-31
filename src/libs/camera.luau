@@ -73,7 +73,7 @@ function camera.smooth.damped(stiffness: number): Smoother
 end
 
 local function new(x: number?, y: number?, zoom: number?, rot: number?, smoother: Smoother?): Camera
-	x, y = x or love.graphics.getWidth() / 2, y or love.graphics.getHeight() / 2
+	x, y = x or WIDTH / 2, y or HEIGHT / 2
 	zoom = zoom or 1
 	rot = rot or 0
 	smoother = smoother or camera.smooth.none() -- for locking, see below
@@ -114,7 +114,7 @@ end
 
 function camera:attach(x: number?, y: number?, w: number?, h: number?, noclip: boolean?)
 	x, y = x or 0, y or 0
-	w, h = w or love.graphics.getWidth(), h or love.graphics.getHeight()
+	w, h = w or WIDTH, h or HEIGHT
 
 	local sx, sy, sw, sh = love.graphics.getScissor()
 	self._sx, self._sy, self._sw, self._sh = sx, sy, sw, sh
@@ -154,7 +154,7 @@ end
 -- world coordinates to camera coordinates
 function camera:cameraCoords(x: number, y: number, ox: number?, oy: number?, w: number?, h: number?): (number, number)
 	ox, oy = ox or 0, oy or 0
-	w, h = w or love.graphics.getWidth(), h or love.graphics.getHeight()
+	w, h = w or WIDTH, h or HEIGHT
 
 	-- x,y = ((x,y) - (self.x, self.y)):rotated(self.rot) * self.scale + center
 	local c, s = cos(self.rot), sin(self.rot)
@@ -166,7 +166,7 @@ end
 -- camera coordinates to world coordinates
 function camera:worldCoords(x: number, y: number, ox: number?, oy: number?, w: number?, h: number?): (number, number)
 	ox, oy = ox or 0, oy or 0
-	w, h = w or love.graphics.getWidth(), h or love.graphics.getHeight()
+	w, h = w or WIDTH, h or HEIGHT
 
 	-- x,y = (((x,y) - center) / self.scale):rotated(-self.rot) + (self.x,self.y)
 	local c, s = cos(-self.rot), sin(-self.rot)

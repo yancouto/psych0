@@ -18,7 +18,7 @@ export type RingProps = {
 export type Ring = typeof(setmetatable({} :: RingProps, Ring))
 
 function Ring.new(pos: Vec.Vector, radius: number, thickness: number, hue: number, speed: number): Ring
-	local w, h = love.graphics.getDimensions()
+	local w, h = WIDTH, HEIGHT
 	-- Calculate max_radius: distance to the farthest corner
 	local corners = {
 		{ x = 0, y = 0 },

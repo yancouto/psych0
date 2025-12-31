@@ -3,6 +3,9 @@ local Play = require "gamestates/play"
 local Tests = require "tests"
 local Timer = require "libs/timer"
 
+-- Used fixed width and height for calculating play screen stuff.
+_G.WIDTH, _G.HEIGHT = 1280, 1024
+
 function love.load(arg)
 	for _, v in ipairs(arg) do
 		if v == "--test" then

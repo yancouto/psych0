@@ -25,6 +25,7 @@ local indicators: ObjectList.ObjectList<Indicator.Indicator> = ObjectList.new()
 local rings: ObjectList.ObjectList<Ring.Ring> = ObjectList.new()
 
 local level_instance: Interpreter.LevelInstance? = nil
+local shake_amount = 0
 
 local paused = false
 
@@ -56,7 +57,7 @@ local function spawn_indicator(params: any)
 end
 
 function gs:enter()
-	local w, h = love.graphics.getDimensions()
+	local w, h = WIDTH, HEIGHT
 	player = Player.new(w / 2, h / 2)
 	cam:lookAt(w / 2, h / 2)
 	timer:clear()
@@ -90,6 +91,10 @@ function gs:update(dt)
 	timer:update(scaled_dt)
 	player:update(dt, keys_tracked, function(r) rings:add(r) end)
 
+	if shake_amount > 0 then
+		shake_amount = math.max(0, shake_amount - dt * 30)
+	end
+
 	if not player.dead then
 		if level_instance then level_instance:update(scaled_dt) end
 
@@ -99,7 +104,7 @@ function gs:update(dt)
 		rings:update(scaled_dt)
 		Explosion.update(scaled_dt)
 
-		local w, h = love.graphics.getDimensions()
+		local w, h = WIDTH, HEIGHT
 		bullets:remove_offscreen(w, h)
 		enemies:remove_offscreen(w, h)
 
@@ -112,6 +117,7 @@ function gs:update(dt)
 				b.to_remove = true
 				Explosion.spawn(e.pos:clone(), e.radius, e.hue)
 				rings:add(Ring.new(e.pos:clone(), e.radius, 6, e.hue, 250))
+				shake_amount = math.min(10, shake_amount + 5)
 			end
 		end)
 
@@ -129,7 +135,12 @@ end
 function gs:draw()
 	background:draw()
 
-	-- Camera is static now, but we still use it for potential screen shakes or zooming later
+	local w, h = WIDTH, HEIGHT
+	local cx, cy = w/2, h/2
+	if shake_amount > 0 then
+		cx, cy = cx + (math.random() * 2 - 1) * shake_amount, cy + (math.random() * 2 - 1)
+	end
+	cam:lookAt(cx, cy) -- Fix if we're moving the camera for some other reason
 	cam:attach()
 
 	indicators:draw()
@@ -140,9 +151,9 @@ function gs:draw()
 	player:draw()
 
 	cam:detach()
+	cam:lookAt(w/2, h/2)
 
 	if paused then
-		local w, h = love.graphics.getDimensions()
 		love.graphics.setColor(0, 0, 0, 0.5)
 		love.graphics.rectangle("fill", 0, 0, w, h)
 		love.graphics.setColor(1, 1, 1)
@@ -150,7 +161,6 @@ function gs:draw()
 	end
 
 	if player.dead then
-		local w, h = love.graphics.getDimensions()
 		love.graphics.setColor(1, 1, 1)
 		love.graphics.printf("GAME OVER\nPress 'R' to Restart", 0, h / 2 - 20, w, "center")
 	end

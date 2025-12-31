@@ -80,7 +80,7 @@ local function get_enemy_type(enemies: string | { string }, index: number): stri
 end
 
 local function clamp_to_screen(pos: Vec2, radius: number): Vec2
-	local w, h = love.graphics.getDimensions()
+	local w, h = WIDTH, HEIGHT
 	return {
 		math.max(radius, math.min(w - radius, pos[1])),
 		math.max(radius, math.min(h - radius, pos[2])),
@@ -165,7 +165,7 @@ function SpawnerImpl:VerticalLine(params: {
 	side: string,
 	placement: any,
 })
-	local w, h = love.graphics.getDimensions()
+	local w, h = WIDTH, HEIGHT
 	local amount = params.amount
 	local speed = params.speed or 15
 	local radius = params.radius or 20
@@ -228,7 +228,7 @@ function SpawnerImpl:HorizontalLine(params: {
 	side: string,
 	placement: any,
 })
-	local w, h = love.graphics.getDimensions()
+	local w, h = WIDTH, HEIGHT
 	local amount = params.amount
 	local speed = params.speed or 15
 	local radius = params.radius or 20
@@ -292,7 +292,7 @@ function SpawnerImpl:Circle(params: {
 	formation_radius: number?,
 	formation_center: Vec2?,
 })
-	local w, h = love.graphics.getDimensions()
+	local w, h = WIDTH, HEIGHT
 	local amount = params.amount
 	local speed = params.speed or 15
 	local enemy_radius = params.enemy_radius or 20
@@ -326,7 +326,7 @@ function SpawnerImpl:Spiral(params: {
 	enemy_radius: number?,
 	speed: number?,
 })
-	local w, h = love.graphics.getDimensions()
+	local w, h = WIDTH, HEIGHT
 	local amount = params.amount
 	local amount_in_circle = params.amount_in_circle
 	local spacing = params.spacing
@@ -436,7 +436,7 @@ local function runLevel(
 		SetDefaultIndicatorDuration = function(duration: number) instance.defaultIndicatorDuration = duration end,
 	}
 
-	local w, h = love.graphics.getDimensions()
+	local w, h = WIDTH, HEIGHT
 	local run = sandbox.protect(levelCode, {
 		env = {
 			API = API_impl,

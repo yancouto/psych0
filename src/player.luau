@@ -80,7 +80,7 @@ function Player.update(self: Player, dt: number, keys: { [string]: boolean }, sp
 	self.pos += move * current_speed * dt
 
 	-- Clamp to screen
-	local w, h = love.graphics.getDimensions()
+	local w, h = WIDTH, HEIGHT
 	self.pos.x = math.max(self.radius, math.min(w - self.radius, self.pos.x))
 	self.pos.y = math.max(self.radius, math.min(h - self.radius, self.pos.y))
 end
@@ -93,7 +93,7 @@ function Player.draw(self: Player)
 	love.graphics.circle("fill", self.pos.x, self.pos.y, self.radius)
 
 	-- Focus bar
-	local w, h = love.graphics.getDimensions()
+	local w, h = WIDTH, HEIGHT
 	local bar_w, bar_h = 200, 10
 	local bar_x, bar_y = (w - bar_w) / 2, h - 30
 	love.graphics.setColor(0.2, 0.2, 0.2, 0.5)
