@@ -15,4 +15,4 @@ test:
 
 typecheck:
 	$(LUALS) --check src
-	$(LUALS) --check levels
+	$(LUALS) --check src/levels

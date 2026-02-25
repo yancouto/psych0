@@ -13,8 +13,8 @@ make run       # or: lovec src/
 # Run tests (headless, all levels through interpreter)
 make test      # or: lovec src/ --test
 
-# Typecheck (LuaLS)
-make typecheck # or: lua-language-server --check src/
+# Typecheck both workspaces (LuaLS)
+make typecheck # or: lua-language-server --check src && lua-language-server --check src/levels
 ```
 
 Tests run every `.lua` file in `src/levels/` through the interpreter and fail if any errors or infinite loops. There is no single-test command; all levels are tested together.
@@ -30,8 +30,11 @@ src/
   object_list.lua       — Generic container with update/draw/collision/offscreen removal
   libs/                 — Modified HUMP libraries (camera, timer, gamestate, vector, sandbox, hsluv)
   tests.lua             — Runs all levels through the interpreter headlessly
-  levels/               — Level scripts (run by the interpreter sandbox, not regular modules)
+  levels/               — Level scripts (separate LuaLS workspace with sandbox restrictions)
+level_script.d.lua      — LuaLS meta file declaring sandbox globals (API, Vec2, Enemy, Side, Placement…)
 ```
+
+The project uses `psycho.code-workspace` with two LuaLS workspaces: `src/` (full Love2D environment) and `src/levels/` (sandbox environment — most stdlib is disabled, only the sandbox allowlist is declared in `level_script.d.lua`).
 
 **Level execution flow:** `play.lua` reads `src/levels/level1.lua`, passes it to `Interpreter.runLevel()`, which wraps the code in a sandbox coroutine. Each `love.update` tick calls `level_instance:update(dt)`, which resumes the coroutine. `API.Wait()` / `API.WaitUntilNoEnemies()` yield the coroutine with typed result tables.
 
@@ -65,12 +68,11 @@ Key API calls:
 
 ## Code Style
 
-Formatter: **StyLua** (`stylua.toml`):
-- Indentation: **Tabs**, column width: 120
-- Quotes: `AutoPreferDouble`
-- `call_parentheses = "None"` — omit parens for single-argument calls (e.g. `require "libs/timer"`)
-- `collapse_simple_statement = "Always"` — one-liners on same line
-- `sort_requires = true` — requires alphabetically sorted
+Formatter: **EmmyLuaCodeStyle** (config in `.editorconfig`):
+- Indentation: **Tabs**
+- `call_arg_parentheses = remove_table_only` — omit parens only for single table-literal args (e.g. `func {}`)
+- `space_before_function_call_single_arg = always` — space before single-arg calls (e.g. `require "libs/timer"`)
+- `trailing_table_separator = smart`
 
 Type annotations use LuaLS EmmyLua style (`---@class`, `---@field`, `---@param`, `---@return`).
 

@@ -1,13 +1,22 @@
 {
-	"folders": [
-		{
-			"path": "src"
-		},
-		{
-			"path": "levels"
-		}
-	],
-	"settings": {
-		"Lua.runtime.version": "LuaJIT"
-	}
+  "folders": [
+    {
+      "path": "src",
+      "name": "🎮 Game Code"
+    },
+    {
+      "path": "src/levels",
+      "name": "🛠️ Level Editor"
+    },
+    {
+      "path": ".",
+      "name": "📂 Project Config"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "src/": true,
+      "levels/": true
+    }
+  }
 }

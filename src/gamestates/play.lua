@@ -70,14 +70,12 @@ function gs:enter()
 	Explosion.init()
 
 	local levelCode = love.filesystem.read("string", "levels/level1.lua") --[[@as string?]]
-
-	if levelCode then
-		level_instance = Interpreter.runLevel(levelCode, {
-			spawnCallback = spawn_enemy,
-			spawnIndicatorCallback = spawn_indicator,
-			getEnemyCount = function() return #enemies.all + #indicators.all end,
-		})
-	end
+	assert(levelCode, "Failed to load level code")
+	level_instance = Interpreter.runLevel(levelCode, {
+		spawnCallback = spawn_enemy,
+		spawnIndicatorCallback = spawn_indicator,
+		getEnemyCount = function() return #enemies.all + #indicators.all end,
+	})
 end
 
 function gs:update(dt)

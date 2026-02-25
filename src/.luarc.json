@@ -6,14 +6,14 @@
   },
   "workspace": {
     "checkThirdParty": false,
-    "ignoreDir": [".git", ".luals"],
+    "ignoreDir": ["levels"],
     "library": ["../.luals/love2d/library"]
   },
   "diagnostics": {
     "groupSeverity": {
       "strict": "Warning",
       "strong": "Warning"
-    },
+    }
   },
   "type": {
     "weakNilCheck": false,

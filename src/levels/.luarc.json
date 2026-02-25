@@ -1,0 +1,41 @@
+{
+  "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+  "runtime": {
+    "version": "LuaJIT",
+    "path": ["?.lua", "?/init.lua"],
+    "builtin": {
+      "basic": "disable",
+      "io": "disable",
+      "debug": "disable",
+      "package": "disable",
+      "ffi": "disable",
+      "jit": "disable",
+      "bit": "disable",
+      "utf8": "disable",
+      "os": "disable",
+      "string": "disable",
+      "table": "disable",
+      "math": "disable"
+    }
+  },
+  "workspace": {
+    "checkThirdParty": false,
+    "library": ["../../level_script.d.lua"]
+  },
+  "diagnostics": {
+    "groupSeverity": {
+      "strict": "Warning",
+      "strong": "Warning"
+    },
+    "severity": {
+      "deprecated": "Error!"
+    },
+    "neededFileStatus": {
+      "deprecated": "Any"
+    }
+  },
+  "type": {
+    "weakNilCheck": false,
+    "weakUnionCheck": false
+  }
+}
