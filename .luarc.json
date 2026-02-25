@@ -10,7 +10,6 @@
     "library": [".luals/love2d/library"]
   },
   "diagnostics": {
-    "globals": ["love", "WIDTH", "HEIGHT", "API", "Vec2", "Enemy", "Side", "Placement"],
     "groupSeverity": {
       "strict": "Warning",
       "strong": "Warning"
