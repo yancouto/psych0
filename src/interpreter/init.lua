@@ -52,6 +52,9 @@ function LevelInstanceImpl:update(dt)
 	return false
 end
 
+---@param enemies string|string[]
+---@param index integer
+---@return string
 local function get_enemy_type(enemies, index)
 	if type(enemies) == "string" then
 		return enemies
@@ -61,6 +64,9 @@ local function get_enemy_type(enemies, index)
 	return "Simple"
 end
 
+---@param pos {[1]: number, [2]: number}
+---@param radius number
+---@return {[1]: number, [2]: number}
 local function clamp_to_screen(pos, radius)
 	local w, h = WIDTH, HEIGHT
 	return {
@@ -69,6 +75,12 @@ local function clamp_to_screen(pos, radius)
 	}
 end
 
+---@param self table
+---@param enemyType string
+---@param pos {[1]: number, [2]: number}
+---@param vel {[1]: number, [2]: number}
+---@param radius number
+---@param indicatorDuration number
 local function handle_spawn(self, enemyType, pos, vel, radius, indicatorDuration)
 	if indicatorDuration > 0 then
 		local indicatorPos = clamp_to_screen(pos, radius)
@@ -89,6 +101,10 @@ local function handle_spawn(self, enemyType, pos, vel, radius, indicatorDuration
 	}
 end
 
+---@class SpawnerImpl
+---@field indicatorDuration number
+---@field spawnCallback fun(params: table)
+---@field spawnIndicatorCallback fun(params: table)
 local SpawnerImpl = {}
 
 function SpawnerImpl:Single(params)

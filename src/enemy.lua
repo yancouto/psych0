@@ -38,7 +38,7 @@ end
 
 ---@param self Enemy
 function Enemy.draw(self)
-	local rgb = HSLuv.hsluv_to_rgb({ self.hue, 100, 50 })
+	local rgb = HSLuv.hsluv_to_rgb { self.hue, 100, 50 }
 	love.graphics.setColor(rgb[1], rgb[2], rgb[3])
 	love.graphics.circle("fill", self.pos.x, self.pos.y, self.radius)
 end

@@ -52,7 +52,7 @@ local function change_state(stack_offset, to, ...)
 	local pre = stack[#stack]
 
 	-- initialize only on first call
-	local init = initialized_states[to] or to.init or __NULL__;
+	local init = initialized_states[to] or to.init or __NULL__
 	init(to)
 	initialized_states[to] = __NULL__
 
@@ -65,7 +65,7 @@ end
 function GS.switch(to, ...)
 	assert(to, "Missing argument: Gamestate to switch to")
 	assert(to ~= GS, "Can't call switch with colon operator")
-	local leave = stack[#stack].leave or __NULL__;
+	local leave = stack[#stack].leave or __NULL__
 	leave(stack[#stack])
 	return change_state(0, to, ...)
 end
@@ -80,7 +80,7 @@ function GS.pop(...)
 	assert(#stack > 1, "No more states to pop!")
 	local pre, to = stack[#stack], stack[#stack - 1]
 	stack[#stack] = nil
-	local leave = pre.leave or __NULL__;
+	local leave = pre.leave or __NULL__
 	leave(pre)
 	state_is_dirty = true
 	local resume = to.resume or __NULL__
@@ -103,7 +103,7 @@ end
 function GS.registerEvents(callbacks)
 	local registry = {}
 	for _, f in ipairs(callbacks or all_callbacks) do
-		registry[f] = love[f] or __NULL__;
+		registry[f] = love[f] or __NULL__
 		love[f] = function(...)
 			registry[f](...)
 			return GS[f](...)

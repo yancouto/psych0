@@ -48,6 +48,8 @@ Timer.__index = Timer
 local function _nothing_() end
 local max, min, cos, sin, asin, sqrt, pi = math.max, math.min, math.cos, math.sin, math.asin, math.sqrt, math.pi
 
+---@param handle TimerHandle
+---@param dt number
 local function updateTimerHandle(handle, dt)
 	-- handle: {
 	--   time = <number>,
@@ -69,6 +71,7 @@ local function updateTimerHandle(handle, dt)
 	end
 end
 
+---@param dt number
 function Timer:update(dt)
 	-- timers may create new timers, which leads to undefined behavior
 	-- in pairs() - so we need to put them in a different table first
@@ -85,16 +88,27 @@ function Timer:update(dt)
 	end
 end
 
+---@param delay number
+---@param during fun(dt: number, timeleft: number)
+---@param after (fun(handle: TimerHandle): boolean?)?
+---@return TimerHandle
 function Timer:during(delay, during, after)
 	local handle = { time = 0, during = during, after = after or _nothing_, limit = delay, count = 1 }
 	self.functions[handle] = true
 	return handle
 end
 
+---@param delay number
+---@param func fun(handle: TimerHandle): boolean?
+---@return TimerHandle
 function Timer:after(delay, func)
 	return self:during(delay, _nothing_, func)
 end
 
+---@param delay number
+---@param after fun(handle: TimerHandle): boolean?
+---@param count number?
+---@return TimerHandle
 function Timer:every(delay, after, count)
 	local count_val = count or math.huge -- exploit below: math.huge - 1 = math.huge
 	local handle = { time = 0, during = _nothing_, after = after, limit = delay, count = count_val }
@@ -102,10 +116,12 @@ function Timer:every(delay, after, count)
 	return handle
 end
 
+---@param handle TimerHandle
 function Timer:cancel(handle) self.functions[handle] = nil end
 
 function Timer:clear() self.functions = {} end
 
+---@param f fun(wait: fun(t: number))
 function Timer:script(f)
 	local co = coroutine.wrap(f)
 	co(function(t)
@@ -150,7 +166,7 @@ Timer.tween = setmetatable({
 
 	elastic = function(s, amp, period)
 		local amp_, period_ = amp and max(1, amp) or 1, period or 0.3
-		return (-amp_ * sin(2 * pi / period_  * (s - 1) - asin(1 / amp_)))
+		return (-amp_ * sin(2 * pi / period_ * (s - 1) - asin(1 / amp_)))
 			* 2 ^ (10 * (s - 1))
 	end,
 }, {
@@ -212,6 +228,7 @@ Timer.tween = setmetatable({
 })
 
 -- Timer instancing
+---@return Timer
 function Timer.new() return setmetatable({ functions = {}, tween = Timer.tween }, Timer) end
 
 -- default instance
@@ -230,4 +247,5 @@ module.tween = setmetatable({}, {
 
 -- Like a timer but without the self arguments (module forwards to default instance)
 
+---@return Timer
 return setmetatable(module, { __call = function(_t) return Timer.new() end })

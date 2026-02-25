@@ -20,18 +20,28 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ]]
 
+---@alias ColorTuple {[1]: number, [2]: number, [3]: number}
+---@alias Bound {slope: number, intercept: number}
+
 local hsluv = {}
 
 local hexChars = "0123456789abcdef"
 
+---@param line Bound
+---@return number
 local function distance_line_from_origin(line)
 	return math.abs(line.intercept) / math.sqrt((line.slope ^ 2) + 1)
 end
 
+---@param theta number
+---@param line Bound
+---@return number
 local function length_of_ray_until_intersect(theta, line)
 	return line.intercept / (math.sin(theta) - line.slope * math.cos(theta))
 end
 
+---@param l number
+---@return Bound[]
 function hsluv.get_bounds(l)
 	local result = {}
 	local sub2
@@ -60,6 +70,8 @@ function hsluv.get_bounds(l)
 	return result
 end
 
+---@param l number
+---@return number
 function hsluv.max_safe_chroma_for_l(l)
 	local bounds = hsluv.get_bounds(l)
 	local min = 1.7976931348623157e+308
@@ -73,6 +85,9 @@ function hsluv.max_safe_chroma_for_l(l)
 	return min
 end
 
+---@param l number
+---@param h number
+---@return number
 function hsluv.max_safe_chroma_for_lh(l, h)
 	local hrad = h / 360 * math.pi * 2
 	local bounds = hsluv.get_bounds(l)
@@ -88,6 +103,9 @@ function hsluv.max_safe_chroma_for_lh(l, h)
 	return min
 end
 
+---@param a number[]
+---@param b number[]
+---@return number
 function hsluv.dot_product(a, b)
 	local sum = 0
 	for i = 1, 3 do
@@ -96,6 +114,8 @@ function hsluv.dot_product(a, b)
 	return sum
 end
 
+---@param c number
+---@return number
 function hsluv.from_linear(c)
 	if c <= 0.0031308 then
 		return 12.92 * c
@@ -104,6 +124,8 @@ function hsluv.from_linear(c)
 	end
 end
 
+---@param c number
+---@return number
 function hsluv.to_linear(c)
 	if c > 0.04045 then
 		return ((c + 0.055) / 1.055) ^ 2.4
@@ -112,6 +134,8 @@ function hsluv.to_linear(c)
 	end
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.xyz_to_rgb(tuple)
 	return {
 		hsluv.from_linear(hsluv.dot_product(hsluv.m[1], tuple)),
@@ -120,6 +144,8 @@ function hsluv.xyz_to_rgb(tuple)
 	}
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.rgb_to_xyz(tuple)
 	local rgbl = {
 		hsluv.to_linear(tuple[1]),
@@ -133,6 +159,8 @@ function hsluv.rgb_to_xyz(tuple)
 	}
 end
 
+---@param Y number
+---@return number
 function hsluv.y_to_l(Y)
 	if Y <= hsluv.epsilon then
 		return Y / hsluv.refY * hsluv.kappa
@@ -141,6 +169,8 @@ function hsluv.y_to_l(Y)
 	end
 end
 
+---@param L number
+---@return number
 function hsluv.l_to_y(L)
 	if L <= 8 then
 		return hsluv.refY * L / hsluv.kappa
@@ -149,6 +179,8 @@ function hsluv.l_to_y(L)
 	end
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.xyz_to_luv(tuple)
 	local X = tuple[1]
 	local Y = tuple[2]
@@ -169,6 +201,8 @@ function hsluv.xyz_to_luv(tuple)
 	return { L, 13 * L * (varU - hsluv.refU), 13 * L * (varV - hsluv.refV) }
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.luv_to_xyz(tuple)
 	local L = tuple[1]
 	local U = tuple[2]
@@ -183,6 +217,8 @@ function hsluv.luv_to_xyz(tuple)
 	return { X, Y, (9 * Y - 15 * varV * Y - varV * X) / (3 * varV) }
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.luv_to_lch(tuple)
 	local L = tuple[1]
 	local U = tuple[2]
@@ -200,6 +236,8 @@ function hsluv.luv_to_lch(tuple)
 	return { L, C, H }
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.lch_to_luv(tuple)
 	local L = tuple[1]
 	local C = tuple[2]
@@ -207,6 +245,8 @@ function hsluv.lch_to_luv(tuple)
 	return { L, math.cos(Hrad) * C, math.sin(Hrad) * C }
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.hsluv_to_lch(tuple)
 	local H = tuple[1]
 	local S = tuple[2]
@@ -220,6 +260,8 @@ function hsluv.hsluv_to_lch(tuple)
 	return { L, hsluv.max_safe_chroma_for_lh(L, H) / 100 * S, H }
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.lch_to_hsluv(tuple)
 	local L = tuple[1]
 	local C = tuple[2]
@@ -235,6 +277,8 @@ function hsluv.lch_to_hsluv(tuple)
 	return { H, C / max_chroma * 100, L }
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.hpluv_to_lch(tuple)
 	local H = tuple[1]
 	local S = tuple[2]
@@ -248,6 +292,8 @@ function hsluv.hpluv_to_lch(tuple)
 	return { L, hsluv.max_safe_chroma_for_l(L) / 100 * S, H }
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.lch_to_hpluv(tuple)
 	local L = tuple[1]
 	local C = tuple[2]
@@ -261,6 +307,8 @@ function hsluv.lch_to_hpluv(tuple)
 	return { H, C / hsluv.max_safe_chroma_for_l(L) * 100, L }
 end
 
+---@param tuple ColorTuple
+---@return string
 function hsluv.rgb_to_hex(tuple)
 	local h = "#"
 	for i = 1, 3 do
@@ -274,6 +322,8 @@ function hsluv.rgb_to_hex(tuple)
 	return h
 end
 
+---@param hex string
+---@return ColorTuple
 function hsluv.hex_to_rgb(hex)
 	hex = string.lower(hex)
 	local ret = {}
@@ -287,54 +337,74 @@ function hsluv.hex_to_rgb(hex)
 	return ret
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.lch_to_rgb(tuple)
 	return hsluv.xyz_to_rgb(hsluv.luv_to_xyz(hsluv.lch_to_luv(tuple)))
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.rgb_to_lch(tuple)
 	return hsluv.luv_to_lch(hsluv.xyz_to_luv(hsluv.rgb_to_xyz(tuple)))
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.hsluv_to_rgb(tuple)
 	return hsluv.lch_to_rgb(hsluv.hsluv_to_lch(tuple))
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.rgb_to_hsluv(tuple)
 	return hsluv.lch_to_hsluv(hsluv.rgb_to_lch(tuple))
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.hpluv_to_rgb(tuple)
 	return hsluv.lch_to_rgb(hsluv.hpluv_to_lch(tuple))
 end
 
+---@param tuple ColorTuple
+---@return ColorTuple
 function hsluv.rgb_to_hpluv(tuple)
 	return hsluv.lch_to_hpluv(hsluv.rgb_to_lch(tuple))
 end
 
+---@param tuple ColorTuple
+---@return string
 function hsluv.hsluv_to_hex(tuple)
 	return hsluv.rgb_to_hex(hsluv.hsluv_to_rgb(tuple))
 end
 
+---@param tuple ColorTuple
+---@return string
 function hsluv.hpluv_to_hex(tuple)
 	return hsluv.rgb_to_hex(hsluv.hpluv_to_rgb(tuple))
 end
 
+---@param s string
+---@return ColorTuple
 function hsluv.hex_to_hsluv(s)
 	return hsluv.rgb_to_hsluv(hsluv.hex_to_rgb(s))
 end
 
+---@param s string
+---@return ColorTuple
 function hsluv.hex_to_hpluv(s)
 	return hsluv.rgb_to_hpluv(hsluv.hex_to_rgb(s))
 end
 
 hsluv.m = {
 	{ 3.240969941904521, -1.537383177570093, -0.498610760293 },
-	{ -0.96924363628087, 1.87596750150772, 0.041555057407175 },
-	{ 0.055630079696993, -0.20397695888897, 1.056971514242878 },
+	{ -0.96924363628087, 1.87596750150772,   0.041555057407175 },
+	{ 0.055630079696993, -0.20397695888897,  1.056971514242878 },
 }
 hsluv.minv = {
-	{ 0.41239079926595, 0.35758433938387, 0.18048078840183 },
-	{ 0.21263900587151, 0.71516867876775, 0.072192315360733 },
+	{ 0.41239079926595,  0.35758433938387, 0.18048078840183 },
+	{ 0.21263900587151,  0.71516867876775, 0.072192315360733 },
 	{ 0.019330818715591, 0.11919477979462, 0.95053215224966 },
 }
 hsluv.refY = 1.0

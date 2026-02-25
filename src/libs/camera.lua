@@ -67,6 +67,12 @@ function camera.smooth.damped(stiffness)
 	end
 end
 
+---@param x number?
+---@param y number?
+---@param zoom number?
+---@param rot number?
+---@param smoother function?
+---@return Camera
 local function new(x, y, zoom, rot, smoother)
 	x, y = x or WIDTH / 2, y or HEIGHT / 2
 	zoom = zoom or 1
@@ -75,38 +81,58 @@ local function new(x, y, zoom, rot, smoother)
 	return setmetatable({ x = x, y = y, scale = zoom, rot = rot, smoother = smoother }, camera)
 end
 
+---@param x number
+---@param y number
+---@return Camera
 function camera:lookAt(x, y)
 	self.x, self.y = x, y
 	return self
 end
 
+---@param dx number
+---@param dy number
+---@return Camera
 function camera:move(dx, dy)
 	self.x, self.y = self.x + dx, self.y + dy
 	return self
 end
 
+---@return number, number
 function camera:position() return self.x, self.y end
 
+---@param phi number
+---@return Camera
 function camera:rotate(phi)
 	self.rot = self.rot + phi
 	return self
 end
 
+---@param phi number
+---@return Camera
 function camera:rotateTo(phi)
 	self.rot = phi
 	return self
 end
 
+---@param mul number
+---@return Camera
 function camera:zoom(mul)
 	self.scale = self.scale * mul
 	return self
 end
 
+---@param zoom number
+---@return Camera
 function camera:zoomTo(zoom)
 	self.scale = zoom
 	return self
 end
 
+---@param x number?
+---@param y number?
+---@param w number?
+---@param h number?
+---@param noclip boolean?
 function camera:attach(x, y, w, h, noclip)
 	x, y = x or 0, y or 0
 	w, h = w or WIDTH, h or HEIGHT
@@ -128,6 +154,7 @@ function camera:detach()
 	love.graphics.setScissor(self._sx, self._sy, self._sw, self._sh)
 end
 
+---@param ... any
 function camera:draw(...)
 	local x, y, w, h, noclip, func
 	local nargs = select("#", ...)
@@ -147,6 +174,13 @@ function camera:draw(...)
 end
 
 -- world coordinates to camera coordinates
+---@param x number
+---@param y number
+---@param ox number?
+---@param oy number?
+---@param w number?
+---@param h number?
+---@return number, number
 function camera:cameraCoords(x, y, ox, oy, w, h)
 	ox, oy = ox or 0, oy or 0
 	w, h = w or WIDTH, h or HEIGHT
@@ -159,6 +193,13 @@ function camera:cameraCoords(x, y, ox, oy, w, h)
 end
 
 -- camera coordinates to world coordinates
+---@param x number
+---@param y number
+---@param ox number?
+---@param oy number?
+---@param w number?
+---@param h number?
+---@return number, number
 function camera:worldCoords(x, y, ox, oy, w, h)
 	ox, oy = ox or 0, oy or 0
 	w, h = w or WIDTH, h or HEIGHT
@@ -170,28 +211,50 @@ function camera:worldCoords(x, y, ox, oy, w, h)
 	return x + self.x, y + self.y
 end
 
+---@param ox number?
+---@param oy number?
+---@param w number?
+---@param h number?
+---@return number, number
 function camera:mousePosition(ox, oy, w, h)
 	local mx, my = love.mouse.getPosition()
 	return self:worldCoords(mx, my, ox, oy, w, h)
 end
 
 -- camera scrolling utilities
+---@param x number
+---@param smoother function?
+---@return Camera
 function camera:lockX(x, smoother, ...)
 	local dx, _ = (smoother or self.smoother)(x - self.x, self.y, ...)
 	self.x = self.x + dx
 	return self
 end
 
+---@param y number
+---@param smoother function?
+---@return Camera
 function camera:lockY(y, smoother, ...)
 	local _, dy = (smoother or self.smoother)(self.x, y - self.y, ...)
 	self.y = self.y + dy
 	return self
 end
 
+---@param x number
+---@param y number
+---@param smoother function?
+---@return Camera
 function camera:lockPosition(x, y, smoother, ...)
 	return self:move((smoother or self.smoother)(x - self.x, y - self.y, ...))
 end
 
+---@param x number
+---@param y number
+---@param x_min number
+---@param x_max number
+---@param y_min number
+---@param y_max number
+---@param smoother function?
 function camera:lockWindow(x, y, x_min, x_max, y_min, y_max, smoother, ...)
 	-- figure out displacement in camera coordinates
 	local cx, cy = self:cameraCoords(x, y)

@@ -1,12 +1,17 @@
 .PHONY: run test typecheck
 
+LOVEC=lovec
+LUALS=lua-language-server
+
+-include .env
+
 all: run
 
 run:
-	lovec src/
+	$(LOVEC) src/
 
 test:
-	lovec src/ --test
+	$(LOVEC) src/ --test
 
 typecheck:
-	lua-language-server --check src/
+	$(LUALS) --check .

@@ -8,16 +8,16 @@ API.CustomSpawn {
 	indicator_duration = 3,
 }.Single {
 	enemy = Enemy.Simple,
-	pos = {-r, HEIGHT / 2},
+	pos = { -r, HEIGHT / 2 },
 	radius = r * 1.25,
-	speed = {s / 2, 0},
+	speed = { s / 2, 0 },
 }
 API.WaitUntilNoEnemies()
 
 -- A few balls from all directions
 API.Wait(0.25)
-API.Spawn.Single { enemy = Enemy.Simple, radius = r, pos = {WIDTH / 2, -r}, speed = {0, s}}
-API.Spawn.Single { enemy = Enemy.Simple, radius = r, pos = {WIDTH / 2, HEIGHT + r}, speed = {0, -s}}
+API.Spawn.Single { enemy = Enemy.Simple, radius = r, pos = { WIDTH / 2, -r }, speed = { 0, s } }
+API.Spawn.Single { enemy = Enemy.Simple, radius = r, pos = { WIDTH / 2, HEIGHT + r }, speed = { 0, -s } }
 API.Wait(1.25)
 API.Spawn.Circle { enemies = Enemy.Simple, enemy_radius = r, speed = s, amount = 4 }
 API.WaitUntilNoEnemies()
@@ -31,10 +31,10 @@ API.Spawn.VerticalLine {
 	radius = r,
 	placement = Placement.Distribute {
 		margin = 10,
-	}
+	},
 }
 API.Wait(2)
-for _, side in ipairs({Side.Top, Side.Bottom}) do
+for _, side in ipairs { Side.Top, Side.Bottom } do
 	API.Spawn.HorizontalLine {
 		enemies = Enemy.Simple,
 		side = side,
@@ -43,7 +43,7 @@ for _, side in ipairs({Side.Top, Side.Bottom}) do
 		radius = r,
 		placement = Placement.Distribute {
 			margin = 10,
-		}
+		},
 	}
 	API.Wait(.5)
 end
@@ -71,7 +71,7 @@ for i = 1, 5 do
 		placement = Placement.V {
 			margin = 10,
 			spacing = 10 + i * 10,
-		}
+		},
 	}
 	API.Wait(0.35)
 end
@@ -80,7 +80,7 @@ API.WaitUntilNoEnemies()
 
 -- Lines from all sides that close around you
 API.Wait(1)
-for _, side in ipairs({Side.Top, Side.Bottom}) do
+for _, side in ipairs { Side.Top, Side.Bottom } do
 	local sides = { Placement.FromLeft, Placement.FromRight }
 	for _, placement in ipairs(sides) do
 		API.Spawn.HorizontalLine {
@@ -92,12 +92,12 @@ for _, side in ipairs({Side.Top, Side.Bottom}) do
 			placement = placement {
 				margin = 10,
 				spacing = 20,
-			}
+			},
 		}
 	end
 end
 API.Wait(1.5)
-for _, side in ipairs({Side.Top, Side.Bottom}) do
+for _, side in ipairs { Side.Top, Side.Bottom } do
 	API.Spawn.HorizontalLine {
 		enemies = Enemy.Simple,
 		side = side,
@@ -106,11 +106,11 @@ for _, side in ipairs({Side.Top, Side.Bottom}) do
 		radius = r,
 		placement = Placement.Distribute {
 			margin = WIDTH * .3,
-		}
+		},
 	}
 end
 API.Wait(0.5)
-for _, side in ipairs({Side.Left, Side.Right}) do
+for _, side in ipairs { Side.Left, Side.Right } do
 	API.Spawn.VerticalLine {
 		enemies = Enemy.Simple,
 		side = side,
@@ -119,7 +119,7 @@ for _, side in ipairs({Side.Left, Side.Right}) do
 		radius = r,
 		placement = Placement.Distribute {
 			margin = WIDTH * .15,
-		}
+		},
 	}
 end
 API.WaitUntilNoEnemies()
@@ -130,8 +130,8 @@ API.CustomSpawn {
 }.Single {
 	enemy = Enemy.Double,
 	radius = r * 1.25,
-	pos = {WIDTH / 2, HEIGHT + r},
-	speed = {0, -s / 2},
+	pos = { WIDTH / 2, HEIGHT + r },
+	speed = { 0, -s / 2 },
 }
 
 API.Wait(3)
@@ -142,8 +142,8 @@ API.WaitUntilNoEnemies()
 API.Spawn.Multiple {
 	enemies = Enemy.Double,
 	amount = 45,
-	speed = {-s, 0},
-	pos = {WIDTH + r, HEIGHT / 2},
+	speed = { -s, 0 },
+	pos = { WIDTH + r, HEIGHT / 2 },
 	radius = r,
 }
 API.Spawn.VerticalLine {
@@ -152,7 +152,7 @@ API.Spawn.VerticalLine {
 	speed = s,
 	radius = r,
 	side = Side.Right,
-	placement = Placement.FromTop { margin = 10, spacing = 10 }
+	placement = Placement.FromTop { margin = 10, spacing = 10 },
 }
 API.Wait(3)
 API.Spawn.HorizontalLine {
@@ -161,7 +161,7 @@ API.Spawn.HorizontalLine {
 	side = Side.Top,
 	speed = s,
 	radius = r,
-	placement = Placement.Distribute { margin = 10 }
+	placement = Placement.Distribute { margin = 10 },
 }
 API.Wait(1.5)
 API.Spawn.VerticalLine {
@@ -170,7 +170,7 @@ API.Spawn.VerticalLine {
 	side = Side.Left,
 	speed = s,
 	radius = r,
-	placement = Placement.Distribute { margin = 10 }
+	placement = Placement.Distribute { margin = 10 },
 }
 API.WaitUntilNoEnemies()
 
@@ -182,14 +182,14 @@ for i = 1, 2 do
 	API.Spawn.Multiple {
 		enemies = Enemy.Double,
 		amount = 50,
-		speed = {0, s * 0.6},
-		pos = {i * WIDTH / 3, -r},
+		speed = { 0, s * 0.6 },
+		pos = { i * WIDTH / 3, -r },
 		radius = r,
 	}
 end
 API.Wait(3)
 local function from_top_and_bottom(enemies, base_amount, speed)
-	for i, side in ipairs({Side.Top, Side.Bottom}) do
+	for i, side in ipairs { Side.Top, Side.Bottom } do
 		API.Spawn.HorizontalLine {
 			enemies = enemies,
 			amount = base_amount + i,
@@ -202,7 +202,7 @@ local function from_top_and_bottom(enemies, base_amount, speed)
 end
 from_top_and_bottom(Enemy.Simple, 10)
 API.Wait(4)
-from_top_and_bottom({Enemy.Simple, Enemy.Double}, 14)
+from_top_and_bottom({ Enemy.Simple, Enemy.Double }, 14)
 API.Wait(4)
 from_top_and_bottom(Enemy.Double, 16, s * 0.9)
 API.WaitUntilNoEnemies()

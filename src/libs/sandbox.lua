@@ -105,6 +105,9 @@ end
 
 local string_rep = string.rep
 
+---@param f function?
+---@param key string?
+---@param quota integer|boolean?
 local function sethook(f, key, quota)
 	if type(debug) ~= "table" or type(debug.sethook) ~= "function" then return end
 	debug.sethook(f, key, quota)
@@ -120,6 +123,9 @@ end
 ---@field env table<string, any>?
 
 -- Public interface: sandbox.protect
+---@param code string
+---@param options_ ProtectOptions?
+---@return function
 function sandbox.protect(code, options_)
 	local options = options_ or {}
 
@@ -177,6 +183,9 @@ function sandbox.protect(code, options_)
 end
 
 -- Public interface: sandbox.run
+---@param code string
+---@param options ProtectOptions?
+---@param ... any
 function sandbox.run(code, options, ...) return sandbox.protect(code, options)(...) end
 
 -- make sandbox(f) == sandbox.protect(f)

@@ -137,7 +137,7 @@ function gs:draw()
 	background:draw()
 
 	local w, h = WIDTH, HEIGHT
-	local cx, cy = w/2, h/2
+	local cx, cy = w / 2, h / 2
 	if shake_amount > 0 then
 		cx, cy = cx + (math.random() * 2 - 1) * shake_amount, cy + (math.random() * 2 - 1)
 	end
@@ -152,7 +152,7 @@ function gs:draw()
 	player:draw()
 
 	cam:detach()
-	cam:lookAt(w/2, h/2)
+	cam:lookAt(w / 2, h / 2)
 
 	if paused then
 		love.graphics.setColor(0, 0, 0, 0.5)

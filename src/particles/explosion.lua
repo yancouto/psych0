@@ -17,9 +17,9 @@ module = {
 }
 ]]
 local LG        = love.graphics
-local particles = {x=24, y=19}
+local particles = { x = 24, y = 19 }
 
-local image1 = LG.newImage("lineGradient.png")
+local image1    = LG.newImage("lineGradient.png")
 image1:setFilter("linear", "linear")
 
 local ps = LG.newParticleSystem(image1, 33)
@@ -43,6 +43,6 @@ ps:setSpin(0, 0)
 ps:setSpinVariation(0)
 ps:setSpread(0.625)
 ps:setTangentialAcceleration(0, 0)
-table.insert(particles, {system=ps, kickStartSteps=0, kickStartDt=0, emitAtStart=33, blendMode="add", shader=nil, texturePath="lineGradient.png", texturePreset="lineGradient", shaderPath="", shaderFilename="", x=0, y=0})
+table.insert(particles, { system = ps, kickStartSteps = 0, kickStartDt = 0, emitAtStart = 33, blendMode = "add", shader = nil, texturePath = "lineGradient.png", texturePreset = "lineGradient", shaderPath = "", shaderFilename = "", x = 0, y = 0 })
 
 return particles

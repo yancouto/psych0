@@ -22,7 +22,7 @@ local function get_particle_image()
 			if dist < size / 2 - border then
 				alpha = 1
 			else
-				alpha = 1 - ((dist - size/2 + border) / border)
+				alpha = 1 - ((dist - size / 2 + border) / border)
 			end
 			alpha = math.max(0, math.min(1, alpha))
 

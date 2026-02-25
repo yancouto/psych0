@@ -36,7 +36,7 @@ function Background.draw(self)
 			local hue = (dist * 0.1 + self.time * 50) % 360
 			local radius = (math.sin(dist * 0.05 - self.time * 5) + 1) * cellSize * 0.4
 
-			local rgb = HSLuv.hsluv_to_rgb({ hue, 60, 10 })
+			local rgb = HSLuv.hsluv_to_rgb { hue, 60, 10 }
 			love.graphics.setColor(rgb[1], rgb[2], rgb[3])
 			love.graphics.circle("fill", x, y, radius)
 		end
