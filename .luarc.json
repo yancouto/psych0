@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/LuaLS/lua-language-server/master/meta/config.json",
+  "runtime": {
+    "version": "LuaJIT",
+    "path": ["?.lua", "?/init.lua"]
+  },
+  "workspace": {
+    "checkThirdParty": false,
+    "ignoreDir": [".build", ".git", ".luals"],
+    "library": [".luals/love2d/library"]
+  },
+  "diagnostics": {
+    "globals": ["love", "WIDTH", "HEIGHT", "API", "Vec2", "Enemy", "Side", "Placement"]
+  }
+}

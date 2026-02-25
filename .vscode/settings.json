@@ -1,6 +1,7 @@
 {
-	"luau-lsp.require.mode": "relativeToFile",
-	"luau-lsp.types.definitionFiles": ["globals.d.luau"],
-	"luau-lsp.platform.type": "standard",
-	"luau-lsp.sourcemap.enabled": false
+	"Lua.runtime.version": "Lua 5.1",
+	"Lua.workspace.library": [],
+	"Lua.workspace.checkThirdParty": false,
+	"Lua.diagnostics.globals": ["love", "WIDTH", "HEIGHT"],
+	"Lua.runtime.path": ["?.lua", "?/init.lua"]
 }

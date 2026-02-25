@@ -1,6 +1,0 @@
-{
-	"lintErrors": true,
-	"aliases": {
-		"packages": "luau_packages"
-	}
-}

@@ -4,23 +4,19 @@ Coming... one day.
 
 ## How to use
 
-We're using Love2D 11.5, but coding in Luau instead of Lua for the types and some other small improvements. To do that, we use Kaledis to transform Luau into Lua.
+We're using Love2D 11.5, coded in plain Lua with [LuaLS](https://github.com/LuaLS/lua-language-server) annotations for type checking. No build step is required — just run Love2D directly on the `src/` directory.
 
-To build, run `kaledis build` and it will create a `.build/final.love` file that can simply be run with Love2D. We're using a custom version of kaledis (https://github.com/yancouto/kaledis) to allow custom polyfill options (since we just care about the types, and there is a bug in the default polyfill).
-
-We use `luasty` to format the code.
-
-We use some HUMP libraries to help out, but we modified them so they have Luau types.
+To run: `lovec src/` (or `make run`)
 
 ## How to typecheck
 
-Install the Luau LSP in your IDE, add the `love.d.luau` as custom type definitions (this adds LOVE and all its functions).
-For the levels, instead add `level_script.d.luau` as custom type definitions.
+Install the [lua-language-server](https://github.com/LuaLS/lua-language-server) and run:
+`lua-language-server --check src/` (or `make typecheck`)
 
-To run in terminal, add `luau-lsp` to your PATH, and then run:
-`luau-lsp analyze --defs love.d.luau src/` to typecheck the main code, and
-`luau-lsp analyze --defs level_script.d.luau levels/` to typecheck the levels.
+The `.luarc.json` at the project root configures the workspace. For IDE support, install the LuaLS extension in VS Code.
+
+For love2d type definitions, install the [LuaCATS/love2d](https://github.com/LuaCATS/love2d) library and add it to `Lua.workspace.library` in `.vscode/settings.json`.
 
 ## How to test
 
-After using kaledis to build, run `lovec .build --test` to test.
+Run `lovec src/ --test` (or `make test`).

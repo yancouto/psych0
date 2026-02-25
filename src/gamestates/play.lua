@@ -1,0 +1,203 @@
+local Background = require "background"
+local Bullet = require "bullet"
+local Camera = require "libs/camera"
+local Enemy = require "enemy"
+local Explosion = require "explosion"
+local Gamestate = require "libs/gamestate"
+local Indicator = require "indicator"
+local Interpreter = require "interpreter/init"
+local ObjectList = require "object_list"
+local Player = require "player"
+local Ring = require "ring"
+local Timer = require "libs/timer"
+local Vec = require "libs/vector"
+
+local gs = {}
+
+local player = Player.new(0, 0)
+local cam = Camera(0, 0)
+local timer = Timer()
+local background = Background.new()
+
+local bullets = ObjectList.new()
+local enemies = ObjectList.new()
+local indicators = ObjectList.new()
+local rings = ObjectList.new()
+
+---@type any
+local level_instance = nil
+local shake_amount = 0
+
+local paused = false
+
+local keys_tracked = {
+	w = false,
+	a = false,
+	s = false,
+	d = false,
+	lshift = false,
+	rshift = false,
+}
+
+local function spawn_enemy(params)
+	local pos = Vec(params.pos[1], params.pos[2])
+	local vel = Vec(params.vel[1], params.vel[2]) * 50
+	local duration = params.indicatorDuration or 0
+	if duration > 0 then
+		timer:after(duration, function() enemies:add(Enemy.new(pos, vel, params.radius)) end)
+	else
+		enemies:add(Enemy.new(pos, vel, params.radius))
+	end
+end
+
+local function spawn_indicator(params)
+	local pos = Vec(params.pos[1], params.pos[2])
+	local vel = Vec(params.vel[1], params.vel[2])
+	local duration = params.duration
+	indicators:add(Indicator.new(pos, vel, duration, params.radius))
+end
+
+function gs:enter()
+	local w, h = WIDTH, HEIGHT
+	player = Player.new(w / 2, h / 2)
+	cam:lookAt(w / 2, h / 2)
+	timer:clear()
+	bullets = ObjectList.new()
+	enemies = ObjectList.new()
+	indicators = ObjectList.new()
+	rings = ObjectList.new()
+	background = Background.new()
+	Explosion.init()
+
+	local levelCode = love.filesystem.read("string", "levels/level1.lua") --[[@as string?]]
+
+	if levelCode then
+		level_instance = Interpreter.runLevel(levelCode, {
+			spawnCallback = spawn_enemy,
+			spawnIndicatorCallback = spawn_indicator,
+			getEnemyCount = function() return #enemies.all + #indicators.all end,
+		})
+	end
+end
+
+function gs:update(dt)
+	if paused then return end
+
+	local time_scale = 1
+	if player.is_focusing then time_scale = 0.2 end
+
+	local scaled_dt = dt * time_scale
+
+	background:update(scaled_dt)
+	timer:update(scaled_dt)
+	player:update(dt, keys_tracked, function(r) rings:add(r) end)
+
+	if shake_amount > 0 then
+		shake_amount = math.max(0, shake_amount - dt * 30)
+	end
+
+	if not player.dead then
+		if level_instance then level_instance:update(scaled_dt) end
+
+		bullets:update(scaled_dt)
+		enemies:update(scaled_dt)
+		indicators:update(scaled_dt)
+		rings:update(scaled_dt)
+		Explosion.update(scaled_dt)
+
+		local w, h = WIDTH, HEIGHT
+		bullets:remove_offscreen(w, h)
+		enemies:remove_offscreen(w, h)
+
+		enemies:check_collision(bullets, function(e, b)
+			local r = e.radius + b.radius
+			return e.pos:dist2(b.pos) < r * r
+		end, function(e, b)
+			if not e.to_remove and not b.to_remove then
+				e.to_remove = true
+				b.to_remove = true
+				Explosion.spawn(e.pos:clone(), e.radius, e.hue)
+				rings:add(Ring.new(e.pos:clone(), e.radius, 6, e.hue, 250))
+				shake_amount = math.min(10, shake_amount + 5)
+			end
+		end)
+
+		-- Collision with player
+		for _, e in ipairs(enemies.all) do
+			local r = e.radius + player.radius
+			if e.pos:dist2(player.pos) < r * r then
+				player.dead = true
+				break
+			end
+		end
+	end
+end
+
+function gs:draw()
+	background:draw()
+
+	local w, h = WIDTH, HEIGHT
+	local cx, cy = w/2, h/2
+	if shake_amount > 0 then
+		cx, cy = cx + (math.random() * 2 - 1) * shake_amount, cy + (math.random() * 2 - 1)
+	end
+	cam:lookAt(cx, cy) -- Fix if we're moving the camera for some other reason
+	cam:attach()
+
+	indicators:draw()
+	rings:draw()
+	Explosion.draw()
+	bullets:draw()
+	enemies:draw()
+	player:draw()
+
+	cam:detach()
+	cam:lookAt(w/2, h/2)
+
+	if paused then
+		love.graphics.setColor(0, 0, 0, 0.5)
+		love.graphics.rectangle("fill", 0, 0, w, h)
+		love.graphics.setColor(1, 1, 1)
+		love.graphics.printf("PAUSED", 0, h / 2 - 10, w, "center")
+	end
+
+	if player.dead then
+		love.graphics.setColor(1, 1, 1)
+		love.graphics.printf("GAME OVER\nPress 'R' to Restart", 0, h / 2 - 20, w, "center")
+	end
+end
+
+function gs:mousepressed(x, y, button)
+	if player.dead then return end
+	if button == 1 then
+		local mx, my = cam:worldCoords(x, y)
+		local target = Vec(mx, my)
+		local dir = (target - player.pos):normalizeInplace()
+		-- Shoot 3 tiny balls in a small spread
+		for i = -1, 1 do
+			local angle = i * 0.1
+			local bdir = dir:rotated(angle)
+			bullets:add(Bullet.new(player.pos:clone(), bdir * 600))
+		end
+	end
+end
+
+function gs:keypressed(k)
+	if k == "escape" then
+		paused = not paused
+	end
+
+	if paused then return end
+
+	if keys_tracked[k] ~= nil then keys_tracked[k] = true end
+	if k == "r" and player.dead then
+		self:enter()
+	end
+end
+
+function gs:keyreleased(k)
+	if k == "escape" then return end
+	if keys_tracked[k] ~= nil then keys_tracked[k] = false end
+end
+
+return gs

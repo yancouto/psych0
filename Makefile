@@ -1,15 +1,12 @@
-.PHONY: run test
+.PHONY: run test typecheck
 
 all: run
 
 run:
-	kaledis build
-	lovec .build/
+	lovec src/
 
 test:
-	kaledis build
-	lovec .build/ --test
+	lovec src/ --test
 
 typecheck:
-	luau-lsp analyze --defs love.d.luau src/
-	luau-lsp analyze --defs level_script.d.luau levels/
+	lua-language-server --check src/
