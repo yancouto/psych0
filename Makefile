@@ -14,4 +14,5 @@ test:
 	$(LOVEC) src/ --test
 
 typecheck:
-	$(LUALS) --check .
+	$(LUALS) --check src
+	$(LUALS) --check levels

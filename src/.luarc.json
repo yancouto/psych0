@@ -1,23 +1,19 @@
 {
-  "$schema": "https://raw.githubusercontent.com/LuaLS/lua-language-server/master/meta/config.json",
+  "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
   "runtime": {
     "version": "LuaJIT",
     "path": ["?.lua", "?/init.lua"]
   },
   "workspace": {
     "checkThirdParty": false,
-    "ignoreDir": [".build", ".git", ".luals"],
-    "library": [".luals/love2d/library"]
+    "ignoreDir": [".git", ".luals"],
+    "library": ["../.luals/love2d/library"]
   },
   "diagnostics": {
     "groupSeverity": {
       "strict": "Warning",
       "strong": "Warning"
     },
-    "neededFileStatus": {
-      "strict": "Any",
-      "strong": "Any"
-    }
   },
   "type": {
     "weakNilCheck": false,

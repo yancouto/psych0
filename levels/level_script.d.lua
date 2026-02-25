@@ -119,3 +119,9 @@ Side = nil
 ---@type PlacementModule
 Placement = nil
 
+-- @type number
+WIDTH = nil
+
+
+-- @type number
+HEIGHT = nil
